@@ -1,0 +1,830 @@
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --azul:#5170FF;
+  --navy:#0A0F2E;
+  --navy-soft:#161B3B;
+  --violeta:#C8ADFF;
+  --coral:#EB9292;
+  --paper:#F4F4F8;
+  --blanco:#FFFFFF;
+  --texto-oscuro:#0A0F2E;
+  --texto-medio:#3a3f5c;
+  --font-display:'Bricolage Grotesque',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+  --r:16px;
+  --r-lg:24px;
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--paper);
+  color:var(--texto-oscuro);
+  font-family:var(--font-display);
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px;
+  background:rgba(244,244,248,0.92);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(81,112,255,0.12);
+}
+.logo{
+  font-family:var(--font-display);font-weight:800;font-size:22px;
+  color:var(--navy);letter-spacing:-1px;
+}
+.logo span{color:var(--azul)}
+.nav-cta{
+  background:var(--azul);color:var(--blanco);
+  font-family:var(--font-display);font-weight:700;font-size:14px;
+  padding:10px 22px;border-radius:100px;border:none;cursor:pointer;
+  text-decoration:none;
+}
+
+/* HERO — fondo oscuro sólo en hero para contraste */
+.hero{
+  background:var(--navy);
+  min-height:100svh;
+  display:flex;align-items:center;justify-content:center;
+  padding:100px 20px 60px;
+  text-align:center;
+  position:relative;overflow:hidden;
+}
+.hero-glow{
+  position:absolute;
+  width:400px;height:400px;border-radius:50%;
+  background:rgba(81,112,255,0.18);
+  top:-80px;left:50%;transform:translateX(-50%);
+  filter:blur(80px);pointer-events:none;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(81,112,255,0.15);border:1px solid rgba(81,112,255,0.35);
+  color:var(--violeta);font-family:var(--font-mono);font-size:11px;font-weight:500;
+  padding:7px 16px;border-radius:100px;margin-bottom:28px;
+  letter-spacing:0.06em;
+}
+.badge-dot{
+  width:6px;height:6px;background:var(--azul);border-radius:50%;
+  animation:pulse 2s infinite;flex-shrink:0;
+}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.75)}}
+.hero h1{
+  color:var(--blanco);
+  font-family:var(--font-display);font-weight:800;
+  font-size:clamp(38px,10vw,80px);
+  line-height:1.0;letter-spacing:-2px;margin-bottom:20px;
+}
+.hero h1 .accent{color:var(--azul)}
+.hero-sub{
+  font-size:clamp(16px,4vw,20px);
+  color:var(--paper);
+  max-width:560px;margin:0 auto 40px;
+  line-height:1.6;font-weight:400;
+  opacity:0.85;
+}
+.hero-actions{
+  display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:48px;
+}
+.btn-primary{
+  background:var(--azul);color:var(--blanco);
+  font-family:var(--font-display);font-weight:700;font-size:16px;
+  padding:15px 32px;border-radius:100px;border:none;cursor:pointer;
+  text-decoration:none;display:inline-block;
+  transition:transform 0.2s,opacity 0.2s;
+}
+.btn-primary:hover{transform:translateY(-2px);opacity:0.9}
+.btn-ghost{
+  background:transparent;color:var(--paper);
+  font-family:var(--font-display);font-weight:500;font-size:16px;
+  padding:15px 32px;border-radius:100px;
+  border:1px solid rgba(244,244,248,0.3);
+  text-decoration:none;display:inline-block;
+  transition:border-color 0.2s;
+}
+.btn-ghost:hover{border-color:rgba(244,244,248,0.7)}
+
+/* CHAT MOCKUP */
+.chat-wrap{width:100%;max-width:400px;margin:0 auto}
+.chat-preview{
+  background:rgba(22,27,59,0.9);
+  border:1px solid rgba(81,112,255,0.25);
+  border-radius:var(--r-lg);padding:20px;text-align:left;
+}
+.chat-header{
+  display:flex;align-items:center;gap:10px;
+  padding-bottom:14px;
+  border-bottom:1px solid rgba(255,255,255,0.07);
+  margin-bottom:14px;
+}
+/* ISOLOGO como avatar */
+.chat-avatar{
+  width:38px;height:38px;border-radius:50%;
+  background:var(--blanco);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;overflow:hidden;
+}
+.isologo-svg{width:24px;height:24px}
+.chat-name{font-weight:700;font-size:13px;color:var(--blanco)}
+.chat-status{font-size:10px;color:rgba(255,255,255,0.45);font-family:var(--font-mono)}
+.chat-status .online{color:#4ade80}
+.msg{margin-bottom:8px;display:flex;flex-direction:column}
+.msg.user{align-items:flex-end}
+.msg.bot{align-items:flex-start}
+.bubble{
+  max-width:88%;padding:9px 13px;border-radius:14px;
+  font-size:13px;line-height:1.5;font-weight:400;
+}
+.msg.user .bubble{
+  background:var(--azul);color:var(--blanco);
+  border-bottom-right-radius:3px;
+}
+.msg.bot .bubble{
+  background:rgba(244,244,248,0.1);color:var(--paper);
+  border-bottom-left-radius:3px;
+}
+.msg-time{
+  font-size:9px;color:rgba(255,255,255,0.3);
+  font-family:var(--font-mono);margin-top:2px;padding:0 3px;
+}
+
+/* SECCIONES GENERALES */
+section{padding:72px 20px}
+.section-label{
+  font-family:var(--font-mono);font-size:10px;font-weight:500;
+  letter-spacing:0.18em;color:var(--azul);text-transform:uppercase;
+  margin-bottom:12px;display:block;
+}
+.section-title{
+  font-family:var(--font-display);font-weight:800;
+  font-size:clamp(28px,7vw,48px);letter-spacing:-1.5px;line-height:1.1;
+  margin-bottom:16px;color:var(--navy);
+}
+.section-sub{
+  font-size:clamp(15px,3.5vw,18px);
+  color:var(--texto-medio);
+  line-height:1.65;font-weight:400;
+  max-width:540px;
+}
+
+/* COMO FUNCIONA */
+.como{background:var(--blanco);text-align:center}
+.steps-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;margin-top:48px;
+  max-width:600px;margin-left:auto;margin-right:auto;
+}
+.step-card{
+  background:var(--paper);
+  border:1.5px solid rgba(81,112,255,0.15);
+  border-radius:var(--r-lg);
+  padding:28px 24px;
+  text-align:left;
+  position:relative;
+  transition:border-color 0.25s,transform 0.25s;
+}
+.step-card:hover{border-color:rgba(81,112,255,0.45);transform:translateY(-3px)}
+.step-num-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:36px;height:36px;border-radius:10px;
+  background:var(--azul);color:var(--blanco);
+  font-family:var(--font-mono);font-weight:700;font-size:14px;
+  margin-bottom:16px;flex-shrink:0;
+}
+.step-card h3{
+  font-weight:700;font-size:17px;margin-bottom:8px;
+  color:var(--navy);letter-spacing:-0.3px;
+}
+.step-card p{
+  font-size:14px;color:var(--texto-medio);line-height:1.65;font-weight:400;
+}
+.step-icon-row{
+  display:flex;align-items:center;gap:12px;margin-bottom:16px;
+}
+.step-emoji{font-size:28px}
+
+/* FEATURES */
+.features{background:var(--paper);text-align:center}
+.feat-grid{
+  display:grid;grid-template-columns:1fr;
+  gap:12px;margin-top:48px;
+  max-width:700px;margin-left:auto;margin-right:auto;
+}
+.feat-card{
+  background:var(--blanco);
+  border:1.5px solid rgba(81,112,255,0.12);
+  border-radius:var(--r-lg);padding:24px;
+  text-align:left;
+  transition:border-color 0.25s,transform 0.25s;
+}
+.feat-card:hover{border-color:rgba(81,112,255,0.4);transform:translateY(-3px)}
+.feat-icon-box{
+  width:44px;height:44px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;margin-bottom:14px;
+}
+.feat-card h3{
+  font-weight:700;font-size:16px;letter-spacing:-0.3px;
+  margin-bottom:8px;color:var(--navy);
+}
+.feat-card p{
+  font-size:14px;color:var(--texto-medio);line-height:1.65;font-weight:400;
+}
+.tag-pill{
+  display:inline-block;margin-top:12px;
+  background:rgba(81,112,255,0.1);border:1px solid rgba(81,112,255,0.2);
+  color:var(--azul);font-family:var(--font-mono);font-size:10px;
+  padding:4px 11px;border-radius:100px;letter-spacing:0.04em;font-weight:500;
+}
+
+/* MÉTRICAS */
+.metrics{background:var(--navy);text-align:center}
+.metrics .section-title{color:var(--blanco)}
+.metrics .section-sub{color:var(--paper);opacity:0.7;margin:0 auto}
+.metrics-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);
+  gap:10px;margin-top:48px;
+  max-width:600px;margin-left:auto;margin-right:auto;
+}
+.metric-card{
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(81,112,255,0.2);
+  border-radius:var(--r-lg);padding:32px 20px;
+}
+.metric-num{
+  font-family:var(--font-display);font-weight:800;
+  font-size:clamp(40px,10vw,64px);letter-spacing:-3px;
+  color:var(--azul);line-height:1;margin-bottom:10px;display:block;
+}
+.metric-label{
+  font-size:13px;color:var(--paper);opacity:0.65;font-weight:400;line-height:1.4;
+}
+
+/* INTEGRACIONES */
+.integ{background:var(--blanco);text-align:center}
+.integ-chips{
+  display:flex;flex-direction:column;gap:10px;
+  margin-top:40px;max-width:400px;margin-left:auto;margin-right:auto;
+}
+.chip{
+  display:flex;align-items:center;gap:12px;
+  background:var(--paper);
+  border:1.5px solid rgba(81,112,255,0.15);
+  border-radius:100px;padding:14px 22px;
+  font-weight:600;font-size:15px;color:var(--navy);
+  transition:border-color 0.25s;
+}
+.chip:hover{border-color:rgba(81,112,255,0.5)}
+.chip-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+
+/* CTA FINAL */
+.cta-final{
+  background:var(--azul);
+  padding:88px 20px;text-align:center;
+  position:relative;overflow:hidden;
+}
+.cta-final::before{
+  content:'';position:absolute;
+  width:500px;height:500px;border-radius:50%;
+  background:rgba(255,255,255,0.07);
+  top:-200px;left:-100px;pointer-events:none;
+}
+.cta-final::after{
+  content:'';position:absolute;
+  width:300px;height:300px;border-radius:50%;
+  background:rgba(255,255,255,0.05);
+  bottom:-100px;right:-60px;pointer-events:none;
+}
+.cta-final .section-title{
+  color:var(--blanco);position:relative;z-index:1;
+  margin-bottom:14px;
+}
+.cta-final .section-sub{
+  color:var(--blanco);opacity:0.85;
+  margin:0 auto 40px;position:relative;z-index:1;
+}
+.btn-white{
+  background:var(--blanco);color:var(--azul);
+  font-family:var(--font-display);font-weight:700;font-size:16px;
+  padding:16px 36px;border-radius:100px;border:none;cursor:pointer;
+  text-decoration:none;display:inline-block;
+  transition:transform 0.2s,opacity 0.2s;position:relative;z-index:1;
+}
+.btn-white:hover{transform:translateY(-2px);opacity:0.95}
+
+/* CASO DE ÉXITO */
+.caso{background:var(--paper);text-align:center;padding:72px 20px}
+.caso-card{
+  max-width:680px;margin:0 auto;
+  background:var(--blanco);
+  border:1.5px solid rgba(81,112,255,0.15);
+  border-radius:var(--r-lg);
+  padding:36px 28px;
+  text-align:left;
+}
+.caso-header{
+  display:flex;align-items:center;gap:16px;
+  margin-bottom:28px;padding-bottom:24px;
+  border-bottom:1px solid rgba(81,112,255,0.08);
+}
+.caso-logo-box{
+  width:52px;height:52px;border-radius:14px;
+  background:var(--navy);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.caso-logo-inicial{
+  font-weight:800;font-size:16px;color:var(--azul);letter-spacing:-0.5px;
+}
+.caso-nombre{font-weight:800;font-size:18px;color:var(--navy);letter-spacing:-0.5px}
+.caso-lugar{font-size:13px;color:var(--texto-medio);margin-top:3px;font-weight:400}
+.caso-metrics{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:12px;margin-bottom:28px;
+}
+.caso-metric{
+  background:var(--paper);border-radius:14px;
+  padding:18px 14px;text-align:center;
+}
+.caso-num{
+  display:block;font-weight:800;
+  font-size:clamp(26px,5vw,36px);
+  letter-spacing:-1.5px;color:var(--azul);
+  line-height:1;margin-bottom:6px;
+}
+.caso-label{
+  font-size:11px;color:var(--texto-medio);
+  line-height:1.5;font-weight:400;
+}
+.caso-quote{
+  font-size:15px;line-height:1.75;
+  color:var(--texto-oscuro);font-weight:500;
+  border-left:3px solid var(--azul);
+  padding-left:18px;margin-bottom:24px;
+}
+.caso-autor{
+  display:flex;align-items:center;gap:12px;
+}
+.caso-autor-avatar{
+  width:40px;height:40px;border-radius:50%;
+  background:rgba(81,112,255,0.12);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:13px;color:var(--azul);flex-shrink:0;
+}
+.caso-autor-nombre{font-weight:700;font-size:14px;color:var(--navy)}
+.caso-autor-rol{font-size:12px;color:var(--texto-medio);font-weight:400;margin-top:2px}
+
+@media(max-width:420px){
+  .caso-metrics{grid-template-columns:1fr}
+  .caso-card{padding:24px 18px}
+}
+.faq{background:var(--blanco)}
+.faq-list{max-width:680px;margin:48px auto 0;display:flex;flex-direction:column;gap:10px}
+.faq-item{
+  background:var(--paper);
+  border:1.5px solid rgba(81,112,255,0.12);
+  border-radius:var(--r-lg);overflow:hidden;
+  transition:border-color 0.25s;
+}
+.faq-item.open{border-color:rgba(81,112,255,0.4)}
+.faq-q{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;padding:20px 22px;cursor:pointer;
+  font-weight:700;font-size:15px;color:var(--navy);
+  user-select:none;-webkit-user-select:none;
+}
+.faq-q:hover{color:var(--azul)}
+.faq-icon{
+  width:28px;height:28px;border-radius:8px;
+  background:rgba(81,112,255,0.1);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:background 0.2s,transform 0.3s;
+  font-size:14px;font-weight:700;color:var(--azul);
+}
+.faq-item.open .faq-icon{background:var(--azul);color:var(--blanco);transform:rotate(45deg)}
+.faq-a{
+  max-height:0;overflow:hidden;
+  transition:max-height 0.35s ease,padding 0.25s ease;
+  padding:0 22px;
+  font-size:14px;color:var(--texto-medio);line-height:1.75;font-weight:400;
+}
+.faq-item.open .faq-a{max-height:200px;padding:0 22px 20px}
+
+/* FOOTER */
+footer{
+  background:var(--navy);
+  padding:48px 20px 32px;
+  border-top:1px solid rgba(81,112,255,0.1);
+}
+.footer-top{
+  display:flex;flex-direction:column;align-items:flex-start;
+  gap:32px;max-width:960px;margin:0 auto;
+  padding-bottom:32px;
+  border-bottom:1px solid rgba(255,255,255,0.07);
+}
+.footer-brand{}
+.footer-logo{font-weight:800;font-size:20px;letter-spacing:-0.5px;color:var(--blanco);margin-bottom:8px}
+.footer-logo span{color:var(--azul)}
+.footer-tagline{font-size:13px;color:var(--paper);opacity:0.5;font-weight:400;line-height:1.5}
+.footer-contact{display:flex;flex-direction:column;gap:12px}
+.footer-contact-title{font-family:var(--font-mono);font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--azul);margin-bottom:4px}
+.footer-link{
+  display:flex;align-items:center;gap:10px;
+  color:var(--paper);font-size:14px;font-weight:500;
+  text-decoration:none;opacity:0.8;transition:opacity 0.2s;
+}
+.footer-link:hover{opacity:1}
+.footer-link-icon{
+  width:36px;height:36px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.footer-bottom{
+  max-width:960px;margin:24px auto 0;
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;
+}
+.footer-copy{font-size:11px;color:var(--paper);opacity:0.3;font-family:var(--font-mono)}
+.footer-legal{display:flex;gap:20px}
+.footer-legal a{font-size:11px;color:var(--paper);opacity:0.3;font-family:var(--font-mono);text-decoration:none;transition:opacity 0.2s}
+.footer-legal a:hover{opacity:0.7}
+
+/* BURBUJAS FLOTANTES */
+.float-buttons{
+  position:fixed;bottom:24px;right:20px;
+  display:flex;flex-direction:column;gap:10px;z-index:200;
+}
+.float-btn{
+  width:52px;height:52px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  text-decoration:none;box-shadow:0 4px 16px rgba(0,0,0,0.2);
+  transition:transform 0.2s,box-shadow 0.2s;
+}
+.float-btn:hover{transform:translateY(-3px) scale(1.07);box-shadow:0 8px 24px rgba(0,0,0,0.25)}
+.float-wsp{background:#25D366}
+.float-ig{background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)}
+.float-btn svg{width:26px;height:26px;fill:var(--blanco)}
+
+/* FADE IN */
+.fade-in{opacity:0;transform:translateY(20px);transition:opacity 0.65s ease,transform 0.65s ease}
+.fade-in.visible{opacity:1;transform:translateY(0)}
+
+/* TABLET+ */
+@media(min-width:600px){
+  nav{padding:16px 36px}
+  section{padding:88px 36px}
+  .hero{padding:120px 36px 72px}
+  .steps-grid{grid-template-columns:1fr 1fr}
+  .feat-grid{grid-template-columns:1fr 1fr}
+  .integ-chips{flex-direction:row;flex-wrap:wrap;justify-content:center;max-width:none}
+  .footer-top{flex-direction:row;justify-content:space-between;align-items:flex-start}
+}
+@media(min-width:900px){
+  nav{padding:18px 56px}
+  section{padding:100px 56px}
+  .hero{padding:130px 56px 80px}
+  .feat-grid{grid-template-columns:repeat(3,1fr)}
+  .steps-grid{grid-template-columns:repeat(2,1fr);max-width:800px}
+  .metrics-grid{grid-template-columns:repeat(4,1fr)}
+  footer{padding:48px 56px 32px}
+}
+
+</style>
+
+
+<!-- NAV -->
+<nav>
+  <div class="logo">airis<span>.</span></div>
+  <a href="#cta" class="nav-cta">Pedir demo</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div style="position:relative;z-index:1;width:100%;max-width:860px">
+    <div class="hero-badge fade-in">
+      <span class="badge-dot"></span>
+      Gastronomía inteligente
+    </div>
+    <h1 class="fade-in" style="transition-delay:0.08s">
+      Tu restaurante<br>atendiendo solo,<br><span class="accent">las 24 horas.</span>
+    </h1>
+    <p class="hero-sub fade-in" style="transition-delay:0.16s">
+      Un agente conversacional que reserva, confirma, recuerda y consigue reseñas. Conectado a WhatsApp e Instagram.
+    </p>
+    <div class="hero-actions fade-in" style="transition-delay:0.24s">
+      <a href="#cta" class="btn-primary">Quiero una demo →</a>
+      <a href="#como" class="btn-ghost">Ver cómo funciona</a>
+    </div>
+
+    <!-- CHAT MOCKUP con isologo SVG -->
+    <div class="chat-wrap fade-in" style="transition-delay:0.36s">
+      <div class="chat-preview">
+        <div class="chat-header">
+          <div class="chat-avatar">
+            <!-- ISOLOGO AIRIS: semicírculo azul eléctrico -->
+            <svg class="isologo-svg" viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+              <path d="M5,55 A45,45,0,0,1,95,55 Z" fill="#5170FF"/>
+            </svg>
+          </div>
+          <div>
+            <div class="chat-name">Agente AIRIS</div>
+            <div class="chat-status"><span class="online">●</span> Activo ahora mismo</div>
+          </div>
+        </div>
+        <div class="msg user">
+          <div class="bubble">Hola, quisiera reservar para 4 personas el viernes a las 21h</div>
+          <span class="msg-time">21:47</span>
+        </div>
+        <div class="msg bot">
+          <div class="bubble">¡Hola! Tenemos disponibilidad el viernes 16 a las 21:00 para 4 personas. ¿A nombre de quién hago la reserva?</div>
+          <span class="msg-time">21:47</span>
+        </div>
+        <div class="msg user">
+          <div class="bubble">Lucas Fernández</div>
+          <span class="msg-time">21:48</span>
+        </div>
+        <div class="msg bot">
+          <div class="bubble">✅ Reserva confirmada — Viernes 16, 21:00h, mesa para 4. ¡Nos vemos, Lucas!</div>
+          <span class="msg-time">21:48</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMO FUNCIONA -->
+<section class="como" id="como">
+  <span class="section-label fade-in">Cómo funciona</span>
+  <h2 class="section-title fade-in">Cuatro pasos.<br>Cero fricción.</h2>
+  <p class="section-sub fade-in" style="margin:0 auto">El sistema trabaja en segundo plano mientras te concentrás en el servicio.</p>
+  <div class="steps-grid">
+    <div class="step-card fade-in">
+      <div class="step-icon-row">
+        <div class="step-num-badge">01</div>
+        <span class="step-emoji">💬</span>
+      </div>
+      <h3>El cliente escribe</h3>
+      <p>Por WhatsApp o Instagram. A cualquier hora, sin que nadie tenga que estar al teléfono.</p>
+    </div>
+    <div class="step-card fade-in">
+      <div class="step-icon-row">
+        <div class="step-num-badge">02</div>
+        <span class="step-emoji">🧠</span>
+      </div>
+      <h3>El agente responde</h3>
+      <p>Consulta disponibilidad real, reserva y envía confirmación automática al instante.</p>
+    </div>
+    <div class="step-card fade-in">
+      <div class="step-icon-row">
+        <div class="step-num-badge">03</div>
+        <span class="step-emoji">🔔</span>
+      </div>
+      <h3>Recordatorio automático</h3>
+      <p>Dos horas antes de la reserva, el cliente recibe un recordatorio. Las no-shows se reducen.</p>
+    </div>
+    <div class="step-card fade-in">
+      <div class="step-icon-row">
+        <div class="step-num-badge">04</div>
+        <span class="step-emoji">⭐</span>
+      </div>
+      <h3>Post-visita automático</h3>
+      <p>Horas después de la visita, el agente le pide una reseña en Google. Sin pedirle nada a tu equipo.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <span class="section-label fade-in">Lo que incluye</span>
+  <h2 class="section-title fade-in">Todo lo que tu<br>restaurante necesitaba.</h2>
+  <p class="section-sub fade-in" style="margin:0 auto">Sin apps extra. Sin personal adicional. Sin complicaciones técnicas.</p>
+  <div class="feat-grid">
+    <div class="feat-card fade-in">
+      <div class="feat-icon-box" style="background:rgba(37,211,102,0.1)">💬</div>
+      <h3>Agente 24/7</h3>
+      <p>Responde al instante en WhatsApp e Instagram, en lenguaje natural, con la personalidad de tu marca.</p>
+      <span class="tag-pill">WhatsApp · Instagram</span>
+    </div>
+    <div class="feat-card fade-in">
+      <div class="feat-icon-box" style="background:rgba(81,112,255,0.1)">📅</div>
+      <h3>Reservas inteligentes</h3>
+      <p>Consulta disponibilidad real de tu local. Ninguna mesa doble-reservada, ningún cliente sin respuesta.</p>
+      <span class="tag-pill">Tiempo real</span>
+    </div>
+    <div class="feat-card fade-in">
+      <div class="feat-icon-box" style="background:rgba(200,173,255,0.15)">🔔</div>
+      <h3>Confirmaciones y recordatorios</h3>
+      <p>Confirmación al reservar y recordatorio automático. Las no-shows caen notablemente.</p>
+      <span class="tag-pill">Automatizado</span>
+    </div>
+    <div class="feat-card fade-in">
+      <div class="feat-icon-box" style="background:rgba(235,146,146,0.12)">⭐</div>
+      <h3>Reseñas en Google</h3>
+      <p>Tras la visita, el agente contacta al comensal y lo lleva directo al botón de reseña de Google.</p>
+      <span class="tag-pill">Post-visita</span>
+    </div>
+    <div class="feat-card fade-in">
+      <div class="feat-icon-box" style="background:rgba(81,112,255,0.1)">📊</div>
+      <h3>CRM con métricas propias</h3>
+      <p>Dashboard en vivo con reservas, conversiones, clientes recurrentes y canales más activos.</p>
+      <span class="tag-pill">Dashboard en vivo</span>
+    </div>
+    <div class="feat-card fade-in">
+      <div class="feat-icon-box" style="background:rgba(200,173,255,0.15)">🔗</div>
+      <h3>Integración total</h3>
+      <p>El sistema conecta todas las piezas de forma automática. Robusto, escalable, sin código.</p>
+      <span class="tag-pill">Todo conectado</span>
+    </div>
+  </div>
+</section>
+
+<!-- MÉTRICAS -->
+<section class="metrics">
+  <span class="section-label fade-in" style="color:var(--violeta)">Resultados</span>
+  <h2 class="section-title fade-in">Números que<br>hablan solos.</h2>
+  <p class="section-sub fade-in" style="margin:0 auto;color:var(--paper);opacity:0.65">Lo que logran los restaurantes que ya usan el sistema.</p>
+  <div class="metrics-grid">
+    <div class="metric-card fade-in">
+      <span class="metric-num">24/7</span>
+      <span class="metric-label">Sin horario de atención</span>
+    </div>
+    <div class="metric-card fade-in">
+      <span class="metric-num">-40%</span>
+      <span class="metric-label">Reducción de no-shows</span>
+    </div>
+    <div class="metric-card fade-in">
+      <span class="metric-num">3×</span>
+      <span class="metric-label">Más reseñas en Google</span>
+    </div>
+    <div class="metric-card fade-in">
+      <span class="metric-num">0</span>
+      <span class="metric-label">Llamadas perdidas</span>
+    </div>
+  </div>
+</section>
+
+<!-- CASO DE ÉXITO -->
+<section class="caso" id="caso">
+  <span class="section-label fade-in" style="text-align:center;display:block">Caso de éxito</span>
+  <h2 class="section-title fade-in" style="text-align:center;margin:0 auto 48px">Resultados reales,<br>en 40 días.</h2>
+  <div class="caso-card fade-in">
+    <div class="caso-header">
+      <div class="caso-logo-box">
+        <img src="data:image/png;base64,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" alt="Flores en Fuego" style="width:44px;height:44px;object-fit:contain;border-radius:10px;">
+      </div>
+      <div>
+        <div class="caso-nombre">Flores en Fuego</div>
+        <div class="caso-lugar">Restaurante nocturno · Mendoza, Argentina</div>
+      </div>
+    </div>
+    <div class="caso-metrics">
+      <div class="caso-metric">
+        <span class="caso-num">250</span>
+        <span class="caso-label">reservas gestionadas<br>en un mes</span>
+      </div>
+      <div class="caso-metric">
+        <span class="caso-num">+70%</span>
+        <span class="caso-label">reseñas en Google<br>en 40 días</span>
+      </div>
+      <div class="caso-metric">
+        <span class="caso-num">-80%</span>
+        <span class="caso-label">reducción de<br>ausencias</span>
+      </div>
+    </div>
+    <blockquote class="caso-quote">
+      "El sistema ordenó toda mi parte comunicacional y organizó el proceso completo del cliente, desde que quiere reservar hasta su pedido de reseña. Mi equipo de trabajo se enfoca en el servicio 100%."
+    </blockquote>
+    <div class="caso-autor">
+      <div class="caso-autor-avatar">JC</div>
+      <div>
+        <div class="caso-autor-nombre">Juan Cruz Carranzani</div>
+        <div class="caso-autor-rol">Co-owner · Flores en Fuego</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INTEGRACIONES -->
+<section class="integ">
+  <span class="section-label fade-in">Plataformas</span>
+  <h2 class="section-title fade-in" style="margin:0 auto 14px">Conectado donde<br>están tus clientes.</h2>
+  <p class="section-sub fade-in" style="margin:0 auto">Funciona con las apps que ya usan. Sin fricción, sin instalaciones.</p>
+  <div class="integ-chips">
+    <div class="chip fade-in"><span class="chip-dot" style="background:#25D366"></span>WhatsApp Business</div>
+    <div class="chip fade-in"><span class="chip-dot" style="background:#E1306C"></span>Instagram DM</div>
+    <div class="chip fade-in"><span class="chip-dot" style="background:#4285F4"></span>Google Reviews</div>
+    <div class="chip fade-in"><span class="chip-dot" style="background:var(--azul)"></span>CRM propio AIRIS</div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq" id="faq" style="padding-top:48px">
+  <span class="section-label fade-in" style="text-align:center;display:block">Preguntas frecuentes</span>
+  <h2 class="section-title fade-in" style="text-align:center;margin:0 auto 16px">Todo lo que querés saber<br>antes de empezar.</h2>
+  <div class="faq-list">
+    <div class="faq-item fade-in">
+      <div class="faq-q">¿Necesito saber de tecnología para usar AIRIS?<span class="faq-icon">+</span></div>
+      <div class="faq-a">No. Nosotros nos encargamos de toda la configuración e implementación. Vos solo recibís el sistema funcionando y accedés a tu dashboard. No se requiere ningún conocimiento técnico.</div>
+    </div>
+    <div class="faq-item fade-in">
+      <div class="faq-q">¿Con qué canales funciona el agente?<span class="faq-icon">+</span></div>
+      <div class="faq-a">Actualmente el agente opera en WhatsApp Business e Instagram Direct. Responde en lenguaje natural, 24/7, sin que ninguna persona de tu equipo tenga que intervenir.</div>
+    </div>
+    <div class="faq-item fade-in">
+      <div class="faq-q">¿Cómo sabe el agente si hay disponibilidad en mi local?<span class="faq-icon">+</span></div>
+      <div class="faq-a">El sistema se conecta con tu calendario o sistema de reservas actual y consulta la disponibilidad en tiempo real. Cada reserva queda registrada automáticamente, sin posibilidad de duplicados.</div>
+    </div>
+    <div class="faq-item fade-in">
+      <div class="faq-q">¿Qué pasa si el cliente hace una pregunta que el agente no puede responder?<span class="faq-icon">+</span></div>
+      <div class="faq-a">El agente está entrenado para gestionar las consultas más frecuentes de un restaurante. Si una pregunta supera su capacidad, el sistema lo notifica para que alguien de tu equipo retome la conversación.</div>
+    </div>
+    <div class="faq-item fade-in">
+      <div class="faq-q">¿Cuánto tiempo lleva la implementación?<span class="faq-icon">+</span></div>
+      <div class="faq-a">En la mayoría de los casos el sistema está operativo en menos de una semana. El proceso incluye la configuración del agente, la personalización con el tono de tu marca y las pruebas antes del lanzamiento.</div>
+    </div>
+    <div class="faq-item fade-in">
+      <div class="faq-q">¿Puedo ver lo que está pasando en tiempo real?<span class="faq-icon">+</span></div>
+      <div class="faq-a">Sí. Tu CRM propio AIRIS muestra reservas activas, conversaciones recientes, métricas de conversión y canales más activos en un dashboard actualizado en tiempo real, accesible desde cualquier dispositivo.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="cta-final" id="cta">
+  <h2 class="section-title fade-in">Tu restaurante,<br>siempre disponible.</h2>
+  <p class="section-sub fade-in">Agendá una demo de 20 minutos y te mostramos el sistema funcionando en vivo.</p>
+  <!-- REEMPLAZÁ # por tu link de calendly/GHL -->
+  <a href="#" class="btn-white fade-in">Quiero mi demo gratuita →</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <div class="footer-logo">airis<span>.</span></div>
+      <div class="footer-tagline">Gastronomía inteligente.<br>Reservas, recordatorios y reseñas en automático.</div>
+    </div>
+    <div class="footer-contact">
+      <div class="footer-contact-title">Contacto directo</div>
+      <a href="mailto:hola@airis.com" class="footer-link">
+        <div class="footer-link-icon" style="background:rgba(81,112,255,0.15)">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#5170FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        </div>
+        hola@airis.com
+      </a>
+      <!-- REEMPLAZÁ el número y usuario de Instagram -->
+      <a href="https://wa.me/5491100000000" target="_blank" class="footer-link">
+        <div class="footer-link-icon" style="background:rgba(37,211,102,0.15)">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+        </div>
+        WhatsApp
+      </a>
+      <a href="https://instagram.com/airis" target="_blank" class="footer-link">
+        <div class="footer-link-icon" style="background:rgba(188,24,136,0.12)">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#bc1888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        </div>
+        @airis
+      </a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2025 AIRIS — Gastronomía Inteligente</div>
+    <div class="footer-legal">
+      <a href="#">Política de privacidad</a>
+      <a href="#">Términos de uso</a>
+    </div>
+  </div>
+</footer>
+
+<!-- BURBUJA FLOTANTE WSP -->
+<div class="float-buttons">
+  <!-- REEMPLAZÁ el número -->
+  <a href="https://wa.me/5491100000000" target="_blank" class="float-btn float-wsp" aria-label="Escribinos por WhatsApp">
+    <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+  </a>
+</div>
+
+<script>
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible') });
+}, { threshold: 0.08 });
+document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+
+document.querySelectorAll('.faq-q').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const item = btn.parentElement;
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    if(!isOpen) item.classList.add('open');
+  });
+});
+</script>
