@@ -6,6 +6,7 @@
 <title>AIRIS — Gastronomía Inteligente</title>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --azul:#5170FF;
@@ -55,12 +56,24 @@ nav{
 
 /* HERO — fondo oscuro sólo en hero para contraste */
 .hero{
-  background:var(--navy);
+  background-image:url('hero-bg.jpg');
+  background-color:var(--navy);
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  background-attachment:fixed;
   min-height:100svh;
   display:flex;align-items:center;justify-content:center;
   padding:100px 20px 60px;
   text-align:center;
   position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;bottom:0;
+  background:rgba(10,15,46,0.5);
+  z-index:0;
 }
 .hero-glow{
   position:absolute;
@@ -84,14 +97,14 @@ nav{
 .hero h1{
   color:var(--blanco);
   font-family:var(--font-display);font-weight:800;
-  font-size:clamp(38px,10vw,80px);
+  font-size:clamp(38px,10vw,64px);
   line-height:1.0;letter-spacing:-2px;margin-bottom:20px;
 }
 .hero h1 .accent{color:var(--azul)}
 .hero-sub{
-  font-size:clamp(16px,4vw,20px);
+  font-size:clamp(14px,3.5vw,18px);
   color:var(--paper);
-  max-width:560px;margin:0 auto 40px;
+  max-width:none;margin:0 0 40px 0;
   line-height:1.6;font-weight:400;
   opacity:0.85;
 }
@@ -292,21 +305,9 @@ section{padding:72px 20px}
 
 /* CTA FINAL */
 .cta-final{
-  background:var(--azul);
+  background:var(--navy);
   padding:88px 20px;text-align:center;
   position:relative;overflow:hidden;
-}
-.cta-final::before{
-  content:'';position:absolute;
-  width:500px;height:500px;border-radius:50%;
-  background:rgba(255,255,255,0.07);
-  top:-200px;left:-100px;pointer-events:none;
-}
-.cta-final::after{
-  content:'';position:absolute;
-  width:300px;height:300px;border-radius:50%;
-  background:rgba(255,255,255,0.05);
-  bottom:-100px;right:-60px;pointer-events:none;
 }
 .cta-final .section-title{
   color:var(--blanco);position:relative;z-index:1;
@@ -427,13 +428,14 @@ section{padding:72px 20px}
 footer{
   background:var(--navy);
   padding:48px 20px 32px;
-  border-top:1px solid rgba(81,112,255,0.1);
+  border-top:none;
 }
 .footer-top{
-  display:flex;flex-direction:column;align-items:flex-start;
+  display:flex;flex-direction:row;align-items:flex-start;
   gap:32px;max-width:960px;margin:0 auto;
   padding-bottom:32px;
   border-bottom:1px solid rgba(255,255,255,0.07);
+  justify-content:space-between;
 }
 .footer-brand{}
 .footer-logo{font-weight:800;font-size:20px;letter-spacing:-0.5px;color:var(--blanco);margin-bottom:8px}
@@ -500,65 +502,50 @@ footer{
   .metrics-grid{grid-template-columns:repeat(4,1fr)}
   footer{padding:48px 56px 32px}
 }
+
 </style>
 </head>
 <body>
-
-<!-- NAV -->
-<nav>
+<nav style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px">
   <div class="logo">airis<span>.</span></div>
-  <a href="#cta" class="nav-cta">Pedir demo</a>
+  <div style="display:flex;gap:24px;align-items:center;flex-wrap:wrap">
+    <a href="#como" style="color:var(--navy);font-weight:500;font-size:14px;text-decoration:none;transition:color 0.2s" onmouseover="this.style.color=var(--azul)" onmouseout="this.style.color=var(--navy)">Cómo funciona</a>
+    <a href="#resultados" style="color:var(--navy);font-weight:500;font-size:14px;text-decoration:none;transition:color 0.2s" onmouseover="this.style.color=var(--azul)" onmouseout="this.style.color=var(--navy)">Resultados</a>
+    <a href="#faq" style="color:var(--navy);font-weight:500;font-size:14px;text-decoration:none;transition:color 0.2s" onmouseover="this.style.color=var(--azul)" onmouseout="this.style.color=var(--navy)">FAQ</a>
+    <a href="#cta" class="nav-cta">Auditoría Free</a>
+  </div>
 </nav>
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-glow"></div>
-  <div style="position:relative;z-index:1;width:100%;max-width:860px">
+    <div style="position:relative;z-index:1;width:100%;max-width:860px">
     <div class="hero-badge fade-in">
       <span class="badge-dot"></span>
       Gastronomía inteligente
     </div>
     <h1 class="fade-in" style="transition-delay:0.08s">
-      Tu restaurante<br>atendiendo solo,<br><span class="accent">las 24 horas.</span>
+      Convertí cada mensaje<br>en una <span style="color:var(--blanco)">reserva confirmada</span>
     </h1>
-    <p class="hero-sub fade-in" style="transition-delay:0.16s">
-      Automatizaciones + un agente conversacional que reserva, confirma, recuerda y consigue reseñas. Conectado a WhatsApp e Instagram.
-    </p>
-    <div class="hero-actions fade-in" style="transition-delay:0.24s">
-      <a href="#cta" class="btn-primary">Quiero una demo →</a>
-      <a href="#como" class="btn-ghost">Ver cómo funciona</a>
-    </div>
+    <!-- HERO CON IPHONE Y CONTENIDO LADO A LADO -->
+    <div style="display:flex;align-items:center;gap:64px;margin-top:56px;flex-wrap:wrap;justify-content:center;max-width:1200px;margin-left:auto;margin-right:auto">
+      <!-- CONTENIDO IZQUIERDO -->
+      <div style="flex:1;min-width:280px;max-width:340px;order:1">
+        <p style="font-size:19px;color:var(--paper);line-height:1.7;margin-bottom:32px;opacity:0.85;font-weight:400">
+          Airis gestiona<br>— desde la consulta hasta la reseña —<br>sin molestar a tu equipo.<br>24/7 en WhatsApp e Instagram.
+        </p>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <a href="#cta" class="btn-primary">Quiero mi auditoría free →</a>
+          <a href="#beneficios" class="btn-ghost">Ver beneficios</a>
+        </div>
+      </div>
 
-    <!-- CHAT MOCKUP con isologo SVG -->
-    <div class="chat-wrap fade-in" style="transition-delay:0.36s">
-      <div class="chat-preview">
-        <div class="chat-header">
-          <div class="chat-avatar">
-            <!-- ISOLOGO AIRIS: semicírculo azul eléctrico -->
-            <svg class="isologo-svg" viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
-              <path d="M5,55 A45,45,0,0,1,95,55 Z" fill="#5170FF"/>
-            </svg>
-          </div>
-          <div>
-            <div class="chat-name">Agente AIRIS</div>
-            <div class="chat-status"><span class="online">●</span> Activo ahora mismo</div>
-          </div>
-        </div>
-        <div class="msg user">
-          <div class="bubble">Hola, quisiera reservar para 4 personas el viernes a las 21h</div>
-          <span class="msg-time">21:47</span>
-        </div>
-        <div class="msg bot">
-          <div class="bubble">¡Hola! Tenemos disponibilidad el viernes 16 a las 21:00 para 4 personas. ¿A nombre de quién hago la reserva?</div>
-          <span class="msg-time">21:47</span>
-        </div>
-        <div class="msg user">
-          <div class="bubble">Lucas Fernández</div>
-          <span class="msg-time">21:48</span>
-        </div>
-        <div class="msg bot">
-          <div class="bubble">✅ Reserva confirmada — Viernes 16, 21:00h, mesa para 4. ¡Nos vemos, Lucas!</div>
-          <span class="msg-time">21:48</span>
+      <!-- IPHONE DERECHO -->
+      <div style="flex:1;min-width:280px;max-width:300px;display:flex;justify-content:center;order:2">
+        <div style="position:relative;width:260px;height:520px;background:var(--navy);border-radius:38px;border:11px solid rgba(255,255,255,0.12);overflow:hidden;box-shadow:0 25px 50px rgba(0,0,0,0.5)">
+          <!-- NOTCH -->
+          <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:140px;height:26px;background:var(--navy);border-radius:0 0 26px 26px;z-index:10"></div>
+          <!-- CONTENIDO APP -->
+          <img src="uploads/WhatsApp Image 2026-06-27 at 00.26.32.jpeg" style="width:100%;height:100%;object-fit:cover;display:block">
         </div>
       </div>
     </div>
@@ -568,110 +555,139 @@ footer{
 <!-- COMO FUNCIONA -->
 <section class="como" id="como">
   <span class="section-label fade-in">Cómo funciona</span>
-  <h2 class="section-title fade-in">Cuatro pasos.<br>Cero fricción.</h2>
-  <p class="section-sub fade-in" style="margin:0 auto">El sistema trabaja en segundo plano mientras te concentrás en el servicio.</p>
+  <h2 class="section-title fade-in">Explicado en simples pasos.</h2>
+  <p class="section-sub fade-in" style="margin:0 auto;max-width:900px">El sistema trabaja en segundo plano mientras te concentrás en el servicio.</p>
   <div class="steps-grid">
     <div class="step-card fade-in">
-      <div class="step-icon-row">
+      <div class="step-icon-row" style="gap:8px">
         <div class="step-num-badge">01</div>
-        <span class="step-emoji">💬</span>
+        <img src="uploads/1.png" style="width:60px;height:60px;object-fit:contain">
       </div>
       <h3>El cliente escribe</h3>
       <p>Por WhatsApp o Instagram. A cualquier hora, sin que nadie tenga que estar al teléfono.</p>
     </div>
     <div class="step-card fade-in">
-      <div class="step-icon-row">
+      <div class="step-icon-row" style="gap:8px">
         <div class="step-num-badge">02</div>
-        <span class="step-emoji">🧠</span>
+        <img src="uploads/2.png" style="width:60px;height:60px;object-fit:contain">
       </div>
       <h3>El agente responde</h3>
-      <p>Consulta disponibilidad real, reserva y envía confirmación automática al instante.</p>
+      <p>Consulta disponibilidad real, guia la reserva y envía confirmación al instante.</p>
     </div>
     <div class="step-card fade-in">
       <div class="step-icon-row">
         <div class="step-num-badge">03</div>
-        <span class="step-emoji">🔔</span>
+        <img src="uploads/3.png" style="width:60px;height:60px;object-fit:contain">
       </div>
-      <h3>Recordatorio automático</h3>
-      <p>Dos horas antes de la reserva, el cliente recibe un recordatorio. Las no-shows se reducen.</p>
+      <h3>El sistema trabaja</h3>
+      <p>Envía recordatorios, genera métricas y en la App gestionás todas las reservas en tiempo real.</p>
     </div>
     <div class="step-card fade-in">
       <div class="step-icon-row">
         <div class="step-num-badge">04</div>
-        <span class="step-emoji">⭐</span>
+        <img src="uploads/4.png" style="width:60px;height:60px;object-fit:contain">
       </div>
-      <h3>Post-visita automático</h3>
-      <p>Horas después de la visita, el agente le pide una reseña en Google. Sin pedirle nada a tu equipo.</p>
+      <h3>Consigue reseñas en Google</h3>
+      <p>Después de la visita, el agente solicita una reseña calificada. Sin pedirle nada a tu equipo.</p>
     </div>
   </div>
 </section>
 
-<!-- FEATURES -->
-<section class="features" id="features">
-  <span class="section-label fade-in">Lo que incluye</span>
-  <h2 class="section-title fade-in">Todo lo que tu<br>restaurante necesitaba.</h2>
-  <p class="section-sub fade-in" style="margin:0 auto">Sin apps extra. Sin personal adicional. Sin complicaciones técnicas.</p>
-  <div class="feat-grid">
-    <div class="feat-card fade-in">
-      <div class="feat-icon-box" style="background:rgba(37,211,102,0.1)">💬</div>
-      <h3>Agente 24/7</h3>
-      <p>Responde al instante en WhatsApp e Instagram, en lenguaje natural, con la personalidad de tu marca.</p>
-      <span class="tag-pill">WhatsApp · Instagram</span>
+<!-- BENEFICIOS DEL SISTEMA - FONDO OSCURO -->
+<section style="background-image:url('hero-bg.jpg');background-color:var(--navy);background-size:cover;background-position:center;background-repeat:no-repeat;background-attachment:fixed;text-align:center;padding:72px 20px">
+  <span class="section-label fade-in" style="color:var(--azul)">Beneficios</span>
+  <h2 class="section-title fade-in" style="color:var(--blanco)">Beneficios de tener el sistema</h2>
+  <p class="section-sub fade-in" style="color:var(--paper);margin:0 auto;max-width:800px">Automatizaciones que facilitan las tareas repetitivas diarias y tu forma de comunicar.</p>
+  <div style="display:grid;grid-template-columns:1fr;gap:16px;margin-top:48px;max-width:1000px;margin-left:auto;margin-right:auto;padding-top:32px;box-shadow:inset 0 1px 0 0 rgba(255,255,255,0.05), inset 0 2px 4px 0 rgba(0,0,0,0.1)">
+    <div class="feat-card fade-in" style="background:rgba(22,27,59,0.8);border:1px solid rgba(81,112,255,0.2);color:var(--blanco);padding:24px">
+      <div style="display:flex;align-items:center;gap:16px">
+        <div style="font-weight:800;font-size:24px;color:var(--azul);min-width:40px">01</div>
+        <div style="text-align:left">
+          <h3 style="font-weight:700;font-size:16px;margin-bottom:6px;color:var(--blanco)">Atención 24/7</h3>
+          <p style="font-size:13px;color:rgba(255,255,255,0.7);margin:0">Tu agente responde consultas, guía reservas, las confirma y se encarga de los recordatorios. Atiende sin parar, incluso a las 3 AM.</p>
+        </div>
+      </div>
     </div>
-    <div class="feat-card fade-in">
-      <div class="feat-icon-box" style="background:rgba(81,112,255,0.1)">📅</div>
-      <h3>Reservas inteligentes</h3>
-      <p>Consulta disponibilidad real de tu local. Ninguna mesa doble-reservada, ningún cliente sin respuesta.</p>
-      <span class="tag-pill">Tiempo real</span>
+    <div class="feat-card fade-in" style="background:rgba(22,27,59,0.8);border:1px solid rgba(81,112,255,0.2);color:var(--blanco);padding:24px">
+      <div style="display:flex;align-items:center;gap:16px">
+        <div style="font-weight:800;font-size:24px;color:var(--violeta);min-width:40px">02</div>
+        <div style="text-align:left">
+          <h3 style="font-weight:700;font-size:16px;margin-bottom:6px;color:var(--blanco)">Gestión de reservas en tiempo real</h3>
+          <p style="font-size:13px;color:rgba(255,255,255,0.7);margin:0">Consulta automáticamente tu disponibilidad, recomienda la mejor opción y evita reservas duplicadas.</p>
+        </div>
+      </div>
     </div>
-    <div class="feat-card fade-in">
-      <div class="feat-icon-box" style="background:rgba(200,173,255,0.15)">🔔</div>
-      <h3>Confirmaciones y recordatorios</h3>
-      <p>Confirmación al reservar y recordatorio automático. Las no-shows caen notablemente.</p>
-      <span class="tag-pill">Automatizado</span>
+    <div class="feat-card fade-in" style="background:rgba(22,27,59,0.8);border:1px solid rgba(81,112,255,0.2);color:var(--blanco);padding:24px">
+      <div style="display:flex;align-items:center;gap:16px">
+        <div style="font-weight:800;font-size:24px;color:var(--violeta);min-width:40px">03</div>
+        <div style="text-align:left">
+          <h3 style="font-weight:700;font-size:16px;margin-bottom:6px;color:var(--blanco)">Responde audios de manera natural</h3>
+          <p style="font-size:13px;color:rgba(255,255,255,0.7);margin:0">Procesa los audios de tus clientes, manteniendo una conversación fluida y natural, sin interrupción.</p>
+        </div>
+      </div>
     </div>
-    <div class="feat-card fade-in">
-      <div class="feat-icon-box" style="background:rgba(235,146,146,0.12)">⭐</div>
-      <h3>Reseñas en Google</h3>
-      <p>Tras la visita, el agente contacta al comensal y lo lleva directo al botón de reseña de Google.</p>
-      <span class="tag-pill">Post-visita</span>
+    <div class="feat-card fade-in" style="background:rgba(22,27,59,0.8);border:1px solid rgba(81,112,255,0.2);color:var(--blanco);padding:24px">
+      <div style="display:flex;align-items:center;gap:16px">
+        <div style="font-weight:800;font-size:24px;color:var(--azul);min-width:40px">04</div>
+        <div style="text-align:left">
+          <h3 style="font-weight:700;font-size:16px;margin-bottom:6px;color:var(--blanco)">Integración con Google Calendar</h3>
+          <p style="font-size:13px;color:rgba(255,255,255,0.7);margin:0">Vinculación a tu calendario sin intervención manual del equipo. Las reservas se sincronizan al instante.</p>
+        </div>
+      </div>
     </div>
-    <div class="feat-card fade-in">
-      <div class="feat-icon-box" style="background:rgba(81,112,255,0.1)">📊</div>
-      <h3>CRM con métricas propias</h3>
-      <p>Dashboard en vivo con reservas, conversiones, clientes recurrentes y canales más activos.</p>
-      <span class="tag-pill">Dashboard en vivo</span>
+    <div class="feat-card fade-in" style="background:rgba(22,27,59,0.8);border:1px solid rgba(81,112,255,0.2);color:var(--blanco);padding:24px">
+      <div style="display:flex;align-items:center;gap:16px">
+        <div style="font-weight:800;font-size:24px;color:var(--violeta);min-width:40px">05</div>
+        <div style="text-align:left">
+          <h3 style="font-weight:700;font-size:16px;margin-bottom:6px;color:var(--blanco)">App para controlar tus reservas</h3>
+          <p style="font-size:13px;color:rgba(255,255,255,0.7);margin:0">Control total: gestión y resumen diario, reservas manuales, lista de espera, avisos. Todo en tiempo real, desde una tablet o móvil.</p>
+        </div>
+      </div>
     </div>
-    <div class="feat-card fade-in">
-      <div class="feat-icon-box" style="background:rgba(200,173,255,0.15)">🔗</div>
-      <h3>Integración total</h3>
-      <p>El sistema conecta todas las piezas de forma automática. Robusto, escalable, sin código.</p>
-      <span class="tag-pill">Todo conectado</span>
+    <div class="feat-card fade-in" style="background:rgba(22,27,59,0.8);border:1px solid rgba(81,112,255,0.2);color:var(--blanco);padding:24px">
+      <div style="display:flex;align-items:center;gap:16px">
+        <div style="font-weight:800;font-size:24px;color:var(--azul);min-width:40px">06</div>
+        <div style="text-align:left">
+          <h3 style="font-weight:700;font-size:16px;margin-bottom:6px;color:var(--blanco)">Panel de control</h3>
+          <p style="font-size:13px;color:rgba(255,255,255,0.7);margin:0">Base de datos, conversiones, contactos, ROI y canales más activos.</p>
+        </div>
+      </div>
     </div>
-  </div>
-</section>
-
-<!-- MÉTRICAS -->
-<section class="metrics">
-  <span class="section-label fade-in" style="color:var(--violeta)">Resultados</span>
-  <h2 class="section-title fade-in">Números que<br>hablan solos.</h2>
-  <p class="section-sub fade-in" style="margin:0 auto;color:var(--paper);opacity:0.65">Lo que logran los restaurantes que ya usan el sistema.</p>
-  <div class="metrics-grid">
-    <div class="metric-card fade-in">
-      <span class="metric-num">24/7</span>
-      <span class="metric-label">Respondiendo en segundos</span>
+    <div class="feat-card fade-in" style="background:rgba(22,27,59,0.8);border:1px solid rgba(81,112,255,0.2);color:var(--blanco);padding:24px">
+      <div style="display:flex;align-items:center;gap:16px">
+        <div style="font-weight:800;font-size:24px;color:var(--violeta);min-width:40px">07</div>
+        <div style="text-align:left">
+          <h3 style="font-weight:700;font-size:16px;margin-bottom:6px;color:var(--blanco)">Derivación a humano</h3>
+          <p style="font-size:13px;color:rgba(255,255,255,0.7);margin:0">Cuando sea necesario, el sistema te notifica al instante para que tu equipo retome la conversación.</p>
+        </div>
+      </div>
     </div>
-    <div class="metric-card fade-in">
-      <span class="metric-num">+ 70%</span>
-      <span class="metric-label">Reducción de no-shows</span>
+    <div class="feat-card fade-in" style="background:rgba(22,27,59,0.8);border:1px solid rgba(81,112,255,0.2);color:var(--blanco);padding:24px">
+      <div style="display:flex;align-items:center;gap:16px">
+        <div style="font-weight:800;font-size:24px;color:var(--azul);min-width:40px">08</div>
+        <div style="text-align:left">
+          <h3 style="font-weight:700;font-size:16px;margin-bottom:6px;color:var(--blanco)">Base de datos tuya y exportable</h3>
+          <p style="font-size:13px;color:rgba(255,255,255,0.7);margin:0">Todos los datos de tus clientes son de tu propiedad. Exportás cuando querés.</p>
+        </div>
+      </div>
     </div>
-    <div class="metric-card fade-in">
-      <span class="metric-num">+ 50%</span>
-      <span class="metric-label">Reseñas en Google</span>
+    <div class="feat-card fade-in" style="background:rgba(22,27,59,0.8);border:1px solid rgba(81,112,255,0.2);color:var(--blanco);padding:24px">
+      <div style="display:flex;align-items:center;gap:16px">
+        <div style="font-weight:800;font-size:24px;color:var(--violeta);min-width:40px">09</div>
+        <div style="text-align:left">
+          <h3 style="font-weight:700;font-size:16px;margin-bottom:6px;color:var(--blanco)">Confirmación y recordatorios automáticos</h3>
+          <p style="font-size:13px;color:rgba(255,255,255,0.7);margin:0">Al reservar y 2 horas antes. Estos mensajes automáticos reducen los no-show hasta 70%.</p>
+        </div>
+      </div>
     </div>
-    <div class="metric-card fade-in">
-      <span class="metric-num">0</span>
-      <span class="metric-label">Mensajes perdidos</span>
+    <div class="feat-card fade-in" style="background:rgba(22,27,59,0.8);border:1px solid rgba(81,112,255,0.2);color:var(--blanco);padding:24px">
+      <div style="display:flex;align-items:center;gap:16px">
+        <div style="font-weight:800;font-size:24px;color:var(--azul);min-width:40px">10</div>
+        <div style="text-align:left">
+          <h3 style="font-weight:700;font-size:16px;margin-bottom:6px;color:var(--blanco)">WhatsApp e Instagram con respuesta inmediata</h3>
+          <p style="font-size:13px;color:rgba(255,255,255,0.7);margin:0">Tu agente responde en segundos en ambas plataformas. No perdés más clientes.</p>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -681,9 +697,12 @@ footer{
   <span class="section-label fade-in" style="text-align:center;display:block">Caso de éxito</span>
   <h2 class="section-title fade-in" style="text-align:center;margin:0 auto 48px">Resultados reales,<br>en 40 días.</h2>
   <div class="caso-card fade-in">
+    <div style="width:100%;height:200px;background:linear-gradient(135deg,rgba(81,112,255,0.08),rgba(200,173,255,0.08));border-radius:var(--r-lg);margin-bottom:20px;display:flex;align-items:center;justify-content:center;overflow:hidden;border:1.5px solid rgba(81,112,255,0.15)">
+      <img src="uploads/WhatsApp Image 2026-06-26 at 01.17.39.jpeg" style="width:100%;height:100%;object-fit:cover;object-position:top">
+    </div>
     <div class="caso-header">
       <div class="caso-logo-box">
-        <img src="data:image/png;base64,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" alt="Flores en Fuego" style="width:44px;height:44px;object-fit:contain;border-radius:10px;">
+        <div class="caso-logo-inicial">FF</div>
       </div>
       <div>
         <div class="caso-nombre">Flores en Fuego</div>
@@ -692,41 +711,161 @@ footer{
     </div>
     <div class="caso-metrics">
       <div class="caso-metric">
-        <span class="caso-num">+ 250</span>
-        <span class="caso-label">reservas gestionadas<br>en un mes</span>
+        <span class="caso-num">+250</span>
+        <span class="caso-label">reservas gestionadas<br>en 30 días</span>
       </div>
       <div class="caso-metric">
-        <span class="caso-num">+ 70%</span>
+        <span class="caso-num">244</span>
         <span class="caso-label">reseñas en Google<br>en 40 días</span>
       </div>
       <div class="caso-metric">
-        <span class="caso-num">+ 80%</span>
+        <span class="caso-num">-80%</span>
         <span class="caso-label">reducción de<br>ausencias</span>
       </div>
     </div>
     <blockquote class="caso-quote">
-      "El sistema ordenó el proceso completo del cliente y la comunicación, controlo desde que quiere reservar hasta su pedido de reseña post-visita. Ahora mi equipo de trabajo se enfoca en el servicio 100%."
+      "El sistema tuvo cambios positivos a partir de la primer semana. No perdemos más clientes por responder siempre y tengo más de 10 reseñas diarias. También me dejaron de fallar las reservas con los recordatorios. Fue una gran decisión."
     </blockquote>
-    <div class="caso-autor">
-      <div class="caso-autor-avatar">JC</div>
-      <div>
-        <div class="caso-autor-nombre">Juan Cruz Carranzani</div>
-        <div class="caso-autor-rol">Co-owner · Flores en Fuego</div>
+    <div class="caso-autor" style="display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="caso-autor-avatar">JC</div>
+        <div>
+          <div class="caso-autor-nombre">Juan Cruz Carranzani</div>
+          <div class="caso-autor-rol">Co-owner · Flores en Fuego</div>
+        </div>
       </div>
+      <a href="https://instagram.com/floresenfuegobar" target="_blank" style="display:flex;align-items:center;gap:8px;color:var(--texto-oscuro);text-decoration:none;font-weight:600;font-size:13px;transition:color 0.2s" onmouseover="this.style.color='#E1306C'" onmouseout="this.style.color='var(--texto-oscuro)'">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><circle cx="17.5" cy="6.5" r="1.5"/></svg>
+        @floresenfuegobar
+      </a>
     </div>
   </div>
 </section>
 
+<!-- MÉTRICAS -->
+<section class="metrics" id="resultados" style="background-image:url('hero-bg.jpg');background-color:var(--navy);background-size:cover;background-position:center;background-repeat:no-repeat;background-attachment:fixed;text-align:center;padding:88px 20px;position:relative">
+  <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(10,15,46,0.5);z-index:0"></div>
+  <div style="position:relative;z-index:1">
+  <span class="section-label fade-in" style="color:var(--azul)">Ganancias</span>
+  <h2 class="section-title fade-in" style="color:var(--blanco)">Números que<br>hablan solos.</h2>
+  <p class="section-sub fade-in" style="margin:0 auto;color:var(--paper)">Lo que logran los restaurantes que ya usan el sistema.</p>
+  <div class="metrics-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:48px;max-width:1000px;margin-left:auto;margin-right:auto;padding-top:32px;box-shadow:inset 0 1px 0 0 rgba(255,255,255,0.05), inset 0 2px 4px 0 rgba(0,0,0,0.1)">
+    <div class="metric-card fade-in" style="background:rgba(22,27,59,0.8);border:1px solid rgba(81,112,255,0.2);padding:32px;border-radius:var(--r-lg);text-align:center">
+      <span class="metric-num" style="font-size:56px;font-weight:800;color:var(--azul);display:block;margin-bottom:8px">24/7</span>
+      <span class="metric-label" style="font-size:14px;color:var(--paper)">Atendiendo clientes</span>
+    </div>
+    <div class="metric-card fade-in" style="background:rgba(22,27,59,0.8);border:1px solid rgba(81,112,255,0.2);padding:32px;border-radius:var(--r-lg);text-align:center">
+      <span class="metric-num" style="font-size:56px;font-weight:800;color:var(--violeta);display:block;margin-bottom:8px">-60%</span>
+      <span class="metric-label" style="font-size:14px;color:var(--paper)">Reducción de no-show</span>
+    </div>
+    <div class="metric-card fade-in" style="background:rgba(22,27,59,0.8);border:1px solid rgba(81,112,255,0.2);padding:32px;border-radius:var(--r-lg);text-align:center">
+      <span class="metric-num" style="font-size:56px;font-weight:800;color:var(--azul);display:block;margin-bottom:8px">3x</span>
+      <span class="metric-label" style="font-size:14px;color:var(--paper)">Más reseñas en Google</span>
+    </div>
+    <div class="metric-card fade-in" style="background:rgba(22,27,59,0.8);border:1px solid rgba(81,112,255,0.2);padding:32px;border-radius:var(--r-lg);text-align:center">
+      <span class="metric-num" style="font-size:56px;font-weight:800;color:var(--violeta);display:block;margin-bottom:8px">0</span>
+      <span class="metric-label" style="font-size:14px;color:var(--paper)">Mensajes perdidos</span>
+    </div>
+    <div class="metric-card fade-in" style="background:rgba(22,27,59,0.8);border:1px solid rgba(81,112,255,0.2);padding:32px;border-radius:var(--r-lg);text-align:center">
+      <span class="metric-num" style="font-size:56px;font-weight:800;color:var(--azul);display:block;margin-bottom:8px">40hs</span>
+      <span class="metric-label" style="font-size:14px;color:var(--paper)">De trabajo manual<br>recuperadas por semana</span>
+    </div>
+    <div class="metric-card fade-in" style="background:rgba(22,27,59,0.8);border:1px solid rgba(81,112,255,0.2);padding:32px;border-radius:var(--r-lg);text-align:center">
+      <span class="metric-num" style="font-size:56px;font-weight:800;color:var(--violeta);display:block;margin-bottom:8px">100%</span>
+      <span class="metric-label" style="font-size:14px;color:var(--paper)">Control de métricas</span>
+    </div>
+  </div>
+  </div>
+</section>
+
+<!-- PLANES -->
+<section style="background:var(--blanco);text-align:center;padding:72px 20px">
+  <span class="section-label fade-in" style="color:var(--azul)">Empezá hoy</span>
+  <h2 class="section-title fade-in" style="margin:0 auto 48px">Tres planes para elegir</h2>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px;max-width:1100px;margin-left:auto;margin-right:auto">
+    <!-- PLAN STANDARD - POPULAR -->
+    <div class="fade-in" style="background:var(--blanco);border:2px solid var(--azul);border-radius:var(--r-lg);padding:28px 20px;text-align:left;position:relative;display:flex;flex-direction:column" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(81,112,255,0.15)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'" style="transition:transform 0.25s,box-shadow 0.25s">
+      <div style="position:absolute;top:-12px;left:16px;background:var(--azul);color:var(--blanco);font-family:var(--font-mono);font-size:9px;font-weight:700;padding:3px 10px;border-radius:100px;letter-spacing:0.08em">POPULAR</div>
+      <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:4px;margin-top:6px">
+        <span style="font-weight:800;font-size:28px;color:var(--navy)">$150</span>
+        <span style="color:var(--texto-medio);font-size:12px">/mes</span>
+      </div>
+      <h3 style="font-weight:700;font-size:16px;color:var(--navy);margin-bottom:16px;letter-spacing:-0.3px">Plan Standard</h3>
+      <ul style="list-style:none;margin:0;font-size:12px;color:var(--texto-oscuro);line-height:1.65;flex-grow:1;margin-bottom:20px">
+        <li style="margin-bottom:7px"><span style="color:var(--azul);font-weight:600">✓</span> WhatsApp e Instagram</li>
+        <li style="margin-bottom:7px"><span style="color:var(--azul);font-weight:600">✓</span> 1 Cuenta</li>
+        <li style="margin-bottom:7px"><span style="color:var(--azul);font-weight:600">✓</span> App móvil</li>
+        <li style="margin-bottom:7px"><span style="color:var(--azul);font-weight:600">✓</span> Reservas en tiempo real</li>
+        <li style="margin-bottom:7px"><span style="color:var(--azul);font-weight:600">✓</span> Confirmación / recordatorios</li>
+        <li style="margin-bottom:7px"><span style="color:var(--azul);font-weight:600">✓</span> Pedido de reseñas</li>
+        <li style="margin-bottom:7px"><span style="color:var(--azul);font-weight:600">✓</span> Agente inteligente</li>
+        <li style="margin-bottom:7px"><span style="color:var(--azul);font-weight:600">✓</span> Métricas en tiempo real</li>
+        <li style="margin-bottom:7px"><span style="color:var(--azul);font-weight:600">✓</span> Google Calendar</li>
+        <li style="margin-bottom:7px"><span style="color:var(--azul);font-weight:600">✓</span> Capacitación</li>
+        <li><span style="color:var(--azul);font-weight:600">✓</span> Soporte WhatsApp</li>
+      </ul>
+      <a href="#cta" style="display:inline-block;background:var(--azul);color:var(--blanco);font-family:var(--font-display);font-weight:700;font-size:14px;padding:11px 22px;border-radius:100px;border:none;cursor:pointer;text-decoration:none;transition:transform 0.2s,opacity 0.2s;width:100%;text-align:center" onmouseover="this.style.opacity='0.9';this.style.transform='translateY(-2px)'" onmouseout="this.style.opacity='1';this.style.transform='translateY(0)'">Comenzar →</a>
+    </div>
+
+    <!-- PLAN FULL -->
+    <div class="fade-in" style="background:var(--blanco);border:2px solid rgba(81,112,255,0.15);border-radius:var(--r-lg);padding:28px 20px;text-align:left;position:relative;display:flex;flex-direction:column" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(81,112,255,0.08)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'" style="transition:transform 0.25s,box-shadow 0.25s">
+      <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:4px">
+        <span style="font-weight:800;font-size:28px;color:var(--navy)">$250</span>
+        <span style="color:var(--texto-medio);font-size:12px">/mes</span>
+      </div>
+      <h3 style="font-weight:700;font-size:16px;color:var(--navy);margin-bottom:16px;letter-spacing:-0.3px">Plan Full</h3>
+      <ul style="list-style:none;margin:0;font-size:12px;color:var(--texto-oscuro);line-height:1.65;flex-grow:1;margin-bottom:20px">
+        <li style="margin-bottom:7px"><span style="color:var(--azul);font-weight:600">✓</span> Todo lo del Standard</li>
+        <li style="margin-bottom:7px"><span style="color:var(--azul);font-weight:600">✓</span> Hasta 3 Cuentas</li>
+        <li style="margin-bottom:7px"><span style="color:var(--azul);font-weight:600">✓</span> Envío de resumen mensual de actividad</li>
+        <li><span style="color:var(--azul);font-weight:600">✓</span> Soporte prioritario</li>
+      </ul>
+      <a href="#cta" style="display:inline-block;background:var(--paper);color:var(--navy);font-family:var(--font-display);font-weight:700;font-size:14px;padding:11px 22px;border-radius:100px;border:1px solid rgba(81,112,255,0.2);cursor:pointer;text-decoration:none;transition:transform 0.2s,opacity 0.2s;width:100%;text-align:center" onmouseover="this.style.opacity='0.85';this.style.transform='translateY(-2px)'" onmouseout="this.style.opacity='1';this.style.transform='translateY(0)'">Comenzar →</a>
+    </div>
+
+    <!-- PLAN CUSTOM -->
+    <div class="fade-in" style="background:var(--blanco);border:2px solid #C8ADFF;border-radius:var(--r-lg);padding:28px 20px;text-align:left;position:relative;display:flex;flex-direction:column" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(200,173,255,0.15)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'" style="transition:transform 0.25s,box-shadow 0.25s">
+      <div style="position:absolute;top:-12px;left:16px;background:#C8ADFF;color:var(--navy);font-family:var(--font-mono);font-size:9px;font-weight:700;padding:3px 10px;border-radius:100px;letter-spacing:0.08em">EMPRESAS</div>
+      <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:4px;margin-top:6px">
+        <span style="font-weight:800;font-size:28px;color:var(--navy)">Desde $300</span>
+        <span style="color:var(--texto-medio);font-size:12px">/mes</span>
+      </div>
+      <h3 style="font-weight:700;font-size:16px;color:var(--navy);margin-bottom:16px;letter-spacing:-0.3px">Plan Custom</h3>
+      <ul style="list-style:none;margin:0;font-size:12px;color:var(--texto-oscuro);line-height:1.65;flex-grow:1;margin-bottom:20px">
+        <li style="margin-bottom:7px"><span style="color:#C8ADFF;font-weight:600">✓</span> Todo lo del Full</li>
+        <li style="margin-bottom:7px"><span style="color:#C8ADFF;font-weight:600">✓</span> Integraciones a medida</li>
+        <li style="margin-bottom:7px"><span style="color:#C8ADFF;font-weight:600">✓</span> Flujos personalizados</li>
+        <li style="margin-bottom:7px"><span style="color:#C8ADFF;font-weight:600">✓</span> Capacitación personalizada</li>
+        <li><span style="color:#C8ADFF;font-weight:600">✓</span> Soporte personalizado</li>
+      </ul>
+      <a href="#cta" style="display:inline-block;background:#C8ADFF;color:var(--navy);font-family:var(--font-display);font-weight:700;font-size:14px;padding:11px 22px;border-radius:100px;border:none;cursor:pointer;text-decoration:none;transition:transform 0.2s,opacity 0.2s;width:100%;text-align:center" onmouseover="this.style.opacity='0.85';this.style.transform='translateY(-2px)'" onmouseout="this.style.opacity='1';this.style.transform='translateY(0)'">Hablar con equipo →</a>
+    </div>
+  </div>
+</section>
+
+
+
 <!-- INTEGRACIONES -->
-<section class="integ">
-  <span class="section-label fade-in">Plataformas</span>
-  <h2 class="section-title fade-in" style="margin:0 auto 14px">Conectado donde<br>están tus clientes.</h2>
-  <p class="section-sub fade-in" style="margin:0 auto">Funciona con las apps que ya usan. Sin fricción, sin instalaciones.</p>
-  <div class="integ-chips">
-    <div class="chip fade-in"><span class="chip-dot" style="background:#25D366"></span>WhatsApp Business</div>
-    <div class="chip fade-in"><span class="chip-dot" style="background:#E1306C"></span>Instagram DM</div>
-    <div class="chip fade-in"><span class="chip-dot" style="background:#4285F4"></span>Google Reviews</div>
-    <div class="chip fade-in"><span class="chip-dot" style="background:var(--azul)"></span>CRM propio AIRIS</div>
+<section class="integ" style="background-image:url('uploads/rm373batch5-07-823b7059.jpg');background-color:var(--navy);background-size:cover;background-position:center;background-repeat:no-repeat;text-align:center;padding:72px 20px;position:relative">
+  <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(10,15,46,0.65);z-index:0"></div>
+  <div style="position:relative;z-index:1">
+    <span class="section-label fade-in" style="color:var(--azul)">Plataformas</span>
+    <h2 class="section-title fade-in" style="margin:0 auto 14px;color:var(--blanco)">Conectado donde<br>están tus clientes.</h2>
+    <p class="section-sub fade-in" style="margin:0 auto;color:rgba(255,255,255,0.85);white-space:nowrap">Funciona con las apps que ya usan. Sin fricción, sin instalaciones.</p>
+    <div class="integ-chips" style="display:flex;justify-content:center;gap:24px;margin-top:40px;flex-wrap:wrap">
+      <div class="chip fade-in" style="background:rgba(255,255,255,0.1);border:1.5px solid #25D366;padding:16px 24px;border-radius:100px;display:flex;align-items:center;gap:10px;backdrop-filter:blur(10px)">
+        <span class="chip-dot" style="background:#25D366;width:12px;height:12px;border-radius:50%;box-shadow:0 0 12px rgba(37,211,102,0.6)"></span>
+        <span style="color:#25D366;font-family:var(--font-display);font-weight:700;font-size:14px">WhatsApp Business</span>
+      </div>
+      <div class="chip fade-in" style="background:rgba(255,255,255,0.1);border:1.5px solid #E1306C;padding:16px 24px;border-radius:100px;display:flex;align-items:center;gap:10px;backdrop-filter:blur(10px)">
+        <span class="chip-dot" style="background:#E1306C;width:12px;height:12px;border-radius:50%;box-shadow:0 0 12px rgba(225,48,108,0.6)"></span>
+        <span style="color:#E1306C;font-family:var(--font-display);font-weight:700;font-size:14px">Instagram</span>
+      </div>
+      <div class="chip fade-in" style="background:rgba(255,255,255,0.1);border:1.5px solid #4285F4;padding:16px 24px;border-radius:100px;display:flex;align-items:center;gap:10px;backdrop-filter:blur(10px)">
+        <span class="chip-dot" style="background:#4285F4;width:12px;height:12px;border-radius:50%;box-shadow:0 0 12px rgba(66,133,244,0.6)"></span>
+        <span style="color:#4285F4;font-family:var(--font-display);font-weight:700;font-size:14px">Google Reviews</span>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -745,7 +884,7 @@ footer{
     </div>
     <div class="faq-item fade-in">
       <div class="faq-q">¿Cómo sabe el agente si hay disponibilidad en mi local?<span class="faq-icon">+</span></div>
-      <div class="faq-a">El sistema se conecta con tu calendario actual y consulta la disponibilidad en tiempo real. Cada reserva queda registrada automáticamente, sin posibilidad de duplicados.</div>
+      <div class="faq-a">El sistema se conecta con tu calendario o sistema de reservas actual y consulta la disponibilidad en tiempo real. Cada reserva queda registrada automáticamente, sin posibilidad de duplicados.</div>
     </div>
     <div class="faq-item fade-in">
       <div class="faq-q">¿Qué pasa si el cliente hace una pregunta que el agente no puede responder?<span class="faq-icon">+</span></div>
@@ -757,54 +896,57 @@ footer{
     </div>
     <div class="faq-item fade-in">
       <div class="faq-q">¿Puedo ver lo que está pasando en tiempo real?<span class="faq-icon">+</span></div>
-      <div class="faq-a">Sí. Tu CRM propio AIRIS muestra conversaciones, reservas activas, cada etapa del cliente y métricas de conversión en un dashboard actualizado en tiempo real, accesible desde cualquier dispositivo.</div>
+      <div class="faq-a">Sí. Tu CRM propio AIRIS muestra reservas activas, conversaciones recientes, métricas de conversión y canales más activos en un dashboard actualizado en tiempo real, accesible desde cualquier dispositivo.</div>
     </div>
   </div>
 </section>
 
 <!-- CTA FINAL -->
-<section class="cta-final" id="cta">
-  <h2 class="section-title fade-in">Tu restaurante,<br>siempre disponible.</h2>
-  <p class="section-sub fade-in">Agendá una demo de 20 minutos y te mostramos el sistema funcionando en vivo.</p>
+<section class="cta-final" id="cta" style="background-image:url('hero-bg.jpg');background-color:var(--navy);background-size:cover;background-position:center;background-repeat:no-repeat;background-attachment:fixed;position:relative">chment:fixed;position:relative">
+  <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(10,15,46,0.5);z-index:0"></div>
+  <div style="position:relative;z-index:1">
+  <p class="section-sub fade-in" style="font-size:24px;line-height:1.4;font-family:var(--font-display);font-weight:700">Agendá una auditoría de 30 minutos y te mostramos el sistema funcionando en vivo.</p>
   <!-- REEMPLAZÁ # por tu link de calendly/GHL -->
-  <a href="https://api.airisworld.com/widget/booking/sCOe9YtKscddwXTHdCYc" class="btn-white fade-in">Quiero mi demo gratuita →</a>
+    <a href="#" class="btn-white fade-in">Quiero mi auditoría gratuita →</a>
+  </div>
 </section>
 
 <!-- FOOTER -->
-<footer>
-  <div class="footer-top">
-    <div class="footer-brand">
-      <div class="footer-logo">airis<span>.</span></div>
-      <div class="footer-tagline">Gastronomía inteligente.<br>Reservas, recordatorios y reseñas en automático.</div>
+<footer style="background-color:var(--navy);position:relative;padding:48px 20px 32px">ve">
+  <div style="position:relative;z-index:1">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="footer-logo">airis<span>.</span></div>
+        <div class="footer-tagline">Gastronomía inteligente.<br>Reservas, recordatorios y reseñas en automático.</div>
+      </div>
+      <div class="footer-contact">
+        <div class="footer-contact-title">Contacto directo</div>
+        <a href="/cdn-cgi/l/email-protection#dcb4b3b0bd9cbdb5aeb5aff2bfb3b1" class="footer-link">
+          <div class="footer-link-icon" style="background:rgba(81,112,255,0.15)">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#5170FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          </div>
+          <span class="__cf_email__" data-cfemail="78101714193819110a110b561b1715">[email&#160;protected]</span>
+        </a>
+        <a href="https://wa.me/5491100000000" target="_blank" class="footer-link">
+          <div class="footer-link-icon" style="background:rgba(37,211,102,0.15)">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+          </div>
+          WhatsApp
+        </a>
+        <a href="https://instagram.com/airis" target="_blank" class="footer-link">
+          <div class="footer-link-icon" style="background:rgba(188,24,136,0.12)">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#bc1888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          </div>
+          @airis
+        </a>
+      </div>
     </div>
-    <div class="footer-contact">
-      <div class="footer-contact-title">Contacto directo</div>
-      <a href="mailto:airis.agentesia@gmail.com" class="footer-link">
-        <div class="footer-link-icon" style="background:rgba(81,112,255,0.15)">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#5170FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-        </div>
-        hola@airis.com
-      </a>
-      <!-- REEMPLAZÁ el número y usuario de Instagram -->
-      <a href="https://wa.me/5492615347036" target="_blank" class="footer-link">
-        <div class="footer-link-icon" style="background:rgba(37,211,102,0.15)">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
-        </div>
-        WhatsApp
-      </a>
-      <a href="https://instagram.com/somos.airis" target="_blank" class="footer-link">
-        <div class="footer-link-icon" style="background:rgba(188,24,136,0.12)">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#bc1888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-        </div>
-        @airis
-      </a>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <div class="footer-copy">© 2025 AIRIS — Gastronomía Inteligente</div>
-    <div class="footer-legal">
-      <a href="#">Política de privacidad</a>
-      <a href="#">Términos de uso</a>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2025 AIRIS — Gastronomía Inteligente</div>
+      <div class="footer-legal">
+        <a href="#">Política de privacidad</a>
+        <a href="#">Términos de uso</a>
+      </div>
     </div>
   </div>
 </footer>
@@ -812,12 +954,12 @@ footer{
 <!-- BURBUJA FLOTANTE WSP -->
 <div class="float-buttons">
   <!-- REEMPLAZÁ el número -->
-  <a href="https://wa.me/5492615347036" target="_blank" class="float-btn float-wsp" aria-label="Escribinos por WhatsApp">
+  <a href="https://wa.me/5491100000000" target="_blank" class="float-btn float-wsp" aria-label="Escribinos por WhatsApp">
     <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
   </a>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 const obs = new IntersectionObserver(entries => {
   entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible') });
 }, { threshold: 0.08 });
