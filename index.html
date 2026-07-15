@@ -826,6 +826,107 @@ section{padding:72px 20px}
   .cta-title{font-size:32px}
 }
 
+/* COMPARACION - MANUAL VS AIRIS */
+.compare{background:var(--navy);text-align:center}
+.compare .section-title{color:var(--blanco)}
+.compare .section-sub{color:var(--paper);opacity:0.85}
+.compare-title{white-space:nowrap;font-size:clamp(20px,4.5vw,36px)!important}
+.compare-vs{
+  color:#FF5C5C;font-weight:800;
+  text-shadow:0 0 10px rgba(255,92,92,0.85),0 0 22px rgba(255,92,92,0.5);
+}
+.compare-sub{
+  font-family:var(--font-display)!important;
+  color:var(--blanco)!important;opacity:1!important;
+}
+.compare-header{
+  display:grid;grid-template-columns:1fr 1fr;gap:12px;
+  max-width:820px;margin:44px auto 14px;
+  padding-left:0;
+}
+@media(min-width:640px){
+  .compare-header{grid-template-columns:160px 1fr 1fr;padding-left:0}
+}
+.compare-badge{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  background:var(--navy-soft);border:1px solid rgba(255,255,255,0.1);
+  border-radius:100px;padding:9px 16px;
+  font-family:var(--font-display);font-size:11px;font-weight:700;
+  letter-spacing:0.06em;color:rgba(255,255,255,0.8);
+}
+@media(min-width:640px){
+  .compare-header .compare-badge:first-child{grid-column:2}
+}
+.compare-badge-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.compare-badge-manual .compare-badge-dot{background:#EB5A5A}
+.compare-badge-airis .compare-badge-dot{background:var(--azul)}
+.compare-table{max-width:820px;margin:0 auto}
+.compare-row{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+  margin-bottom:10px;text-align:left;
+}
+@media(min-width:640px){
+  .compare-row{grid-template-columns:150px 1fr 1fr;align-items:stretch}
+}
+.compare-label{
+  grid-column:1/-1;
+  font-family:var(--font-mono);font-weight:700;font-size:11px;
+  letter-spacing:0.05em;color:rgba(255,255,255,0.5);
+  text-transform:uppercase;display:flex;align-items:center;
+  margin-bottom:2px;
+}
+@media(min-width:640px){
+  .compare-label{grid-column:auto;margin-bottom:0}
+}
+.compare-cell{
+  display:flex;align-items:center;gap:12px;
+  background:var(--navy-soft);
+  border:1.5px solid rgba(255,255,255,0.06);
+  border-radius:var(--r);padding:16px 16px;
+  font-size:13px;line-height:1.55;color:rgba(255,255,255,0.75);
+  transition:border-color 0.35s ease,box-shadow 0.35s ease,color 0.3s ease;
+}
+.compare-icon{
+  width:24px;height:24px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:800;
+}
+.compare-icon-x{background:rgba(235,90,90,0.15);color:#FF8080}
+.compare-icon-check{background:rgba(81,112,255,0.18);color:var(--azul)}
+
+.compare-row:hover .compare-cell-manual,
+.compare-cell-manual.always-glow{
+  border-color:rgba(235,90,90,0.55);color:rgba(255,255,255,0.92);
+  box-shadow:0 0 0 1px rgba(235,90,90,0.25) inset,0 0 24px 4px rgba(235,90,90,0.3);
+}
+.compare-row:hover .compare-cell-manual .compare-icon-x{
+  background:#EB5A5A;color:var(--blanco);box-shadow:0 0 12px rgba(235,90,90,0.7);
+}
+.compare-row:hover .compare-cell-airis,
+.compare-cell-airis.always-glow{
+  border-color:rgba(81,112,255,0.55);color:rgba(255,255,255,0.92);
+  box-shadow:0 0 0 1px rgba(81,112,255,0.3) inset,0 0 24px 4px rgba(81,112,255,0.35);
+}
+.compare-row:hover .compare-cell-airis .compare-icon-check{
+  background:var(--azul);color:var(--blanco);box-shadow:0 0 12px rgba(81,112,255,0.7);
+}
+@media(max-width:899px){
+  .compare-cell-manual{
+    border-color:rgba(235,90,90,0.55);color:rgba(255,255,255,0.92);
+    box-shadow:0 0 0 1px rgba(235,90,90,0.25) inset,0 0 20px 3px rgba(235,90,90,0.3);
+  }
+  .compare-cell-manual .compare-icon-x{
+    background:#EB5A5A;color:var(--blanco);box-shadow:0 0 10px rgba(235,90,90,0.7);
+  }
+  .compare-cell-airis{
+    border-color:rgba(81,112,255,0.55);color:rgba(255,255,255,0.92);
+    box-shadow:0 0 0 1px rgba(81,112,255,0.3) inset,0 0 20px 3px rgba(81,112,255,0.35);
+  }
+  .compare-cell-airis .compare-icon-check{
+    background:var(--azul);color:var(--blanco);box-shadow:0 0 10px rgba(81,112,255,0.7);
+  }
+}
+
 .faq{background:var(--navy)}
 .faq .section-title{color:var(--blanco)}
 .faq .section-sub{color:var(--paper);opacity:0.85}
@@ -1187,6 +1288,98 @@ footer{
       <div class="bento-content">
         <h3>Empieza la magia</h3>
         <p>El sistema toma reservas 24/7 desde el primer turno. Capacitamos a tu equipo en minutos, sin curva de aprendizaje.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARACION - MANUAL VS AIRIS -->
+<section class="compare" id="comparacion">
+  <span class="section-label fade-in">La diferencia</span>
+  <h2 class="section-title fade-in compare-title">Gestión manual <span class="compare-vs">vs</span> sistema Airis</h2>
+  <p class="section-sub fade-in compare-sub" style="margin:0 auto">La diferencia entre un restaurante que gestiona improvisando y uno que domina en automático.</p>
+
+  <div class="compare-header fade-in">
+    <div class="compare-badge compare-badge-manual"><span class="compare-badge-dot"></span>SIN AIRIS</div>
+    <div class="compare-badge compare-badge-airis"><span class="compare-badge-dot"></span>CON AIRIS</div>
+  </div>
+
+  <div class="compare-table">
+    <div class="compare-row fade-in">
+      <div class="compare-label">Respuesta a mensajes</div>
+      <div class="compare-cell compare-cell-manual">
+        <span class="compare-icon compare-icon-x">✕</span>
+        Cuando el equipo tiene tiempo.
+      </div>
+      <div class="compare-cell compare-cell-airis">
+        <span class="compare-icon compare-icon-check">✓</span>
+        24/7, al instante.
+      </div>
+    </div>
+    <div class="compare-row fade-in">
+      <div class="compare-label">Reservas</div>
+      <div class="compare-cell compare-cell-manual">
+        <span class="compare-icon compare-icon-x">✕</span>
+        A mano, riesgo de duplicados.
+      </div>
+      <div class="compare-cell compare-cell-airis">
+        <span class="compare-icon compare-icon-check">✓</span>
+        Automáticas, en tiempo real.
+      </div>
+    </div>
+    <div class="compare-row fade-in">
+      <div class="compare-label">Recordatorios</div>
+      <div class="compare-cell compare-cell-manual">
+        <span class="compare-icon compare-icon-x">✕</span>
+        Si alguien se acuerda.
+      </div>
+      <div class="compare-cell compare-cell-airis">
+        <span class="compare-icon compare-icon-check">✓</span>
+        Automáticos, sin fallar.
+      </div>
+    </div>
+    <div class="compare-row fade-in">
+      <div class="compare-label">Pedido de reseñas</div>
+      <div class="compare-cell compare-cell-manual">
+        <span class="compare-icon compare-icon-x">✕</span>
+        Rara vez, o nunca.
+      </div>
+      <div class="compare-cell compare-cell-airis">
+        <span class="compare-icon compare-icon-check">✓</span>
+        Después de cada visita.
+      </div>
+    </div>
+    <div class="compare-row fade-in">
+      <div class="compare-label">Reseñas negativas</div>
+      <div class="compare-cell compare-cell-manual">
+        <span class="compare-icon compare-icon-x">✕</span>
+        Van directo a Google.
+      </div>
+      <div class="compare-cell compare-cell-airis">
+        <span class="compare-icon compare-icon-check">✓</span>
+        Se filtran antes de publicarse.
+      </div>
+    </div>
+    <div class="compare-row fade-in">
+      <div class="compare-label">Tiempo de tu equipo</div>
+      <div class="compare-cell compare-cell-manual">
+        <span class="compare-icon compare-icon-x">✕</span>
+        Se pierde respondiendo lo mismo.
+      </div>
+      <div class="compare-cell compare-cell-airis">
+        <span class="compare-icon compare-icon-check">✓</span>
+        Libre para atender la mesa.
+      </div>
+    </div>
+    <div class="compare-row fade-in">
+      <div class="compare-label">Tu negocio</div>
+      <div class="compare-cell compare-cell-manual">
+        <span class="compare-icon compare-icon-x">✕</span>
+        Sin análisis real. Números y decisiones sin parámetros.
+      </div>
+      <div class="compare-cell compare-cell-airis">
+        <span class="compare-icon compare-icon-check">✓</span>
+        Control total, en tiempo real. Siempre.
       </div>
     </div>
   </div>
