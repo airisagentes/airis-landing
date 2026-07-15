@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Política de Privacidad — AIRIS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --azul:#5170FF;--navy:#0A0F2E;--navy-soft:#161B3B;
+    --violeta:#C8ADFF;--coral:#EB9292;--paper:#F4F4F8;--blanco:#FFFFFF;
+    --texto-oscuro:#1A1D29;--texto-medio:#6B7080;
+    --font-display:'Bricolage Grotesque',sans-serif;
+    --r:16px;--r-lg:24px;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--paper);color:var(--texto-oscuro);
+    font-family:var(--font-display);line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+  }
+  nav{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 24px;background:rgba(255,255,255,0.92);
+    backdrop-filter:blur(12px);border-bottom:1px solid rgba(81,112,255,0.12);
+    position:sticky;top:0;z-index:10;
+  }
+  .logo{font-weight:800;font-size:24px;color:var(--navy);letter-spacing:-1px;text-decoration:none}
+  .logo span{color:var(--azul)}
+  .back-link{
+    color:var(--azul);font-weight:600;font-size:14px;text-decoration:none;
+    display:flex;align-items:center;gap:6px;
+  }
+  .back-link:hover{opacity:0.75}
+  main{max-width:720px;margin:0 auto;padding:56px 24px 100px}
+  .doc-title{
+    font-weight:800;font-size:clamp(28px,5vw,40px);color:var(--navy);
+    letter-spacing:-1px;margin-bottom:8px;
+  }
+  .doc-subtitle{color:var(--texto-medio);font-size:14px;margin-bottom:40px}
+  h2{
+    font-weight:700;font-size:19px;color:var(--navy);
+    margin-top:36px;margin-bottom:12px;letter-spacing:-0.3px;
+  }
+  p{color:var(--texto-oscuro);font-size:15px;margin-bottom:14px;font-weight:400}
+  ul{margin:0 0 14px 20px}
+  li{color:var(--texto-oscuro);font-size:15px;margin-bottom:6px}
+  strong{color:var(--navy);font-weight:700}
+  a.inline-link{color:var(--azul);text-decoration:underline}
+  footer{
+    background:var(--navy);color:rgba(255,255,255,0.6);
+    text-align:center;padding:28px 20px;font-size:13px;
+  }
+  footer a{color:var(--azul);text-decoration:none}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="logo">airis<span>.</span></a>
+  <a href="index.html" class="back-link">← Volver al sitio</a>
+</nav>
+<main>
+  <h1 class="doc-title">Política de Privacidad</h1>
+  <p class="doc-subtitle">Última actualización: [Mes de 2026]</p>
+  <h2>1. Introducción</h2>
+  <p>En AIRIS (en adelante, "nosotros", "nuestro" o "el Servicio"), nos comprometemos a proteger la privacidad y los datos personales de los usuarios que interactúan con nuestro sistema de agentes conversacionales con Inteligencia Artificial para la gestión de reservas y atención al cliente en restaurantes y negocios de gastronomía.</p>
+  <p>La presente Política de Privacidad describe de forma clara cómo recopilamos, utilizamos, almacenamos, procesamos y protegemos los datos personales cuando los usuarios finales interactúan con nuestros agentes de IA, y cuando los restaurantes y su personal utilizan nuestras aplicaciones de gestión.</p>
+  <p>Esta política se aplica a: el sitio web airisworld.com, el agente conversacional de IA para reservas y consultas, la aplicación para equipos de restaurante, el panel de métricas para dueños/administradores, las comunicaciones realizadas a través de WhatsApp Business API y otros canales de mensajería habilitados, la integración con Google Calendar y Google Business Profile, y cualquier otro servicio tecnológico relacionado que ofrezca AIRIS.</p>
+  <p>Esta Política de Privacidad se ha elaborado conforme a la Ley 25.326 de Protección de Datos Personales (Argentina), principal marco normativo aplicable dado que el Servicio opera de forma centralizada desde Argentina. Adicionalmente, y en la medida en que el Servicio se ofrece a negocios ubicados en otros países de Latinoamérica, en Estados Unidos y en España, se han considerado también las normativas de protección de datos vigentes en dichas jurisdicciones (incluyendo, según corresponda, leyes estatales de privacidad de Estados Unidos y el Reglamento (UE) 2016/679 – RGPD junto con la Ley Orgánica 3/2018 – LOPDGDD para clientes en España), así como buenas prácticas internacionales en materia de privacidad y uso de Inteligencia Artificial.</p>
+  <h2>2. Responsable del Tratamiento</h2>
+  <ul>
+  <li><strong>Identidad:</strong> AIRIS World</li>
+  <li><strong>Titulares:</strong> Camila La Rocca / Lucas Pace</li>
+  <li><strong>DNI:</strong> 40.271.647 / 39.235.040</li>
+  <li><strong>Domicilio:</strong> 3008 Thornton, Orlando, Florida, Estados Unidos</li>
+  <li><strong>Email:</strong> airis.agentesia@gmail.com</li>
+  <li><strong>Web:</strong> https://airisworld.com</li>
+  </ul>
+  <h2>3. Descripción del Servicio</h2>
+  <p>AIRIS ofrece un sistema automatizado de gestión de reservas y atención al cliente basado en Inteligencia Artificial, diseñado para: responder consultas automáticamente 24/7 en el idioma del cliente, gestionar el ciclo completo de una reserva (consulta, disponibilidad, confirmación y recordatorio), coordinar la comunicación interna del equipo del restaurante en tiempo real, proporcionar métricas de negocio al dueño o administrador, y solicitar reseñas de Google de forma estratégica una vez finalizada la visita del cliente.</p>
+  <h2>4. Datos Personales que se Recopilan</h2>
+  <p><strong>4.1. Datos recopilados automáticamente</strong></p>
+  <p>Nombre del usuario, número de teléfono o ID de usuario, canal de comunicación, contenido de los mensajes, fecha y hora de cada interacción, datos de la reserva (fecha, horario, cantidad de personas, salón), identificadores técnicos y historial de conversaciones.</p>
+  <p><strong>4.2. Datos proporcionados voluntariamente</strong></p>
+  <p>Email, preferencias del cliente, comentarios adicionales, y cualquier otro dato de contacto que el usuario decida compartir con el agente.</p>
+  <p><strong>4.3. Datos del personal del restaurante</strong></p>
+  <p>Nombre, email y credenciales de acceso del personal que utiliza la aplicación de equipo, registros de actividad dentro de la app (reservas gestionadas, derivaciones atendidas).</p>
+  <p><strong>4.4. Datos inferidos mediante IA</strong></p>
+  <p>El sistema puede generar clasificación de consultas, estado de la reserva, resúmenes automáticos de conversación y métricas de conversión. Estas inferencias no producen efectos jurídicos automáticos sobre el usuario final.</p>
+  <h2>5. Finalidad del Tratamiento</h2>
+  <p>Los datos serán tratados para: la gestión y confirmación de reservas, la atención automatizada y/o humana de consultas, el envío de recordatorios y solicitudes de reseña post-visita, la coordinación operativa entre el agente de IA y el equipo del restaurante, la generación de métricas y reportes para el dueño del negocio, la mejora y optimización del servicio, la detección de incidencias técnicas y el cumplimiento de obligaciones legales.</p>
+  <h2>6. Base Legal del Tratamiento</h2>
+  <p>Consentimiento del usuario al iniciar la conversación con el agente o al realizar una reserva, ejecución de medidas precontractuales o contractuales con el restaurante que contrata AIRIS, interés legítimo para mejorar el servicio, y cumplimiento de obligaciones legales, fiscales y contables.</p>
+  <h2>7. Decisiones Automatizadas y Uso de IA</h2>
+  <p>El sistema utiliza procesos automatizados basados en IA para: gestionar la disponibilidad y confirmación de reservas, clasificar y derivar consultas, generar resúmenes de conversación, y decidir el momento de envío de la solicitud de reseña post-visita. El usuario tiene derecho a solicitar intervención humana, oponerse al tratamiento automatizado y solicitar información sobre la lógica aplicada.</p>
+  <h2>8. Destinatarios y Terceros</h2>
+  <p>Los datos pueden ser tratados por proveedores de infraestructura tecnológica necesarios para prestar el Servicio, incluyendo Meta Platforms Inc. (WhatsApp Business API), Google LLC (Google Calendar y Google Business Profile), proveedores de modelos de Inteligencia Artificial, y proveedores de hosting/alojamiento en la nube. No se venden ni ceden datos a terceros con fines comerciales.</p>
+  <h2>9. Transferencias Internacionales</h2>
+  <p>Los datos pueden transferirse a Estados Unidos u otros países donde operan nuestros proveedores tecnológicos. Se aplican Cláusulas Contractuales Tipo y medidas de seguridad equivalentes a las exigidas por el RGPD y la normativa argentina aplicable.</p>
+  <h2>10. Conservación de los Datos</h2>
+  <p>Conversaciones y reservas: mientras dure la relación con el restaurante y hasta solicitud de eliminación. Logs técnicos: entre 7 y 30 días. Datos de facturación: según plazos legales aplicables. Datos procesados por proveedores de IA: según la política de retención de cada proveedor, típicamente hasta 30 días.</p>
+  <h2>11. Seguridad de la Información</h2>
+  <p>Se aplican cifrado HTTPS/TLS, accesos restringidos por rol dentro de las aplicaciones de equipo y dueño, credenciales encriptadas, control de logs y auditorías, y copias de seguridad periódicas.</p>
+  <h2>12. Derechos del Usuario</h2>
+  <p>El usuario puede ejercer los derechos de acceso, rectificación, supresión, oposición, limitación y portabilidad enviando una solicitud a <strong>airis.agentesia@gmail.com</strong> con el asunto "Ejercicio de derechos de protección de datos".</p>
+  <h2>13. Menores de Edad</h2>
+  <p>El servicio no está dirigido a menores de 18 años. Si se detecta que un dato corresponde a un menor, será eliminado inmediatamente.</p>
+  <h2>14. Contacto</h2>
+  <p>📧 Email: airis.agentesia@gmail.com</p>
+  <p>📍 Dirección: 3008 Thornton, Orlando, Florida, Estados Unidos</p>
+  <p>🌐 Web: https://airisworld.com</p>
+</main>
+<footer>© 2026 AIRIS — Gastronomía Inteligente · <a href="mailto:airis.agentesia@gmail.com">airis.agentesia@gmail.com</a></footer>
+</body>
+</html>
