@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reserva confirmada</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:#000000;color:#FFFFFF;
+    font-family:'Bricolage Grotesque',sans-serif;
+    min-height:100svh;display:flex;align-items:center;justify-content:center;
+    text-align:center;padding:24px;
+  }
+  p{color:rgba(255,255,255,0.5);font-size:13px}
+</style>
+</head>
+<body>
+<p>Confirmando...</p>
+<script>
+  /* Esta página no la ve nadie en pantalla normalmente — GHL la carga
+     adentro del iframe apenas termina la reserva, y lo único que hace
+     es avisarle a la página que la contiene ("reservas.airisworld.com/
+     flores-en-fuego") que ya puede mostrar el agradecimiento propio. */
+  if(window.parent && window.parent !== window){
+    window.parent.postMessage({ type: 'airis-reserva-confirmada' }, '*');
+  } else {
+    document.body.innerHTML = '<p style="color:#fff;font-size:16px">Gracias, tu reserva fue exitosa.<br>En unos minutos recibirás la confirmación por WhatsApp.</p>';
+  }
+</script>
+</body>
+</html>
