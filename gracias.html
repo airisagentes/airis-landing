@@ -6,27 +6,69 @@
 <title>Reserva confirmada</title>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&display=swap" rel="stylesheet">
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{
-    background:#000000;color:#FFFFFF;
-    font-family:'Bricolage Grotesque',sans-serif;
-    min-height:100svh;display:flex;align-items:center;justify-content:center;
-    text-align:center;padding:24px;
-  }
-  p{color:rgba(255,255,255,0.5);font-size:13px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg-page:#000000;
+  --bg-card:#141414;
+  --azul:#5170FF;
+  --coral:#EB9292;
+  --texto-claro:#FFFFFF;
+  --texto-medio:rgba(255,255,255,0.62);
+  --texto-tenue:rgba(255,255,255,0.4);
+  --borde:rgba(255,255,255,0.1);
+  --font-display:'Bricolage Grotesque',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+  --r-lg:24px;
+}
+body{
+  background:var(--bg-page);color:var(--texto-claro);font-family:var(--font-display);
+  min-height:100svh;-webkit-font-smoothing:antialiased;
+  padding:32px 16px 40px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.thankyou-view{max-width:520px;width:100%;text-align:center}
+.thankyou-card{
+  background:var(--bg-card);border:1.5px solid var(--borde);
+  border-radius:var(--r-lg);padding:44px 28px;
+}
+.thankyou-icon{
+  width:56px;height:56px;border-radius:50%;margin:0 auto 20px;
+  background:rgba(235,146,146,0.14);color:var(--coral);
+  display:flex;align-items:center;justify-content:center;
+}
+.thankyou-title{font-weight:800;font-size:22px;letter-spacing:-0.5px;color:var(--texto-claro);margin-bottom:10px}
+.thankyou-sub{font-size:13.5px;color:var(--texto-medio);line-height:1.6;max-width:340px;margin:0 auto}
+.footer{
+  max-width:680px;margin:36px auto 0;
+  display:flex;align-items:baseline;justify-content:center;gap:6px;
+}
+.footer-label{font-size:11px;color:var(--texto-tenue);font-family:var(--font-mono);letter-spacing:0.04em}
+.footer-logo{font-weight:800;font-size:14px;letter-spacing:-0.3px;color:var(--texto-claro)}
+.footer-logo span{color:var(--azul)}
 </style>
 </head>
 <body>
-<p>Confirmando...</p>
+
+<div class="thankyou-view">
+  <div class="thankyou-card">
+    <div class="thankyou-icon">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+    </div>
+    <div class="thankyou-title">Gracias, tu reserva fue exitosa.</div>
+    <div class="thankyou-sub">En unos minutos recibirás la confirmación por WhatsApp.</div>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="footer-label">Desarrollado por</div>
+  <div class="footer-logo">airis<span>.</span></div>
+</div>
+
 <script>
-  /* Esta página no la ve nadie en pantalla normalmente — GHL la carga
-     adentro del iframe apenas termina la reserva, y lo único que hace
-     es avisarle a la página que la contiene ("reservas.airisworld.com/
-     flores-en-fuego") que ya puede mostrar el agradecimiento propio. */
+  /* Aunque se vea completa, esta página también avisa a la principal
+     por si está cargada adentro del iframe (uso normal en producción). */
   if(window.parent && window.parent !== window){
     window.parent.postMessage({ type: 'airis-reserva-confirmada' }, '*');
-  } else {
-    document.body.innerHTML = '<p style="color:#fff;font-size:16px">Gracias, tu reserva fue exitosa.<br>En unos minutos recibirás la confirmación por WhatsApp.</p>';
   }
 </script>
 </body>
