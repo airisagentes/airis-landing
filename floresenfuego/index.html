@@ -86,8 +86,8 @@ body{
   background:var(--bg-card);border:1.5px solid var(--borde);
   border-radius:var(--r-lg);padding:6px;position:relative;overflow:hidden;
 }
-.booking-frame-wrap{position:relative;border-radius:calc(var(--r-lg) - 6px);overflow:hidden;background:var(--bg-page);min-height:780px}
-.booking-frame-wrap iframe{width:100%;height:100%;min-height:780px;border:none;display:block}
+.booking-frame-wrap{position:relative;border-radius:calc(var(--r-lg) - 6px);overflow:hidden;background:var(--bg-page);min-height:620px}
+.booking-frame-wrap iframe{width:100%;height:100%;min-height:620px;border:none;display:block}
 .loading-overlay{
   position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;
   background:var(--bg-page);transition:opacity .3s ease;pointer-events:none;
@@ -96,15 +96,6 @@ body{
 .spinner{width:30px;height:30px;border-radius:50%;border:3px solid rgba(255,255,255,0.12);border-top-color:var(--coral);animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading-text{font-family:var(--font-mono);font-size:11.5px;color:var(--texto-tenue);letter-spacing:0.03em}
-
-.manual-confirm{
-  display:block;text-align:center;margin-top:14px;
-  color:var(--texto-tenue);font-size:11.5px;font-family:var(--font-mono);
-  background:none;border:none;cursor:pointer;letter-spacing:0.02em;
-  text-decoration:underline;text-underline-offset:2px;
-  width:100%;
-}
-.manual-confirm:hover{color:var(--texto-medio)}
 
 /* VISTA 3: AGRADECIMIENTO PROPIO */
 .thankyou-view{display:none;max-width:520px;margin:0 auto;text-align:center}
@@ -119,14 +110,7 @@ body{
   display:flex;align-items:center;justify-content:center;
 }
 .thankyou-title{font-weight:800;font-size:22px;letter-spacing:-0.5px;color:var(--texto-claro);margin-bottom:10px}
-.thankyou-sub{font-size:13.5px;color:var(--texto-medio);line-height:1.6;max-width:340px;margin:0 auto 26px}
-.thankyou-btn{
-  display:inline-flex;align-items:center;gap:6px;
-  background:none;border:1.5px solid var(--borde-fuerte);border-radius:100px;
-  color:var(--texto-claro);font-family:var(--font-display);font-weight:700;font-size:13px;
-  padding:11px 22px;cursor:pointer;transition:border-color .2s,background .2s;
-}
-.thankyou-btn:hover{border-color:var(--coral);background:rgba(235,146,146,0.08)}
+.thankyou-sub{font-size:13.5px;color:var(--texto-medio);line-height:1.6;max-width:340px;margin:0 auto}
 
 /* FOOTER */
 .footer{
@@ -166,7 +150,6 @@ body{
       <iframe id="bookingFrame" title="Reserva de mesa" src=""></iframe>
     </div>
   </div>
-  <button class="manual-confirm" id="manualConfirmBtn">Ya terminé mi reserva</button>
 </div>
 
 <!-- VISTA 3: AGRADECIMIENTO PROPIO (reemplaza la página de GHL que no cargaba) -->
@@ -177,7 +160,6 @@ body{
     </div>
     <div class="thankyou-title">Gracias, tu reserva fue exitosa.</div>
     <div class="thankyou-sub">En unos minutos recibirás la confirmación por WhatsApp.</div>
-    <button class="thankyou-btn" id="thankyouBackBtn">Reservar en otro salón</button>
   </div>
 </div>
 
@@ -287,8 +269,6 @@ function showThankYou(){
 let iframeLoadCount = 0;
 
 document.getElementById('backBtn').addEventListener('click', closeBooking);
-document.getElementById('thankyouBackBtn').addEventListener('click', closeBooking);
-document.getElementById('manualConfirmBtn').addEventListener('click', showThankYou);
 
 document.getElementById('bookingFrame').addEventListener('load', () => {
   const frame = document.getElementById('bookingFrame');
