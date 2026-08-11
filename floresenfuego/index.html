@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reservá tu mesa</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+/* ============================================================
+   CONFIG — si el negro real del calendario de GHL difiere de
+   este, ajustar solo estas dos variables.
+   ============================================================ */
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg-page:#000000;
+  --bg-card:#141414;
+  --bg-card-active:#1c1c1c;
+  --azul:#5170FF;
+  --coral:#EB9292;
+  --texto-claro:#FFFFFF;
+  --texto-medio:rgba(255,255,255,0.62);
+  --texto-tenue:rgba(255,255,255,0.4);
+  --borde:rgba(255,255,255,0.1);
+  --borde-fuerte:rgba(255,255,255,0.22);
+  --font-display:'Bricolage Grotesque',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+  --r:16px;
+  --r-lg:24px;
+}
+body{
+  background:var(--bg-page);color:var(--texto-claro);font-family:var(--font-display);
+  min-height:100svh;-webkit-font-smoothing:antialiased;padding:32px 16px 40px;
+}
+
+/* HEADER */
+.top{max-width:680px;margin:0 auto 6px;text-align:center}
+.top-eyebrow{font-weight:800;font-size:16px;letter-spacing:-0.2px;color:var(--texto-medio);margin-bottom:18px}
+.top-title{font-weight:800;font-size:clamp(26px,7vw,36px);letter-spacing:-1px;color:var(--texto-claro);margin-bottom:10px}
+.top-sub{font-size:14px;color:var(--texto-medio);line-height:1.5;max-width:440px;margin:0 auto 28px}
+
+/* VISTA 1: LISTA DE SALONES */
+.salon-list{max-width:640px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.salon-card{
+  display:flex;flex-direction:column;text-decoration:none;color:inherit;
+  background:var(--bg-card);border:1.5px solid var(--borde);
+  border-radius:var(--r-lg);padding:18px;cursor:pointer;
+  transition:border-color .2s,transform .2s,background .2s;
+}
+.salon-card:hover{border-color:var(--borde-fuerte);transform:translateY(-2px)}
+.salon-top{display:flex;align-items:center;gap:11px;margin-bottom:9px}
+.salon-emoji{
+  width:38px;height:38px;border-radius:11px;flex-shrink:0;
+  background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;font-size:17px;
+}
+.salon-name{font-weight:800;font-size:14.5px;color:var(--texto-claro);letter-spacing:-0.2px;line-height:1.25}
+.salon-closed{
+  display:inline-block;margin-top:3px;
+  background:rgba(235,146,146,0.15);color:var(--coral);
+  font-family:var(--font-mono);font-size:9.5px;font-weight:600;
+  padding:2px 8px;border-radius:100px;letter-spacing:0.03em;
+}
+.salon-desc{font-size:12px;color:var(--texto-medio);line-height:1.55;margin-bottom:12px;flex-grow:1}
+.salon-cta{display:inline-flex;align-items:center;gap:5px;color:var(--coral);font-weight:700;font-size:12px}
+.salon-card:hover .salon-cta{gap:8px}
+.salon-cta svg{transition:transform .2s;flex-shrink:0}
+.salon-card:hover .salon-cta svg{transform:translateX(2px)}
+
+@media(max-width:520px){
+  .salon-list{grid-template-columns:1fr}
+}
+
+/* VISTA 2: CALENDARIO */
+.booking-view{display:none;max-width:680px;margin:0 auto}
+.booking-view.active{display:block}
+.salon-list-wrap.hidden{display:none}
+.back-link{
+  display:inline-flex;align-items:center;gap:6px;
+  color:var(--texto-medio);font-size:13px;font-weight:600;
+  background:none;border:none;cursor:pointer;padding:0;margin-bottom:16px;
+  font-family:var(--font-display);transition:color .2s;
+}
+.back-link:hover{color:var(--texto-claro)}
+.booking-card{
+  background:var(--bg-card);border:1.5px solid var(--borde);
+  border-radius:var(--r-lg);padding:6px;position:relative;overflow:hidden;
+}
+.booking-frame-wrap{position:relative;border-radius:calc(var(--r-lg) - 6px);overflow:hidden;background:var(--bg-page);min-height:780px}
+.booking-frame-wrap iframe{width:100%;height:100%;min-height:780px;border:none;display:block}
+.loading-overlay{
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;
+  background:var(--bg-page);transition:opacity .3s ease;pointer-events:none;
+}
+.loading-overlay.hidden{opacity:0}
+.spinner{width:30px;height:30px;border-radius:50%;border:3px solid rgba(255,255,255,0.12);border-top-color:var(--coral);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-family:var(--font-mono);font-size:11.5px;color:var(--texto-tenue);letter-spacing:0.03em}
+
+.manual-confirm{
+  display:block;text-align:center;margin-top:14px;
+  color:var(--texto-tenue);font-size:11.5px;font-family:var(--font-mono);
+  background:none;border:none;cursor:pointer;letter-spacing:0.02em;
+  text-decoration:underline;text-underline-offset:2px;
+  width:100%;
+}
+.manual-confirm:hover{color:var(--texto-medio)}
+
+/* VISTA 3: AGRADECIMIENTO PROPIO */
+.thankyou-view{display:none;max-width:520px;margin:0 auto;text-align:center}
+.thankyou-view.active{display:block}
+.thankyou-card{
+  background:var(--bg-card);border:1.5px solid var(--borde);
+  border-radius:var(--r-lg);padding:44px 28px;
+}
+.thankyou-icon{
+  width:56px;height:56px;border-radius:50%;margin:0 auto 20px;
+  background:rgba(235,146,146,0.14);color:var(--coral);
+  display:flex;align-items:center;justify-content:center;
+}
+.thankyou-title{font-weight:800;font-size:22px;letter-spacing:-0.5px;color:var(--texto-claro);margin-bottom:10px}
+.thankyou-sub{font-size:13.5px;color:var(--texto-medio);line-height:1.6;max-width:340px;margin:0 auto 26px}
+.thankyou-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  background:none;border:1.5px solid var(--borde-fuerte);border-radius:100px;
+  color:var(--texto-claro);font-family:var(--font-display);font-weight:700;font-size:13px;
+  padding:11px 22px;cursor:pointer;transition:border-color .2s,background .2s;
+}
+.thankyou-btn:hover{border-color:var(--coral);background:rgba(235,146,146,0.08)}
+
+/* FOOTER */
+.footer{
+  max-width:680px;margin:36px auto 0;
+  display:flex;align-items:baseline;justify-content:center;gap:6px;
+}
+.footer-label{font-size:11px;color:var(--texto-tenue);font-family:var(--font-mono);letter-spacing:0.04em}
+.footer-logo{font-weight:800;font-size:14px;letter-spacing:-0.3px;color:var(--texto-claro)}
+.footer-logo span{color:var(--azul)}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="top-eyebrow" id="topEyebrow"></div>
+  <div class="top-title">Reservá tu mesa</div>
+  <div class="top-sub">Completá tu reserva en simples pasos.</div>
+</div>
+
+<!-- VISTA 1: SOLO LOS SALONES -->
+<div class="salon-list-wrap" id="salonListWrap">
+  <div class="salon-list" id="salonList"></div>
+</div>
+
+<!-- VISTA 2: CALENDARIO DEL SALON ELEGIDO -->
+<div class="booking-view" id="bookingView">
+  <button class="back-link" id="backBtn">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    Elegir otro salón
+  </button>
+  <div class="booking-card">
+    <div class="booking-frame-wrap">
+      <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-text">Cargando disponibilidad...</div>
+      </div>
+      <iframe id="bookingFrame" title="Reserva de mesa" src=""></iframe>
+    </div>
+  </div>
+  <button class="manual-confirm" id="manualConfirmBtn">Ya terminé mi reserva</button>
+</div>
+
+<!-- VISTA 3: AGRADECIMIENTO PROPIO (reemplaza la página de GHL que no cargaba) -->
+<div class="thankyou-view" id="thankyouView">
+  <div class="thankyou-card">
+    <div class="thankyou-icon">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+    </div>
+    <div class="thankyou-title">Gracias, tu reserva fue exitosa.</div>
+    <div class="thankyou-sub">En unos minutos recibirás la confirmación por WhatsApp.</div>
+    <button class="thankyou-btn" id="thankyouBackBtn">Reservar en otro salón</button>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="footer-label">Desarrollado por</div>
+  <div class="footer-logo">airis<span>.</span></div>
+</div>
+
+<script>
+/* ============================================================
+   ⚙️ ÚNICO BLOQUE A EDITAR POR CADA CLIENTE NUEVO.
+   Todo lo demás del archivo (HTML, CSS, lógica) queda igual.
+   ============================================================ */
+
+const RESTAURANT_NAME = 'Flores en Fuego';
+
+const SALONES = [
+  {
+    id: 'flores',
+    nombre: 'Salón Flores',
+    icon: '🌹',
+    url: 'https://api.airisworld.com/widget/booking/9EhLZ4AEhX8pRhYndBiL',
+    desc: 'Barra propia, ambiente distendido. Ideal para parejas o encuentros informales.',
+    nota: null,
+  },
+  {
+    id: 'fuego',
+    nombre: 'Salón Fuego',
+    icon: '🔥',
+    url: 'https://api.airisworld.com/widget/booking/Q1x7fNFSYK91V9kowvMR',
+    desc: 'El más amplio, con DJs los fines de semana. Único con sillones y espacio para grupos grandes.',
+    nota: 'Cerrado martes y domingo',
+  },
+  {
+    id: 'terraza',
+    nombre: 'Terraza Flores',
+    icon: '🌹',
+    url: 'https://api.airisworld.com/widget/booking/mlamezaGApKAisNbORvI',
+    desc: 'Sobre Arístides Villanueva, al aire libre. Ambiente urbano y dinámico.',
+    nota: null,
+  },
+  {
+    id: 'patio',
+    nombre: 'Patio Flores',
+    icon: '🌹',
+    url: 'https://api.airisworld.com/widget/booking/uEP8coQ7IbtKmyhmkCVb',
+    desc: 'Patio interno rodeado de vegetación. Más íntimo y resguardado que la Terraza.',
+    nota: null,
+  },
+];
+
+/* ============================================================
+   De acá para abajo no hace falta tocar nada por cliente.
+   ============================================================ */
+
+document.title = `Reservá tu mesa — ${RESTAURANT_NAME}`;
+document.getElementById('topEyebrow').textContent = RESTAURANT_NAME;
+
+
+function renderList(){
+  const wrap = document.getElementById('salonList');
+  wrap.innerHTML = '';
+  SALONES.forEach(s => {
+    const card = document.createElement('div');
+    card.className = 'salon-card';
+    card.innerHTML = `
+      <div class="salon-top">
+        <div class="salon-emoji">${s.icon}</div>
+        <div>
+          <div class="salon-name">${s.nombre}</div>
+          ${s.nota ? `<div class="salon-closed">${s.nota}</div>` : ''}
+        </div>
+      </div>
+      <div class="salon-desc">${s.desc}</div>
+      <div class="salon-cta">Reservar en ${s.nombre} <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+    `;
+    card.addEventListener('click', () => openBooking(s));
+    wrap.appendChild(card);
+  });
+}
+
+function openBooking(salon){
+  iframeLoadCount = 0;
+  document.getElementById('thankyouView').classList.remove('active');
+  document.getElementById('salonListWrap').classList.add('hidden');
+  document.getElementById('bookingView').classList.add('active');
+  document.getElementById('loadingOverlay').classList.remove('hidden');
+  document.getElementById('bookingFrame').src = salon.url;
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function closeBooking(){
+  document.getElementById('bookingView').classList.remove('active');
+  document.getElementById('thankyouView').classList.remove('active');
+  document.getElementById('salonListWrap').classList.remove('hidden');
+  document.getElementById('bookingFrame').src = '';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function showThankYou(){
+  document.getElementById('bookingView').classList.remove('active');
+  document.getElementById('thankyouView').classList.add('active');
+  document.getElementById('bookingFrame').src = '';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+let iframeLoadCount = 0;
+
+document.getElementById('backBtn').addEventListener('click', closeBooking);
+document.getElementById('thankyouBackBtn').addEventListener('click', closeBooking);
+document.getElementById('manualConfirmBtn').addEventListener('click', showThankYou);
+
+document.getElementById('bookingFrame').addEventListener('load', () => {
+  const frame = document.getElementById('bookingFrame');
+  if(!frame.src || frame.src === 'about:blank') return;
+  iframeLoadCount++;
+  if(iframeLoadCount === 1){
+    document.getElementById('loadingOverlay').classList.add('hidden');
+  }
+});
+
+/* Señal específica que manda gracias-flores-en-fuego.html cuando GHL
+   redirige ahí después de confirmar la reserva (ver ese archivo). */
+window.addEventListener('message', (event) => {
+  if(event.data && event.data.type === 'airis-reserva-confirmada'){
+    showThankYou();
+  }
+});
+
+renderList();
+</script>
+
+</body>
+</html>
