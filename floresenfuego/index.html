@@ -842,13 +842,20 @@ function aplicarMarca(restaurante){
     document.body.style.backgroundAttachment = 'fixed';
   }
 
-  const logoType = restaurante.logo_type || b.logoType;
-  const logoValue = restaurante.logo_value || b.logoValue;
   const logoEl = document.getElementById('logoBadge');
-  if(logoType === 'image'){
-    logoEl.innerHTML = `<img src="${logoValue}" alt="${restaurante.name}">`;
+  if(!restaurante.logo_value){
+    // Sin logo real cargado todavía -- se oculta el recuadro
+    // entero, en vez de mostrar el emoji genérico de relleno.
+    logoEl.style.display = 'none';
   }else{
-    logoEl.textContent = logoValue;
+    logoEl.style.display = '';
+    const logoType = restaurante.logo_type || b.logoType;
+    const logoValue = restaurante.logo_value;
+    if(logoType === 'image'){
+      logoEl.innerHTML = `<img src="${logoValue}" alt="${restaurante.name}">`;
+    }else{
+      logoEl.textContent = logoValue;
+    }
   }
 }
 
