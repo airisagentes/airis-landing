@@ -3,292 +3,1566 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Reservá tu mesa</title>
+<title id="pageTitle">Reserva tu mesa — Pura Vida</title>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 
 /* ============================================================
-   CONFIG — si el negro real del calendario de GHL difiere de
-   este, ajustar solo estas dos variables.
+   PROTOTIPO — widget propio (no usa el widget nativo de GHL).
+   Este es el patrón pensado para clientes SIN calendario nativo
+   configurado todavía. Consulta disponibilidad real vía webhooks
+   de n8n en vez de embeber la interfaz de GHL.
+
+   Mientras CONFIG.MOCK_MODE = true, los horarios son de prueba
+   y "crear reserva" no escribe nada real — así se puede revisar
+   el diseño y el flujo sin depender de que los webhooks ya existan.
+   Cuando Lucas tenga los dos webhooks (ver especificación aparte),
+   solo hay que completar las URLs de abajo y poner MOCK_MODE en false.
    ============================================================ */
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg-page:#000000;
-  --bg-card:#141414;
-  --bg-card-active:#1c1c1c;
-  --azul:#5170FF;
-  --coral:#EB9292;
-  --texto-claro:#FFFFFF;
-  --texto-medio:rgba(255,255,255,0.62);
-  --texto-tenue:rgba(255,255,255,0.4);
-  --borde:rgba(255,255,255,0.1);
-  --borde-fuerte:rgba(255,255,255,0.22);
+  --azul:#8BAA7C;
+  --navy:#37432E;
+  --violeta:#C9B28A;
+  --coral:#C97B4A;
+  --paper:#EEF2E4;
+  --blanco:#FBFAF5;
+  --card-bg:#FBFAF5;
+  --texto-oscuro:#2F3B28;
+  --texto-medio:#5F6B52;
+  --airis-blue:#5170FF;
   --font-display:'Bricolage Grotesque',sans-serif;
   --font-mono:'JetBrains Mono',monospace;
   --r:16px;
   --r-lg:24px;
 }
+html{scroll-behavior:smooth}
 body{
-  background:var(--bg-page);color:var(--texto-claro);font-family:var(--font-display);
-  min-height:100svh;-webkit-font-smoothing:antialiased;padding:32px 16px 40px;
+  background:var(--paper);
+  color:var(--texto-oscuro);
+  font-family:var(--font-display);
+  min-height:100svh;
+  -webkit-font-smoothing:antialiased;
+  padding:104px 16px 80px;
 }
 
-/* HEADER */
-.top{max-width:680px;margin:0 auto 6px;text-align:center}
-.top-eyebrow{font-weight:800;font-size:16px;letter-spacing:-0.2px;color:var(--texto-medio);margin-bottom:18px}
-.top-title{font-weight:800;font-size:clamp(26px,7vw,36px);letter-spacing:-1px;color:var(--texto-claro);margin-bottom:10px}
-.top-sub{font-size:14px;color:var(--texto-medio);line-height:1.5;max-width:440px;margin:0 auto 28px}
+.mock-banner{
+  max-width:640px;margin:0 auto 20px;
+  background:rgba(235,146,146,0.12);border:1px solid rgba(235,146,146,0.35);
+  color:#b23b3b;font-family:var(--font-mono);font-size:11px;font-weight:600;
+  padding:10px 16px;border-radius:12px;text-align:center;letter-spacing:0.02em;
+}
+.mock-banner.hidden{display:none}
 
-/* VISTA 1: LISTA DE SALONES */
-.salon-list{max-width:640px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.logo-badge{
+  position:fixed;top:20px;left:20px;z-index:50;
+  width:68px;height:68px;border-radius:18px;
+  background:var(--azul);
+  display:flex;align-items:center;justify-content:center;
+  font-size:34px;
+  box-shadow:0 8px 20px rgba(55,67,46,0.22);
+}
+.logo-badge img{width:60%;height:60%;object-fit:contain}
+
+.top{max-width:640px;margin:0 auto 20px;text-align:center}
+.top-eyebrow{font-weight:800;font-size:16px;letter-spacing:-0.2px;color:var(--texto-medio);margin-bottom:6px}
+.top-title{font-weight:800;font-size:clamp(26px,7vw,34px);letter-spacing:-1px;color:var(--navy);margin-bottom:8px}
+.top-sub{font-size:14px;color:var(--texto-medio);line-height:1.5;max-width:420px;margin:0 auto 28px}
+
+.progress-wrap{max-width:640px;margin:0 auto 28px}
+.progress-bar{display:flex;gap:6px;margin-bottom:10px}
+.progress-seg{flex:1;height:4px;border-radius:100px;background:rgba(81,112,255,0.15);overflow:hidden}
+.progress-seg-fill{height:100%;width:0%;background:var(--azul);border-radius:100px}
+.progress-seg.done .progress-seg-fill,.progress-seg.active .progress-seg-fill{width:100%}
+.progress-label{font-family:var(--font-mono);font-size:11px;color:var(--azul);letter-spacing:0.08em;text-transform:uppercase;display:flex;justify-content:space-between}
+.progress-label span:last-child{color:var(--texto-medio)}
+
+.widget{
+  max-width:640px;margin:0 auto;
+  background:var(--card-bg);
+  border:1.5px solid rgba(81,112,255,0.15);
+  border-radius:var(--r-lg);
+  padding:28px 22px;
+  box-shadow:0 12px 40px rgba(10,15,46,0.06);
+}
+.step{display:none;animation:fadeIn .4s ease}
+.step.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.step-title{font-weight:800;font-size:22px;letter-spacing:-0.7px;color:var(--navy);margin-bottom:6px}
+.step-hint{font-size:13.5px;color:var(--texto-medio);line-height:1.5;margin-bottom:24px}
+
+.salon-grid{display:grid;grid-template-columns:1fr;gap:10px}
 .salon-card{
-  display:flex;flex-direction:column;text-decoration:none;color:inherit;
-  background:var(--bg-card);border:1.5px solid var(--borde);
-  border-radius:var(--r-lg);padding:18px;cursor:pointer;
-  transition:border-color .2s,transform .2s,background .2s;
+  display:flex;align-items:center;gap:14px;
+  border:1.5px solid rgba(81,112,255,0.15);
+  border-radius:var(--r);padding:14px 16px;
+  cursor:pointer;transition:border-color .2s,background .2s;
+  background:var(--paper);
 }
-.salon-card:hover{border-color:var(--borde-fuerte);transform:translateY(-2px)}
-.salon-top{display:flex;align-items:center;gap:11px;margin-bottom:9px}
-.salon-emoji{
-  width:38px;height:38px;border-radius:11px;flex-shrink:0;
-  background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;font-size:17px;
+.salon-card:hover{border-color:rgba(81,112,255,0.4)}
+.salon-card.selected{border-color:var(--azul);background:rgba(81,112,255,0.06)}
+.salon-icon{
+  width:44px;height:44px;border-radius:12px;flex-shrink:0;
+  background:rgba(81,112,255,0.12);
+  display:flex;align-items:center;justify-content:center;font-size:20px;
 }
-.salon-name{font-weight:800;font-size:14.5px;color:var(--texto-claro);letter-spacing:-0.2px;line-height:1.25}
-.salon-closed{
-  display:inline-block;margin-top:3px;
-  background:rgba(235,146,146,0.15);color:var(--coral);
-  font-family:var(--font-mono);font-size:9.5px;font-weight:600;
-  padding:2px 8px;border-radius:100px;letter-spacing:0.03em;
-}
-.salon-desc{font-size:12px;color:var(--texto-medio);line-height:1.55;margin-bottom:12px;flex-grow:1}
-.salon-cta{display:inline-flex;align-items:center;gap:5px;color:var(--coral);font-weight:700;font-size:12px}
-.salon-card:hover .salon-cta{gap:8px}
-.salon-cta svg{transition:transform .2s;flex-shrink:0}
-.salon-card:hover .salon-cta svg{transform:translateX(2px)}
-
-@media(max-width:520px){
-  .salon-list{grid-template-columns:1fr}
-}
-
-/* VISTA 2: CALENDARIO */
-.booking-view{display:none;max-width:680px;margin:0 auto}
-.booking-view.active{display:block}
-.salon-list-wrap.hidden{display:none}
-.back-link{
-  display:inline-flex;align-items:center;gap:6px;
-  color:var(--texto-medio);font-size:13px;font-weight:600;
-  background:none;border:none;cursor:pointer;padding:0;margin-bottom:16px;
-  font-family:var(--font-display);transition:color .2s;
-}
-.back-link:hover{color:var(--texto-claro)}
-.booking-card{
-  background:var(--bg-card);border:1.5px solid var(--borde);
-  border-radius:var(--r-lg);padding:6px;position:relative;overflow:hidden;
-}
-.booking-frame-wrap{position:relative;border-radius:calc(var(--r-lg) - 6px);overflow:hidden;background:var(--bg-page);min-height:620px}
-.booking-frame-wrap iframe{width:100%;height:100%;min-height:620px;border:none;display:block}
-.loading-overlay{
-  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;
-  background:var(--bg-page);transition:opacity .3s ease;pointer-events:none;
-}
-.loading-overlay.hidden{opacity:0}
-.spinner{width:30px;height:30px;border-radius:50%;border:3px solid rgba(255,255,255,0.12);border-top-color:var(--coral);animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading-text{font-family:var(--font-mono);font-size:11.5px;color:var(--texto-tenue);letter-spacing:0.03em}
-
-/* VISTA 3: AGRADECIMIENTO PROPIO */
-.thankyou-view{display:none;max-width:520px;margin:0 auto;text-align:center}
-.thankyou-view.active{display:block}
-.thankyou-card{
-  background:var(--bg-card);border:1.5px solid var(--borde);
-  border-radius:var(--r-lg);padding:44px 28px;
-}
-.thankyou-icon{
-  width:56px;height:56px;border-radius:50%;margin:0 auto 20px;
-  background:rgba(235,146,146,0.14);color:var(--coral);
+.salon-info h4{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:2px}
+.salon-info p{font-size:12.5px;color:var(--texto-medio)}
+.salon-check{
+  margin-left:auto;width:20px;height:20px;border-radius:50%;
+  border:1.5px solid rgba(81,112,255,0.3);flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
 }
-.thankyou-title{font-weight:800;font-size:22px;letter-spacing:-0.5px;color:var(--texto-claro);margin-bottom:10px}
-.thankyou-sub{font-size:13.5px;color:var(--texto-medio);line-height:1.6;max-width:340px;margin:0 auto}
+.salon-card.selected .salon-check{background:var(--azul);border-color:var(--azul)}
+.salon-card.selected .salon-check::after{content:'✓';color:var(--blanco);font-size:12px;font-weight:700}
 
-/* FOOTER */
-.footer{
-  max-width:680px;margin:36px auto 0;
-  display:flex;align-items:baseline;justify-content:center;gap:6px;
+.personas-box{display:flex;align-items:center;justify-content:center;gap:28px;padding:36px 0 24px}
+.stepper-btn{
+  width:52px;height:52px;border-radius:50%;
+  border:1.5px solid rgba(81,112,255,0.25);background:var(--paper);
+  font-size:22px;font-weight:700;color:var(--azul);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .2s,border-color .2s;
 }
-.footer-label{font-size:11px;color:var(--texto-tenue);font-family:var(--font-mono);letter-spacing:0.04em}
-.footer-logo{font-weight:800;font-size:14px;letter-spacing:-0.3px;color:var(--texto-claro)}
-.footer-logo span{color:var(--azul)}
+.stepper-btn:hover{background:rgba(81,112,255,0.1);border-color:var(--azul)}
+.stepper-btn:disabled{opacity:0.35;cursor:not-allowed}
+.personas-num{font-size:40px;font-weight:800;color:var(--navy);min-width:64px;text-align:center;letter-spacing:-2px}
+.personas-quick{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.quick-chip{
+  font-family:var(--font-mono);font-size:12.5px;font-weight:500;
+  border:1.5px solid rgba(81,112,255,0.2);border-radius:100px;
+  padding:7px 16px;cursor:pointer;color:var(--texto-medio);background:var(--card-bg);
+  transition:border-color .2s,color .2s;
+}
+.quick-chip:hover,.quick-chip.selected{border-color:var(--azul);color:var(--azul);background:rgba(81,112,255,0.06)}
+
+.date-scroll{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 12px;scrollbar-width:none}
+.date-scroll::-webkit-scrollbar{display:none}
+.date-scroll-wrap{position:relative;display:flex;align-items:center;gap:4px}
+.date-scroll-wrap .date-scroll{flex:1;min-width:0}
+.date-arrow{
+  flex-shrink:0;width:30px;height:30px;border-radius:50%;border:1.5px solid rgba(81,112,255,0.25);
+  background:var(--card-bg);color:var(--azul);font-size:18px;line-height:1;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:opacity 0.15s;
+}
+.date-arrow:hover{border-color:var(--azul)}
+.date-arrow:disabled{opacity:0.25;cursor:default;pointer-events:none}
+.date-chip{
+  flex-shrink:0;min-width:62px;
+  border:1.5px solid rgba(81,112,255,0.18);border-radius:14px;
+  padding:10px 6px;text-align:center;cursor:pointer;background:var(--paper);
+  transition:border-color .2s,background .2s;
+}
+.date-chip:hover{border-color:rgba(81,112,255,0.45)}
+.date-chip.selected{border-color:var(--azul);background:var(--azul);color:var(--blanco)}
+.date-chip.closed{opacity:0.35;cursor:not-allowed;pointer-events:none;background:var(--paper)}
+.date-dow{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:0.05em;opacity:0.7}
+.date-num{font-size:19px;font-weight:800;margin:3px 0}
+.date-mon{font-family:var(--font-mono);font-size:9.5px;text-transform:uppercase;opacity:0.7}
+
+.time-groups{margin-top:18px;min-height:52px}
+.time-groups .time-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:0;margin-bottom:14px;min-height:0}
+.time-groups .time-grid:last-child{margin-bottom:0}
+.time-franja-label{font-family:var(--font-mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--texto-medio);margin:14px 0 8px}
+.time-franja-label:first-child{margin-top:0}
+.time-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:18px;min-height:52px}
+.time-slot{
+  border:1.5px solid rgba(81,112,255,0.18);border-radius:12px;
+  padding:11px 6px;text-align:center;font-size:13.5px;font-weight:600;
+  color:var(--navy);cursor:pointer;background:var(--paper);
+  transition:border-color .2s,background .2s,color .2s;
+}
+.time-slot:hover{border-color:rgba(81,112,255,0.45)}
+.time-slot.selected{border-color:var(--azul);background:var(--azul);color:var(--blanco)}
+.time-loading,.time-empty{
+  grid-column:1/-1;text-align:center;font-family:var(--font-mono);
+  font-size:12px;color:var(--texto-medio);padding:16px 0;
+}
+.section-mini-label{font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--azul);margin:20px 0 4px;display:block}
+
+.salon-resumen-row{
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px 14px;
+  padding:10px 14px;margin-bottom:6px;
+  background:var(--paper);border:1px solid rgba(81,112,255,0.15);border-radius:12px;
+}
+.salon-resumen-row span:first-child{font-size:13px;color:var(--texto-medio);font-weight:600}
+.cambiar-salon-link{
+  font-family:var(--font-display);font-weight:700;font-size:13px;color:var(--azul);
+  text-decoration:underline;text-underline-offset:3px;white-space:nowrap;
+  padding:4px 2px;/* área de toque más cómoda en mobile sin romper el layout */
+}
+.cambiar-salon-link:hover{opacity:0.75}
+
+.form-field{margin-bottom:18px}
+.form-field label{display:block;font-size:12.5px;font-weight:700;color:var(--navy);margin-bottom:7px;letter-spacing:0.01em}
+.form-field input,.form-field select{
+  width:100%;border:1.5px solid rgba(81,112,255,0.2);border-radius:12px;
+  padding:13px 14px;font-family:var(--font-display);font-size:15px;color:var(--texto-oscuro);
+  background:var(--paper);outline:none;transition:border-color .2s;
+}
+.form-field input:focus,.form-field select:focus{border-color:var(--azul)}
+.tel-row{display:flex;gap:8px}
+.tel-row select{flex:0 0 118px}
+.tel-row input{flex:1}
+.field-error{font-size:12px;color:var(--coral);margin-top:6px;display:none;font-weight:600}
+.field-error.show{display:block}
+
+.summary-card{background:#1A1F14;border-radius:var(--r);padding:20px;margin-bottom:22px}
+.summary-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.08)}
+.summary-row:last-child{border-bottom:none}
+.summary-row-label{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(255,255,255,0.5)}
+.summary-row-val{font-size:14px;font-weight:700;color:var(--blanco);text-align:right}
+
+.success-box{text-align:center;padding:20px 0 4px}
+.success-icon{
+  width:64px;height:64px;border-radius:50%;background:rgba(81,112,255,0.12);
+  display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:30px;color:var(--azul);
+}
+
+.nav-row{display:flex;gap:10px;margin-top:26px}
+.btn{
+  font-family:var(--font-display);font-weight:700;font-size:14.5px;
+  padding:14px 22px;border-radius:100px;border:none;cursor:pointer;
+  text-decoration:none;transition:transform .2s,opacity .2s;text-align:center;
+}
+.btn:disabled{opacity:0.4;cursor:not-allowed}
+.btn-back{background:var(--paper);color:var(--navy);border:1.5px solid rgba(81,112,255,0.18);flex:0 0 auto}
+.btn-next{background:var(--azul);color:var(--blanco);flex:1}
+.btn-next:not(:disabled):hover{transform:translateY(-2px);opacity:0.92}
+
+@media(min-width:600px){
+  .salon-grid{grid-template-columns:1fr 1fr}
+  .widget{padding:36px 40px}
+}
+
+.airis-footer{
+  max-width:640px;margin:28px auto 0;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+}
+.airis-footer-row{display:flex;align-items:baseline;justify-content:center;gap:6px}
+.airis-footer-label{font-size:11px;color:var(--texto-medio);font-family:var(--font-mono);letter-spacing:0.04em}
+.airis-footer-logo{font-weight:800;font-size:14px;letter-spacing:-0.3px;color:var(--texto-oscuro)}
+.airis-footer-logo span{color:var(--airis-blue)}
+.airis-footer-link{
+  font-family:var(--font-mono);font-size:11px;color:var(--texto-medio);
+  text-decoration:none;transition:color .2s;
+}
+.airis-footer-link:hover{color:var(--airis-blue)}
+
+/* ==== Modal "Gestionar mi reserva" ==== */
+.gestionar-link{
+  font-family:var(--font-mono);font-size:11px;color:var(--texto-medio);
+  background:none;border:none;cursor:pointer;text-decoration:underline;
+  padding:0;margin-top:4px;
+}
+.gestionar-link:hover{color:var(--airis-blue)}
+.modal-overlay{
+  display:none;position:fixed;inset:0;background:rgba(10,15,46,0.55);
+  z-index:100;align-items:center;justify-content:center;padding:16px;
+}
+.modal-overlay.open{display:flex}
+.modal-box{
+  background:var(--card-bg);border-radius:var(--r-lg);padding:26px 22px;
+  max-width:440px;width:100%;max-height:85vh;overflow-y:auto;
+  box-shadow:0 20px 60px rgba(10,15,46,0.25);
+}
+.modal-close{
+  float:right;background:none;border:none;font-size:20px;cursor:pointer;
+  color:var(--texto-medio);line-height:1;padding:4px;
+}
+.modal-title{font-weight:800;font-size:19px;color:var(--navy);margin-bottom:6px;clear:both}
+.modal-hint{font-size:13px;color:var(--texto-medio);margin-bottom:18px;line-height:1.5}
+.modal-tel-row{display:flex;gap:8px;margin-bottom:8px}
+.modal-tel-row select{flex:0 0 118px}
+.modal-tel-row input{flex:1}
+.modal-btn{
+  width:100%;font-family:var(--font-display);font-weight:700;font-size:14px;
+  padding:12px;border-radius:100px;border:none;cursor:pointer;
+  background:var(--azul);color:var(--blanco);margin-top:6px;
+}
+.modal-btn:disabled{opacity:0.5;cursor:not-allowed}
+.reserva-item{
+  border:1.5px solid rgba(81,112,255,0.15);border-radius:var(--r);
+  padding:14px;margin-top:12px;
+}
+.reserva-item-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px}
+.reserva-item-label{color:var(--texto-medio)}
+.reserva-item-val{font-weight:700;color:var(--navy)}
+.reserva-cancel-btn{
+  width:100%;margin-top:10px;font-family:var(--font-display);font-weight:700;
+  font-size:12.5px;padding:9px;border-radius:100px;border:1.5px solid var(--coral);
+  background:none;color:var(--coral);cursor:pointer;
+}
+.reserva-cancel-btn:hover{background:var(--coral);color:var(--blanco)}
+.modal-empty{font-size:13px;color:var(--texto-medio);text-align:center;padding:16px 0}
+.modal-msg{font-size:13px;text-align:center;padding:10px;border-radius:var(--r);margin-top:10px}
+.modal-msg.ok{background:rgba(139,170,124,0.12);color:var(--azul)}
+.modal-msg.err{background:rgba(201,123,74,0.12);color:var(--coral)}
 </style>
 </head>
 <body>
 
+<div class="logo-badge" id="logoBadge"></div>
+
+<div class="mock-banner" id="mockBanner"></div>
+
 <div class="top">
   <div class="top-eyebrow" id="topEyebrow"></div>
-  <div class="top-title">Reservá tu mesa</div>
-  <div class="top-sub">Completá tu reserva en simples pasos.</div>
+  <div class="top-title" id="topTitle">Reserva tu mesa</div>
+  <div class="top-sub" id="topSub"></div>
 </div>
 
-<!-- VISTA 1: SOLO LOS SALONES -->
-<div class="salon-list-wrap" id="salonListWrap">
-  <div class="salon-list" id="salonList"></div>
+<div class="progress-wrap">
+  <div class="progress-bar" id="progressBar"></div>
+  <div class="progress-label">
+    <span id="progressStepLabel">Paso 1 de 5</span>
+    <span id="progressStepName">Elige el espacio</span>
+  </div>
 </div>
 
-<!-- VISTA 2: CALENDARIO DEL SALON ELEGIDO -->
-<div class="booking-view" id="bookingView">
-  <button class="back-link" id="backBtn">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-    Elegir otro salón
-  </button>
-  <div class="booking-card">
-    <div class="booking-frame-wrap">
-      <div class="loading-overlay" id="loadingOverlay">
-        <div class="spinner"></div>
-        <div class="loading-text">Cargando disponibilidad...</div>
+<div class="widget">
+
+  <div class="step active" data-step="1">
+    <div class="step-title" id="step1Title"></div>
+    <div class="step-hint" id="step1Hint"></div>
+    <div class="salon-grid" id="salonGrid">
+      <div class="time-loading">Cargando salones...</div>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-next" id="next1" disabled></button>
+    </div>
+  </div>
+
+  <div class="step" data-step="2">
+    <div class="step-title" id="step2Title"></div>
+    <div class="step-hint">Incluí a todos los comensales de la mesa.</div>
+    <div class="personas-box">
+      <button class="stepper-btn" id="personasMinus">−</button>
+      <div class="personas-num" id="personasNum">2</div>
+      <button class="stepper-btn" id="personasPlus">+</button>
+    </div>
+    <div class="personas-quick" id="personasQuick"></div>
+    <div id="grupoGrandeBox" style="display:none;text-align:center;margin-top:18px;padding:16px;background:var(--paper);border-radius:var(--r);border:1.5px dashed rgba(81,112,255,0.3)">
+      <p style="font-size:13px;color:var(--texto-medio);margin-bottom:10px;line-height:1.5" id="grupoGrandeTexto"></p>
+      <a id="grupoGrandeBtn" href="#" style="display:inline-block;font-family:var(--font-display);font-weight:700;font-size:13.5px;padding:11px 20px;border-radius:100px;background:var(--coral);color:var(--blanco);text-decoration:none"></a>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-back" id="back2"></button>
+      <button class="btn btn-next" id="next2"></button>
+    </div>
+  </div>
+
+  <div class="step" data-step="3">
+    <div class="step-title" id="step3Title"></div>
+    <div class="step-hint" id="disponibilidadHint"></div>
+    <div id="salonResumenRow" class="salon-resumen-row">
+      <span id="salonResumenTexto"></span>
+      <a href="#" id="cambiarSalonLink" class="cambiar-salon-link"></a>
+    </div>
+    <span class="section-mini-label">Fecha</span>
+    <div class="date-scroll-wrap">
+      <button class="date-arrow date-arrow-left" id="dateArrowLeft" aria-label="Fechas anteriores">‹</button>
+      <div class="date-scroll" id="dateScroll"></div>
+      <button class="date-arrow date-arrow-right" id="dateArrowRight" aria-label="Más fechas">›</button>
+    </div>
+    <span class="section-mini-label">Horario</span>
+    <div class="time-groups" id="timeGrid"></div>
+    <div class="nav-row">
+      <button class="btn btn-back" id="back3"></button>
+      <button class="btn btn-next" id="next3" disabled></button>
+    </div>
+  </div>
+
+  <div class="step" data-step="4">
+    <div class="step-title" id="step4Title"></div>
+    <div class="step-hint" id="step4Hint"></div>
+    <div class="form-field">
+      <label for="nombreInput" id="labelNombre"></label>
+      <input type="text" id="nombreInput" autocomplete="name">
+      <div class="field-error" id="nombreError"></div>
+    </div>
+    <div class="form-field">
+      <label for="telInput" id="labelTelefono"></label>
+      <div class="tel-row">
+        <select id="prefijoSelect"></select>
+        <input type="tel" id="telInput" autocomplete="tel">
       </div>
-      <iframe id="bookingFrame" title="Reserva de mesa" src=""></iframe>
+      <div class="field-error" id="telError"></div>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-back" id="back4"></button>
+      <button class="btn btn-next" id="next4"></button>
     </div>
   </div>
-</div>
 
-<!-- VISTA 3: AGRADECIMIENTO PROPIO (reemplaza la página de GHL que no cargaba) -->
-<div class="thankyou-view" id="thankyouView">
-  <div class="thankyou-card">
-    <div class="thankyou-icon">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+  <div class="step" data-step="5">
+    <div class="step-title" id="step5Title"></div>
+    <div class="step-hint" id="step5Hint"></div>
+    <div class="summary-card" id="summaryCard"></div>
+    <div class="nav-row">
+      <button class="btn btn-back" id="back5"></button>
+      <button class="btn btn-next" id="confirmBtn"></button>
     </div>
-    <div class="thankyou-title">Gracias, tu reserva fue exitosa.</div>
-    <div class="thankyou-sub">En unos minutos recibirás la confirmación por WhatsApp.</div>
   </div>
+
+  <div class="step" data-step="6">
+    <div class="success-box">
+      <div class="success-icon">✓</div>
+      <div class="step-title" style="text-align:center" id="successTitle">¡Reserva exitosa!</div>
+      <div class="step-hint" style="text-align:center;max-width:380px;margin-left:auto;margin-right:auto" id="successSub">
+        Enviaremos tu confirmación por WhatsApp en unos minutos.
+      </div>
+    </div>
+  </div>
+
 </div>
 
-<div class="footer">
-  <div class="footer-label">Desarrollado por</div>
-  <div class="footer-logo">airis<span>.</span></div>
+<div style="text-align:center;margin-top:20px">
+  <button class="gestionar-link" id="abrirGestionar"></button>
+</div>
+
+<div class="airis-footer">
+  <div class="airis-footer-row">
+    <div class="airis-footer-label" id="footerLabel"></div>
+    <div class="airis-footer-logo">airis<span>.</span></div>
+  </div>
+  <a class="airis-footer-link" href="https://www.airisworld.com" target="_blank">www.airisworld.com</a>
+</div>
+
+<!-- Modal "Gestionar mi reserva" -->
+<div class="modal-overlay" id="modalGestionar">
+  <div class="modal-box">
+    <button class="modal-close" id="cerrarGestionar">&times;</button>
+    <div class="modal-title" id="modalTitle"></div>
+    <div class="modal-hint" id="modalHint"></div>
+    <div class="modal-tel-row">
+      <select id="modalPrefijoSelect"></select>
+      <input type="tel" id="modalTelInput" autocomplete="tel">
+    </div>
+    <button class="modal-btn" id="modalBuscarBtn"></button>
+    <div id="modalResultados"></div>
+  </div>
 </div>
 
 <script>
+
 /* ============================================================
-   ⚙️ ÚNICO BLOQUE A EDITAR POR CADA CLIENTE NUEVO.
-   Todo lo demás del archivo (HTML, CSS, lógica) queda igual.
+   🌍 IDIOMAS — el widget detecta el idioma del navegador/dispositivo
+   de quien lo visita (mismo criterio que ya usa el agente de WhatsApp,
+   que responde en el idioma en que le escriben) y muestra toda la
+   interfaz en ese idioma. Español acá es "neutro" (forma tú, sin
+   voseo argentino) para que funcione igual de bien en cualquier país
+   hispanohablante. Para sumar un idioma nuevo, alcanza con agregar
+   una clave nueva acá -- no hace falta tocar nada más del archivo.
    ============================================================ */
+const TRANSLATIONS = {
+  es: {
+    pageTitle: 'Reserva tu mesa',
+    topTitle: 'Reserva tu mesa',
+    topSub: 'Elige el espacio, la fecha y el horario que prefieras.',
+    mockBanner: '⚠ Modo de prueba: horarios de ejemplo, la reserva no se crea de verdad todavía',
+    progressStep: (n, total) => `Paso ${n} de ${total}`,
+    stepNames: { 1: 'Elige el espacio', 2: 'Cantidad de personas', 3: 'Fecha y horario', 4: 'Tus datos', 5: 'Confirma' },
+    step1Title: '¿Dónde prefieres tu mesa?',
+    step1Hint: 'Elige el ambiente que más te guste.',
+    step2Title: '¿Cuántas personas?',
+    step2Hint: 'Incluye a todos los comensales de la mesa.',
+    grupoGrandeChip: 'Eventos y grupos grandes',
+    grupoGrandeText: (n) => `Para grupos de ${n}+ personas armamos la reserva a medida contigo.`,
+    grupoGrandeBtn: 'Escríbenos por WhatsApp',
+    whatsappMensaje: (salon, n) => `Hola! Quiero reservar en ${salon}, somos ${n} personas. ¿Me ayudan a coordinar?`,
+    step3Title: 'Elige la fecha y el horario',
+    step3Hint: 'Consultando disponibilidad real.',
+    horariosLoading: 'Consultando horarios disponibles...',
+    horariosEmpty: 'No hay horarios libres para esta fecha. Prueba con otro día.',
+    franjaManana: 'Mañana', franjaTarde: 'Tarde', franjaNoche: 'Noche',
+    step4Title: 'Tus datos de contacto',
+    step4Hint: 'Solo necesitamos esto para confirmarte la reserva.',
+    labelNombre: 'Nombre completo',
+    placeholderNombre: 'Ej: Ana Fernández',
+    errorNombre: 'Ingresa tu nombre y apellido.',
+    labelTelefono: 'Teléfono (con código de país)',
+    placeholderTelefono: 'Ej: 261 534 7036',
+    errorTelefono: 'Ingresa un número válido, solo dígitos.',
+    step5Title: 'Confirma tu reserva',
+    step5Hint: 'Revisa que esté todo bien antes de enviarla.',
+    summaryEspacio: 'Espacio', summaryPersonas: 'Personas', summaryFecha: 'Fecha',
+    summaryHorario: 'Horario', summaryNombre: 'Nombre', summaryTelefono: 'Teléfono',
+    btnContinuar: 'Continuar →', btnVolver: '← Volver', btnVerResumen: 'Ver resumen →',
+    cambiarSalonLink: 'Cambiar espacio',
+    btnConfirmar: 'Confirmar reserva', btnConfirmando: 'Confirmando...',
+    successTitleOk: '¡Reserva exitosa!',
+    successSubMock: 'Esto fue una simulación (modo de prueba) — no se creó ninguna reserva real todavía.',
+    successSubOk: 'Te enviaremos la confirmación por WhatsApp en unos minutos.',
+    successTitleErr: 'Hubo un problema',
+    successSubErrDefault: 'No pudimos confirmar tu reserva. Prueba de nuevo en unos minutos.',
+    footerLabel: 'Desarrollado por',
+    errorCarga: 'No pudimos traer la información del restaurante. Prueba recargar la página en unos minutos.',
+    gestionarLink: '¿Necesitas cancelar? Gestiona tu reserva',
+    modalTitle: 'Tu reserva',
+    modalHint: 'Ingresa el teléfono con el que reservaste para ver tus reservas activas.',
+    modalBuscarBtn: 'Buscar mis reservas',
+    modalBuscando: 'Buscando...',
+    modalEmpty: 'No encontramos reservas activas con ese teléfono.',
+    modalReservaPersonas: 'personas',
+    modalCancelarBtn: 'Cancelar reserva',
+    modalCancelando: 'Cancelando...',
+    modalConfirmarCancelar: '¿Seguro que quieres cancelar esta reserva?',
+    modalCanceladaOk: 'Reserva cancelada correctamente.',
+    modalCanceladaErr: 'No pudimos cancelar la reserva. Intenta de nuevo.',
+  },
+  en: {
+    pageTitle: 'Book your table',
+    topTitle: 'Book your table',
+    topSub: 'Choose the space, date, and time you prefer.',
+    mockBanner: '⚠ Test mode: sample times shown, no reservation is created yet',
+    progressStep: (n, total) => `Step ${n} of ${total}`,
+    stepNames: { 1: 'Choose the space', 2: 'Number of guests', 3: 'Date and time', 4: 'Your details', 5: 'Confirm' },
+    step1Title: 'Where would you like to sit?',
+    step1Hint: 'Pick the atmosphere you like best.',
+    step2Title: 'How many people?',
+    step2Hint: 'Include everyone at the table.',
+    grupoGrandeChip: 'Events & large groups',
+    grupoGrandeText: (n) => `For groups of ${n}+ people, we'll tailor the reservation with you.`,
+    grupoGrandeBtn: 'Message us on WhatsApp',
+    whatsappMensaje: (salon, n) => `Hi! I'd like to book at ${salon}, we're ${n} people. Can you help me coordinate?`,
+    step3Title: 'Choose date and time',
+    step3Hint: 'Checking real availability.',
+    horariosLoading: 'Checking available times...',
+    horariosEmpty: 'No available times for this date. Try another day.',
+    franjaManana: 'Morning', franjaTarde: 'Afternoon', franjaNoche: 'Evening',
+    step4Title: 'Your contact details',
+    step4Hint: "We just need this to confirm your reservation.",
+    labelNombre: 'Full name',
+    placeholderNombre: 'E.g: John Smith',
+    errorNombre: 'Please enter your first and last name.',
+    labelTelefono: 'Phone (with country code)',
+    placeholderTelefono: 'E.g: 555 123 4567',
+    errorTelefono: 'Enter a valid number, digits only.',
+    step5Title: 'Confirm your reservation',
+    step5Hint: 'Check that everything looks right before sending it.',
+    summaryEspacio: 'Space', summaryPersonas: 'People', summaryFecha: 'Date',
+    summaryHorario: 'Time', summaryNombre: 'Name', summaryTelefono: 'Phone',
+    btnContinuar: 'Continue →', btnVolver: '← Back', btnVerResumen: 'Review →',
+    cambiarSalonLink: 'Change space',
+    btnConfirmar: 'Confirm reservation', btnConfirmando: 'Confirming...',
+    successTitleOk: 'Reservation confirmed!',
+    successSubMock: 'This was a simulation (test mode) — no real reservation was created yet.',
+    successSubOk: "We'll send your confirmation via WhatsApp shortly.",
+    successTitleErr: 'Something went wrong',
+    successSubErrDefault: "We couldn't confirm your reservation. Please try again in a few minutes.",
+    footerLabel: 'Powered by',
+    errorCarga: "We couldn't load the restaurant's information. Please try reloading the page in a few minutes.",
+    gestionarLink: 'Need to cancel? Manage your reservation',
+    modalTitle: 'Your reservation',
+    modalHint: 'Enter the phone number you used to book, to see your active reservations.',
+    modalBuscarBtn: 'Find my reservations',
+    modalBuscando: 'Searching...',
+    modalEmpty: "We couldn't find any active reservations with that phone number.",
+    modalReservaPersonas: 'people',
+    modalCancelarBtn: 'Cancel reservation',
+    modalCancelando: 'Cancelling...',
+    modalConfirmarCancelar: 'Are you sure you want to cancel this reservation?',
+    modalCanceladaOk: 'Reservation cancelled successfully.',
+    modalCanceladaErr: "We couldn't cancel the reservation. Please try again.",
+  },
+  pt: {
+    pageTitle: 'Reserve sua mesa',
+    topTitle: 'Reserve sua mesa',
+    topSub: 'Escolha o espaço, a data e o horário que preferir.',
+    mockBanner: '⚠ Modo de teste: horários de exemplo, a reserva ainda não é criada de verdade',
+    progressStep: (n, total) => `Passo ${n} de ${total}`,
+    stepNames: { 1: 'Escolha o espaço', 2: 'Quantidade de pessoas', 3: 'Data e horário', 4: 'Seus dados', 5: 'Confirmar' },
+    step1Title: 'Onde você prefere se sentar?',
+    step1Hint: 'Escolha o ambiente que mais gostar.',
+    step2Title: 'Quantas pessoas?',
+    step2Hint: 'Inclua todos os convidados da mesa.',
+    grupoGrandeChip: 'Eventos e grupos grandes',
+    grupoGrandeText: (n) => `Para grupos de ${n}+ pessoas, montamos a reserva sob medida com você.`,
+    grupoGrandeBtn: 'Fale conosco no WhatsApp',
+    whatsappMensaje: (salon, n) => `Olá! Quero reservar em ${salon}, somos ${n} pessoas. Podem me ajudar a organizar?`,
+    step3Title: 'Escolha a data e o horário',
+    step3Hint: 'Consultando disponibilidade real.',
+    horariosLoading: 'Consultando horários disponíveis...',
+    horariosEmpty: 'Não há horários livres para esta data. Tente outro dia.',
+    franjaManana: 'Manhã', franjaTarde: 'Tarde', franjaNoche: 'Noite',
+    step4Title: 'Seus dados de contato',
+    step4Hint: 'Precisamos só disso para confirmar sua reserva.',
+    labelNombre: 'Nome completo',
+    placeholderNombre: 'Ex: João Silva',
+    errorNombre: 'Informe seu nome e sobrenome.',
+    labelTelefono: 'Telefone (com código do país)',
+    placeholderTelefono: 'Ex: 11 91234-5678',
+    errorTelefono: 'Informe um número válido, somente dígitos.',
+    step5Title: 'Confirme sua reserva',
+    step5Hint: 'Revise se está tudo certo antes de enviar.',
+    summaryEspacio: 'Espaço', summaryPersonas: 'Pessoas', summaryFecha: 'Data',
+    summaryHorario: 'Horário', summaryNombre: 'Nome', summaryTelefono: 'Telefone',
+    btnContinuar: 'Continuar →', btnVolver: '← Voltar', btnVerResumen: 'Ver resumo →',
+    cambiarSalonLink: 'Trocar espaço',
+    btnConfirmar: 'Confirmar reserva', btnConfirmando: 'Confirmando...',
+    successTitleOk: 'Reserva confirmada!',
+    successSubMock: 'Isso foi uma simulação (modo de teste) — nenhuma reserva real foi criada ainda.',
+    successSubOk: 'Enviaremos a confirmação pelo WhatsApp em breve.',
+    successTitleErr: 'Ocorreu um problema',
+    successSubErrDefault: 'Não conseguimos confirmar sua reserva. Tente novamente em alguns minutos.',
+    footerLabel: 'Desenvolvido por',
+    errorCarga: 'Não conseguimos carregar as informações do restaurante. Tente recarregar a página em alguns minutos.',
+    gestionarLink: 'Precisa cancelar? Gerencie sua reserva',
+    modalTitle: 'Sua reserva',
+    modalHint: 'Informe o telefone usado na reserva para ver suas reservas ativas.',
+    modalBuscarBtn: 'Buscar minhas reservas',
+    modalBuscando: 'Buscando...',
+    modalEmpty: 'Não encontramos reservas ativas com esse telefone.',
+    modalReservaPersonas: 'pessoas',
+    modalCancelarBtn: 'Cancelar reserva',
+    modalCancelando: 'Cancelando...',
+    modalConfirmarCancelar: 'Tem certeza que deseja cancelar esta reserva?',
+    modalCanceladaOk: 'Reserva cancelada com sucesso.',
+    modalCanceladaErr: 'Não conseguimos cancelar a reserva. Tente novamente.',
+  },
+};
 
-const RESTAURANT_NAME = 'Flores en Fuego';
+/* Detecta el idioma real del navegador/dispositivo de la visita (mismo
+   criterio que ya usa el agente de WhatsApp -- responde en el idioma
+   en que le escriben). Si el idioma detectado no está soportado
+   todavía, usa español neutro como respaldo. */
+function detectarIdioma(){
+  const raw = (navigator.language || navigator.userLanguage || 'es').toLowerCase();
+  const base = raw.split('-')[0];
+  return TRANSLATIONS[base] ? base : 'es';
+}
+const LANG = detectarIdioma();
+const T = TRANSLATIONS[LANG];
 
-const SALONES = [
-  {
-    id: 'flores',
-    nombre: 'Salón Flores',
-    icon: '🌹',
-    url: 'https://api.airisworld.com/widget/booking/9EhLZ4AEhX8pRhYndBiL',
-    desc: 'Barra propia, ambiente distendido. Ideal para parejas o encuentros informales.',
-    nota: null,
+/* ⚙️ CONFIG — esto es lo único que cambia por cliente */
+const CONFIG = {
+  // restaurantName ya no se hardcodea — se lee de restaurants.name en Supabase
+
+  // ---- SUPABASE — de acá se leen los salones (rooms) en vivo ----
+  supabase: {
+    url: 'https://wjfmzzkvmeznfvoczwda.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndqZm16emt2bWV6bmZ2b2N6d2RhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyMjgwNTMsImV4cCI6MjA5NjgwNDA1M30.V34mXq1OiL3o_9FsVFGpAYUCCoeKifgqUy0_TwqehsI',
+    restaurantSlug: 'flores-en-fuego',
   },
-  {
-    id: 'fuego',
-    nombre: 'Salón Fuego',
-    icon: '🔥',
-    url: 'https://api.airisworld.com/widget/booking/Q1x7fNFSYK91V9kowvMR',
-    desc: 'El más amplio, con DJs los fines de semana. Único con sillones y espacio para grupos grandes.',
-    nota: 'Cerrado martes y domingo',
+
+  // ---- MARCA POR DEFECTO — se usa SOLO si todavía no corriste el SQL
+  //      que agrega las columnas de marca a restaurants en Supabase.
+  //      Apenas existan esas columnas, lo que esté cargado ahí en
+  //      Supabase pisa esto automáticamente. ----
+  brandPorDefecto: {
+    logoType: 'emoji', logoValue: '🍽️',
+    colorPrimario: '#5170FF', colorOscuro: '#0A0F2E', colorSecundario: '#EB9292',
+    colorTextoOscuro: '#0A0F2E', colorTextoMedio: '#3a3f5c',
+    bgColor: '#F4F4F8', bgImage: '', cardColor: '#FFFFFF',
   },
-  {
-    id: 'terraza',
-    nombre: 'Terraza Flores',
-    icon: '🌹',
-    url: 'https://api.airisworld.com/widget/booking/mlamezaGApKAisNbORvI',
-    desc: 'Sobre Arístides Villanueva, al aire libre. Ambiente urbano y dinámico.',
-    nota: null,
-  },
-  {
-    id: 'patio',
-    nombre: 'Patio Flores',
-    icon: '🌹',
-    url: 'https://api.airisworld.com/widget/booking/uEP8coQ7IbtKmyhmkCVb',
-    desc: 'Patio interno rodeado de vegetación. Más íntimo y resguardado que la Terraza.',
-    nota: null,
-  },
-];
+
+  // true = usa horarios de ejemplo y NO crea reservas reales todavía.
+  // Poner en false cuando Lucas tenga los webhooks de n8n listos.
+  MOCK_MODE: false,
+
+  // URLs reales de los 3 endpoints (confirmados con evidencia real, 15/8/2026)
+  webhookHorarios: 'https://n8n.airisworld.com/webhook/disponibilidad-real',
+  webhookReserva: 'https://n8n.airisworld.com/webhook/confirmar-reserva',
+  webhookGrupoGrande: 'https://n8n.airisworld.com/webhook/derivacion-grupo-grande',
+  webhookBuscarReservas: 'https://n8n.airisworld.com/webhook/buscar-mis-reservas',
+  webhookCancelarReserva: 'https://n8n.airisworld.com/webhook/cancelar-reserva',
+
+  // WhatsApp real de Pura Vida, para el botón de "Grupos grandes"
+  // Respaldo únicamente -- el número real se lee de
+  // restaurants.whatsapp_numero en Supabase (dinámico por cliente).
+  // Este valor solo se usa si esa columna todavía no está cargada.
+  whatsappNumero: '5492615347036',
+
+  // (sin array de respaldo — si Supabase falla, se muestra un error real, no datos falsos)
+
+  personasMin: 1,
+  personasMaxPorDefecto: 20, // se usa solo si el salón no tiene max_people cargado en Supabase
+  personasQuickPicks: [2, 4, 6, 8],
+  diasDisponibles: 30,
+
+  // Lista completa de códigos de país -- para que el widget funcione
+  // en cualquier mercado, no solo LATAM/USA/España. Cada entrada tiene
+  // 'iso' (código de país de 2 letras) para poder detectar el más
+  // probable según el idioma/región del dispositivo del visitante.
+  prefijos: [
+    { code: '+93', iso: 'AF', label: '🇦🇫 +93 Afganistán' },
+    { code: '+27', iso: 'ZA', label: '🇿🇦 +27 Sudáfrica' },
+    { code: '+49', iso: 'DE', label: '🇩🇪 +49 Alemania' },
+    { code: '+966', iso: 'SA', label: '🇸🇦 +966 Arabia Saudita' },
+    { code: '+213', iso: 'DZ', label: '🇩🇿 +213 Argelia' },
+    { code: '+549', iso: 'AR', label: '🇦🇷 +54 Argentina' },
+    { code: '+374', iso: 'AM', label: '🇦🇲 +374 Armenia' },
+    { code: '+61', iso: 'AU', label: '🇦🇺 +61 Australia' },
+    { code: '+43', iso: 'AT', label: '🇦🇹 +43 Austria' },
+    { code: '+994', iso: 'AZ', label: '🇦🇿 +994 Azerbaiyán' },
+    { code: '+32', iso: 'BE', label: '🇧🇪 +32 Bélgica' },
+    { code: '+591', iso: 'BO', label: '🇧🇴 +591 Bolivia' },
+    { code: '+55', iso: 'BR', label: '🇧🇷 +55 Brasil' },
+    { code: '+359', iso: 'BG', label: '🇧🇬 +359 Bulgaria' },
+    { code: '+1', iso: 'CA', label: '🇨🇦 +1 Canadá' },
+    { code: '+56', iso: 'CL', label: '🇨🇱 +56 Chile' },
+    { code: '+86', iso: 'CN', label: '🇨🇳 +86 China' },
+    { code: '+357', iso: 'CY', label: '🇨🇾 +357 Chipre' },
+    { code: '+57', iso: 'CO', label: '🇨🇴 +57 Colombia' },
+    { code: '+82', iso: 'KR', label: '🇰🇷 +82 Corea del Sur' },
+    { code: '+225', iso: 'CI', label: '🇨🇮 +225 Costa de Marfil' },
+    { code: '+506', iso: 'CR', label: '🇨🇷 +506 Costa Rica' },
+    { code: '+385', iso: 'HR', label: '🇭🇷 +385 Croacia' },
+    { code: '+53', iso: 'CU', label: '🇨🇺 +53 Cuba' },
+    { code: '+45', iso: 'DK', label: '🇩🇰 +45 Dinamarca' },
+    { code: '+593', iso: 'EC', label: '🇪🇨 +593 Ecuador' },
+    { code: '+20', iso: 'EG', label: '🇪🇬 +20 Egipto' },
+    { code: '+503', iso: 'SV', label: '🇸🇻 +503 El Salvador' },
+    { code: '+971', iso: 'AE', label: '🇦🇪 +971 Emiratos Árabes Unidos' },
+    { code: '+34', iso: 'ES', label: '🇪🇸 +34 España' },
+    { code: '+1', iso: 'US', label: '🇺🇸 +1 Estados Unidos' },
+    { code: '+372', iso: 'EE', label: '🇪🇪 +372 Estonia' },
+    { code: '+251', iso: 'ET', label: '🇪🇹 +251 Etiopía' },
+    { code: '+63', iso: 'PH', label: '🇵🇭 +63 Filipinas' },
+    { code: '+358', iso: 'FI', label: '🇫🇮 +358 Finlandia' },
+    { code: '+33', iso: 'FR', label: '🇫🇷 +33 Francia' },
+    { code: '+995', iso: 'GE', label: '🇬🇪 +995 Georgia' },
+    { code: '+233', iso: 'GH', label: '🇬🇭 +233 Ghana' },
+    { code: '+30', iso: 'GR', label: '🇬🇷 +30 Grecia' },
+    { code: '+502', iso: 'GT', label: '🇬🇹 +502 Guatemala' },
+    { code: '+592', iso: 'GY', label: '🇬🇾 +592 Guyana' },
+    { code: '+509', iso: 'HT', label: '🇭🇹 +509 Haití' },
+    { code: '+504', iso: 'HN', label: '🇭🇳 +504 Honduras' },
+    { code: '+852', iso: 'HK', label: '🇭🇰 +852 Hong Kong' },
+    { code: '+91', iso: 'IN', label: '🇮🇳 +91 India' },
+    { code: '+62', iso: 'ID', label: '🇮🇩 +62 Indonesia' },
+    { code: '+964', iso: 'IQ', label: '🇮🇶 +964 Irak' },
+    { code: '+98', iso: 'IR', label: '🇮🇷 +98 Irán' },
+    { code: '+353', iso: 'IE', label: '🇮🇪 +353 Irlanda' },
+    { code: '+354', iso: 'IS', label: '🇮🇸 +354 Islandia' },
+    { code: '+972', iso: 'IL', label: '🇮🇱 +972 Israel' },
+    { code: '+39', iso: 'IT', label: '🇮🇹 +39 Italia' },
+    { code: '+81', iso: 'JP', label: '🇯🇵 +81 Japón' },
+    { code: '+254', iso: 'KE', label: '🇰🇪 +254 Kenia' },
+    { code: '+371', iso: 'LV', label: '🇱🇻 +371 Letonia' },
+    { code: '+961', iso: 'LB', label: '🇱🇧 +961 Líbano' },
+    { code: '+370', iso: 'LT', label: '🇱🇹 +370 Lituania' },
+    { code: '+352', iso: 'LU', label: '🇱🇺 +352 Luxemburgo' },
+    { code: '+60', iso: 'MY', label: '🇲🇾 +60 Malasia' },
+    { code: '+52', iso: 'MX', label: '🇲🇽 +52 México' },
+    { code: '+212', iso: 'MA', label: '🇲🇦 +212 Marruecos' },
+    { code: '+595', iso: 'PY', label: '🇵🇾 +595 Paraguay' },
+    { code: '+31', iso: 'NL', label: '🇳🇱 +31 Países Bajos' },
+    { code: '+51', iso: 'PE', label: '🇵🇪 +51 Perú' },
+    { code: '+48', iso: 'PL', label: '🇵🇱 +48 Polonia' },
+    { code: '+351', iso: 'PT', label: '🇵🇹 +351 Portugal' },
+    { code: '+1', iso: 'PR', label: '🇵🇷 +1 Puerto Rico' },
+    { code: '+44', iso: 'GB', label: '🇬🇧 +44 Reino Unido' },
+    { code: '+420', iso: 'CZ', label: '🇨🇿 +420 República Checa' },
+    { code: '+1', iso: 'DO', label: '🇩🇴 +1 República Dominicana' },
+    { code: '+40', iso: 'RO', label: '🇷🇴 +40 Rumania' },
+    { code: '+7', iso: 'RU', label: '🇷🇺 +7 Rusia' },
+    { code: '+65', iso: 'SG', label: '🇸🇬 +65 Singapur' },
+    { code: '+421', iso: 'SK', label: '🇸🇰 +421 Eslovaquia' },
+    { code: '+46', iso: 'SE', label: '🇸🇪 +46 Suecia' },
+    { code: '+41', iso: 'CH', label: '🇨🇭 +41 Suiza' },
+    { code: '+66', iso: 'TH', label: '🇹🇭 +66 Tailandia' },
+    { code: '+886', iso: 'TW', label: '🇹🇼 +886 Taiwán' },
+    { code: '+90', iso: 'TR', label: '🇹🇷 +90 Turquía' },
+    { code: '+380', iso: 'UA', label: '🇺🇦 +380 Ucrania' },
+    { code: '+598', iso: 'UY', label: '🇺🇾 +598 Uruguay' },
+    { code: '+58', iso: 'VE', label: '🇻🇪 +58 Venezuela' },
+    { code: '+84', iso: 'VN', label: '🇻🇳 +84 Vietnam' },
+  ],
+};
+
+/* Detecta el prefijo telefónico más probable según el idioma/región
+   del dispositivo del visitante (ej. 'es-MX' -> México, 'pt-BR' ->
+   Brasil, 'en-US' -> Estados Unidos). Si no se puede determinar,
+   respalda en Argentina (primer mercado real de Airis) -- nunca
+   rompe, siempre devuelve algo usable. */
+function detectarPrefijoDefault(){
+  const raw = (navigator.language || navigator.userLanguage || '').toUpperCase();
+  const partes = raw.split('-');
+  const region = partes.length > 1 ? partes[1] : null;
+  if(region){
+    const match = CONFIG.prefijos.find(p => p.iso === region);
+    if(match) return match.code;
+  }
+  const ar = CONFIG.prefijos.find(p => p.iso === 'AR');
+  return ar ? ar.code : CONFIG.prefijos[0].code;
+}
+
+// Horarios de ejemplo, solo mientras CONFIG.MOCK_MODE = true
+const MOCK_HORARIOS = ['12:30','13:00','13:30','20:00','20:30','21:00','21:30','22:00'];
 
 /* ============================================================
    De acá para abajo no hace falta tocar nada por cliente.
    ============================================================ */
 
-document.title = `Reservá tu mesa — ${RESTAURANT_NAME}`;
-document.getElementById('topEyebrow').textContent = RESTAURANT_NAME;
+let restaurantData = null; // se completa con cargarRestaurante()
 
+/* Trae nombre, prefijo telefónico y marca (logo/colores) del
+   restaurante desde Supabase. Si las columnas de marca todavía no
+   existen (no corriste el SQL), reintenta pidiendo solo las columnas
+   base y usa CONFIG.brandPorDefecto para lo visual. */
+async function cargarRestaurante(){
+  const sb = window.supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
 
-function renderList(){
-  const wrap = document.getElementById('salonList');
-  wrap.innerHTML = '';
-  SALONES.forEach(s => {
+  const columnasCompletas = 'id, name, phone_prefix, timezone, whatsapp_numero, logo_type, logo_value, color_primario, color_oscuro, color_secundario, color_texto_oscuro, color_texto_medio, color_bg, color_card, bg_image';
+  let { data, error } = await sb.from('restaurants').select(columnasCompletas).eq('slug', CONFIG.supabase.restaurantSlug).single();
+
+  if(error){
+    console.warn('[Pura Vida widget] columnas de marca no encontradas todavía (¿corriste el SQL?), sigo solo con datos base:', error.message);
+    const basico = await sb.from('restaurants').select('id, name, phone_prefix, timezone, whatsapp_numero').eq('slug', CONFIG.supabase.restaurantSlug).single();
+    if(basico.error) throw basico.error;
+    data = basico.data;
+  }
+  return data;
+}
+
+function aplicarMarca(restaurante){
+  const b = CONFIG.brandPorDefecto;
+  const root = document.documentElement.style;
+  root.setProperty('--azul', restaurante.color_primario || b.colorPrimario);
+  root.setProperty('--navy', restaurante.color_oscuro || b.colorOscuro);
+  root.setProperty('--coral', restaurante.color_secundario || b.colorSecundario);
+  root.setProperty('--texto-oscuro', restaurante.color_texto_oscuro || b.colorTextoOscuro);
+  root.setProperty('--texto-medio', restaurante.color_texto_medio || b.colorTextoMedio);
+  root.setProperty('--paper', restaurante.color_bg || b.bgColor);
+  root.setProperty('--card-bg', restaurante.color_card || b.cardColor);
+  // --blanco NO se pisa acá a propósito: es el color de texto/ícono
+  // sobre fondos de acento (botones, chips seleccionados) -- tiene
+  // que quedar blanco siempre, en cualquier tema, claro u oscuro.
+
+  const bgImage = restaurante.bg_image || b.bgImage;
+  if(bgImage){
+    document.body.style.backgroundImage = `linear-gradient(rgba(255,255,255,0.55), rgba(255,255,255,0.55)), url('${bgImage}')`;
+    document.body.style.backgroundSize = 'cover';
+    document.body.style.backgroundPosition = 'center';
+    document.body.style.backgroundAttachment = 'fixed';
+  }
+
+  const logoType = restaurante.logo_type || b.logoType;
+  const logoValue = restaurante.logo_value || b.logoValue;
+  const logoEl = document.getElementById('logoBadge');
+  if(logoType === 'image'){
+    logoEl.innerHTML = `<img src="${logoValue}" alt="${restaurante.name}">`;
+  }else{
+    logoEl.textContent = logoValue;
+  }
+}
+
+function mostrarErrorCarga(mensaje){
+  document.getElementById('mockBanner').classList.add('hidden');
+  document.querySelector('.widget').innerHTML = `
+    <div style="text-align:center;padding:20px 0">
+      <div class="step-title">${T.successTitleErr}</div>
+      <div class="step-hint">${mensaje}</div>
+    </div>`;
+}
+
+/* Aplica el diccionario de idioma detectado a todos los textos
+   estáticos de la página -- se llama una sola vez, al arrancar. */
+function aplicarIdioma(){
+  document.documentElement.lang = LANG;
+  document.getElementById('pageTitle').textContent = T.pageTitle;
+  document.getElementById('topTitle').textContent = T.topTitle;
+  document.getElementById('topSub').textContent = T.topSub;
+  document.getElementById('mockBanner').textContent = T.mockBanner;
+
+  document.getElementById('step1Title').textContent = T.step1Title;
+  document.getElementById('step1Hint').textContent = T.step1Hint;
+  document.getElementById('next1').textContent = T.btnContinuar;
+
+  document.getElementById('step2Title').textContent = T.step2Title;
+  document.getElementById('back2').textContent = T.btnVolver;
+  document.getElementById('next2').textContent = T.btnContinuar;
+
+  document.getElementById('step3Title').textContent = T.step3Title;
+  document.getElementById('disponibilidadHint').textContent = T.step3Hint;
+  document.getElementById('back3').textContent = T.btnVolver;
+  document.getElementById('next3').textContent = T.btnContinuar;
+  document.getElementById('cambiarSalonLink').textContent = T.cambiarSalonLink;
+
+  document.getElementById('step4Title').textContent = T.step4Title;
+  document.getElementById('step4Hint').textContent = T.step4Hint;
+  document.getElementById('labelNombre').textContent = T.labelNombre;
+  document.getElementById('nombreInput').placeholder = T.placeholderNombre;
+  document.getElementById('nombreError').textContent = T.errorNombre;
+  document.getElementById('labelTelefono').textContent = T.labelTelefono;
+  document.getElementById('telInput').placeholder = T.placeholderTelefono;
+  document.getElementById('telError').textContent = T.errorTelefono;
+  document.getElementById('back4').textContent = T.btnVolver;
+  document.getElementById('next4').textContent = T.btnVerResumen;
+
+  document.getElementById('step5Title').textContent = T.step5Title;
+  document.getElementById('step5Hint').textContent = T.step5Hint;
+  document.getElementById('back5').textContent = T.btnVolver;
+  document.getElementById('confirmBtn').textContent = T.btnConfirmar;
+
+  document.getElementById('footerLabel').textContent = T.footerLabel;
+  document.getElementById('abrirGestionar').textContent = T.gestionarLink;
+  document.getElementById('modalTitle').textContent = T.modalTitle;
+  document.getElementById('modalHint').textContent = T.modalHint;
+  document.getElementById('modalBuscarBtn').textContent = T.modalBuscarBtn;
+}
+
+const state = {
+  step: 1, salon: null, personas: 2,
+  fechaISO: null, fechaLabel: null, hora: null, horaISO: null,
+  nombre: '', prefijo: detectarPrefijoDefault(), telefono: '',
+};
+
+const totalSteps = 5;
+
+function renderProgress(){
+  const bar = document.getElementById('progressBar');
+  bar.innerHTML = '';
+  for(let i=1;i<=totalSteps;i++){
+    const seg = document.createElement('div');
+    seg.className = 'progress-seg' + (i < state.step ? ' done' : i === state.step ? ' active' : '');
+    const fill = document.createElement('div');
+    fill.className = 'progress-seg-fill';
+    seg.appendChild(fill);
+    bar.appendChild(seg);
+  }
+  document.getElementById('progressStepLabel').textContent = T.progressStep(Math.min(state.step,totalSteps), totalSteps);
+  document.getElementById('progressStepName').textContent = T.stepNames[Math.min(state.step,totalSteps)] || '';
+}
+
+function goToStep(n){
+  document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+  document.querySelector(`.step[data-step="${n}"]`).classList.add('active');
+  state.step = n;
+  renderProgress();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function renderSalones(){
+  const grid = document.getElementById('salonGrid');
+  grid.innerHTML = '';
+  CONFIG.salones.forEach(s => {
     const card = document.createElement('div');
-    card.className = 'salon-card';
+    card.className = 'salon-card' + (state.salon === s.id ? ' selected' : '');
     card.innerHTML = `
-      <div class="salon-top">
-        <div class="salon-emoji">${s.icon}</div>
-        <div>
-          <div class="salon-name">${s.nombre}</div>
-          ${s.nota ? `<div class="salon-closed">${s.nota}</div>` : ''}
-        </div>
-      </div>
-      <div class="salon-desc">${s.desc}</div>
-      <div class="salon-cta">Reservar en ${s.nombre} <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+      <div class="salon-icon">${s.icon}</div>
+      <div class="salon-info"><h4>${s.nombre}</h4><p>${s.desc}</p></div>
+      <div class="salon-check"></div>
     `;
-    card.addEventListener('click', () => openBooking(s));
-    wrap.appendChild(card);
+    card.addEventListener('click', () => {
+      state.salon = s.id;
+      state.personasMax = s.maxPersonasPorReserva;
+      if(state.personas > state.personasMax) state.personas = state.personasMax;
+      renderSalones();
+      document.getElementById('next1').disabled = false;
+    });
+    grid.appendChild(card);
   });
 }
 
-function openBooking(salon){
-  iframeLoadCount = 0;
-  document.getElementById('thankyouView').classList.remove('active');
-  document.getElementById('salonListWrap').classList.add('hidden');
-  document.getElementById('bookingView').classList.add('active');
-  document.getElementById('loadingOverlay').classList.remove('hidden');
-  document.getElementById('bookingFrame').src = salon.url;
-  window.scrollTo({top:0, behavior:'smooth'});
+function renderPersonas(){
+  document.getElementById('personasNum').textContent = state.personas;
+  document.getElementById('personasMinus').disabled = state.personas <= CONFIG.personasMin;
+  document.getElementById('personasPlus').disabled = state.personas >= (state.personasMax || CONFIG.personasMaxPorDefecto);
+  const tope = state.personasMax || CONFIG.personasMaxPorDefecto;
+  const quick = document.getElementById('personasQuick');
+  quick.innerHTML = '';
+  CONFIG.personasQuickPicks.filter(n => n <= tope).forEach(n => {
+    const chip = document.createElement('div');
+    chip.className = 'quick-chip' + (state.personas === n ? ' selected' : '');
+    chip.textContent = `${n} personas`;
+    chip.addEventListener('click', () => { state.personas = n; ocultarCartelGrupo(); renderPersonas(); });
+    quick.appendChild(chip);
+  });
+
+  // Chip fijo, siempre visible junto a los demás -- no depende de llegar
+  // al tope con el stepper. Estilo distinto (coral) para diferenciarlo
+  // como "esto no es un número más, es otra cosa".
+  const chipGrupo = document.createElement('div');
+  chipGrupo.className = 'quick-chip';
+  chipGrupo.style.borderColor = 'var(--coral)';
+  chipGrupo.style.color = 'var(--coral)';
+  chipGrupo.textContent = T.grupoGrandeChip;
+  chipGrupo.addEventListener('click', () => mostrarCartelGrupo());
+  quick.appendChild(chipGrupo);
 }
 
-function closeBooking(){
-  document.getElementById('bookingView').classList.remove('active');
-  document.getElementById('thankyouView').classList.remove('active');
-  document.getElementById('salonListWrap').classList.remove('hidden');
-  document.getElementById('bookingFrame').src = '';
-  window.scrollTo({top:0, behavior:'smooth'});
+/* Muestra el cartel de derivación a WhatsApp para grupos grandes --
+   independiente del valor de state.personas, se puede activar desde
+   el chip fijo (siempre visible) o automáticamente al llegar al tope
+   con el stepper +/-. */
+function mostrarCartelGrupo(){
+  const grupoBox = document.getElementById('grupoGrandeBox');
+  const tope = state.personasMax || CONFIG.personasMaxPorDefecto;
+  grupoBox.style.display = 'block';
+  document.getElementById('grupoGrandeTexto').textContent = T.grupoGrandeText(tope + 1);
+  document.getElementById('grupoGrandeBtn').textContent = T.grupoGrandeBtn;
+  document.getElementById('grupoGrandeBtn').onclick = (e) => {
+    e.preventDefault();
+    derivarGrupoGrande();
+  };
+  grupoBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
-
-function showThankYou(){
-  document.getElementById('bookingView').classList.remove('active');
-  document.getElementById('thankyouView').classList.add('active');
-  document.getElementById('bookingFrame').src = '';
-  window.scrollTo({top:0, behavior:'smooth'});
+function ocultarCartelGrupo(){
+  document.getElementById('grupoGrandeBox').style.display = 'none';
 }
-
-let iframeLoadCount = 0;
-
-document.getElementById('backBtn').addEventListener('click', closeBooking);
-
-document.getElementById('bookingFrame').addEventListener('load', () => {
-  const frame = document.getElementById('bookingFrame');
-  if(!frame.src || frame.src === 'about:blank') return;
-  iframeLoadCount++;
-  if(iframeLoadCount === 1){
-    document.getElementById('loadingOverlay').classList.add('hidden');
-  }
+document.getElementById('personasMinus').addEventListener('click', () => {
+  if(state.personas > CONFIG.personasMin){ state.personas--; ocultarCartelGrupo(); renderPersonas(); }
+});
+document.getElementById('personasPlus').addEventListener('click', () => {
+  if(state.personas < (state.personasMax || CONFIG.personasMaxPorDefecto)){ state.personas++; renderPersonas(); }
+  else { mostrarCartelGrupo(); }
 });
 
-/* Señal específica que manda gracias-flores-en-fuego.html cuando GHL
-   redirige ahí después de confirmar la reserva (ver ese archivo). */
-window.addEventListener('message', (event) => {
-  if(event.data && event.data.type === 'airis-reserva-confirmada'){
-    showThankYou();
+/* Deriva un pedido de grupo grande: abre WhatsApp con el mensaje
+   pre-cargado (en el idioma detectado, para que el cliente no espere
+   nada) y, en paralelo, avisa al Endpoint 3 para que quede registrado
+   en Contacto/derivaciones, sin bloquear la apertura de WhatsApp si
+   ese llamado tarda o falla. */
+function derivarGrupoGrande(){
+  const salon = CONFIG.salones.find(s => s.id === state.salon);
+  const nombreSalon = salon ? salon.nombre : '';
+  const texto = T.whatsappMensaje(nombreSalon, state.personas);
+  const numeroWhatsapp = restaurantData?.whatsapp_numero || CONFIG.whatsappNumero;
+  const url = `https://wa.me/${numeroWhatsapp}?text=${encodeURIComponent(texto)}`;
+  window.open(url, '_blank');
+
+  if(!CONFIG.MOCK_MODE && salon){
+    fetch(CONFIG.webhookGrupoGrande, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        restaurant_id: restaurantData.id,
+        room_slug: salon.id,
+        nombre: 'Consulta desde la página',
+        telefono: '',
+        personas: state.personas,
+      }),
+    }).catch(e => console.warn('[Pura Vida widget] no se pudo registrar la derivación (no bloqueante):', e));
   }
+}
+
+const DOW = ['DOM','LUN','MAR','MIE','JUE','VIE','SAB'];
+const MON = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+
+function renderFechas(){
+  const scroll = document.getElementById('dateScroll');
+  scroll.innerHTML = '';
+  const today = new Date();
+  // Días cerrados del salón elegido -- 100% dinámico, viene de
+  // rooms.closed_days de Supabase, nunca hardcodeado. Cada restaurante
+  // (y cada salón dentro de un mismo restaurante) puede tener sus
+  // propios días de cierre semanal.
+  const salonActual = CONFIG.salones.find(s => s.id === state.salon);
+  const closedDays = salonActual?.closedDays || [];
+
+  const resumenTexto = document.getElementById('salonResumenTexto');
+  if(resumenTexto) resumenTexto.textContent = salonActual ? `${salonActual.icon} ${salonActual.nombre}` : '';
+
+  if(state.salon){
+    console.log('[Pura Vida widget] DIAGNÓSTICO -- salón elegido:', state.salon,
+      '| días cerrados de este salón:', closedDays,
+      '| excepciones cargadas para este salón:', EXCEPCIONES_APERTURA[state.salon] ? [...EXCEPCIONES_APERTURA[state.salon]] : 'ninguna');
+  }
+
+  for(let i=0;i<CONFIG.diasDisponibles;i++){
+    const d = new Date(today);
+    d.setDate(today.getDate()+i);
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    const iso = `${yyyy}-${mm}-${dd}`;
+    const esCerradoNormal = closedDays.includes(d.getDay());
+    // Si hoy está normalmente cerrado, pero hay un aviso real y activo
+    // de Apertura Especial para esta fecha puntual en este salón, la
+    // excepción gana -- el día se muestra abierto igual.
+    const tieneExcepcion = EXCEPCIONES_APERTURA[state.salon]?.has(iso) || false;
+    const esCerrado = esCerradoNormal && !tieneExcepcion;
+    const chip = document.createElement('div');
+    chip.className = 'date-chip'
+      + (state.fechaISO === iso ? ' selected' : '')
+      + (esCerrado ? ' closed' : '');
+    chip.innerHTML = `
+      <div class="date-dow">${DOW[d.getDay()]}</div>
+      <div class="date-num">${d.getDate()}</div>
+      <div class="date-mon">${MON[d.getMonth()]}</div>
+    `;
+    chip.dataset.iso = iso;
+    if(!esCerrado){
+      chip.addEventListener('click', () => seleccionarFecha(iso, d));
+    }
+    scroll.appendChild(chip);
+  }
+
+  // Si ya había una fecha elegida de una vuelta anterior (ej: el cliente
+  // volvió a cambiar de salón con "Cambiar espacio" y ahora regresa acá),
+  // el chip queda marcado como seleccionado arriba, pero el grid de
+  // horarios todavía tiene los datos del salón anterior -- nunca se
+  // vuelve a pedir solo por reconstruir los chips. Dos casos:
+  const chipPrevio = state.fechaISO ? scroll.querySelector(`.date-chip[data-iso="${state.fechaISO}"]`) : null;
+  if(chipPrevio && !chipPrevio.classList.contains('closed')){
+    // La fecha sigue siendo válida para el salón actual -> refrescamos
+    // los horarios reales para esa combinación salón+fecha nueva.
+    cargarHorarios();
+  } else if(state.fechaISO){
+    // La fecha ya no es válida para el nuevo salón (día cerrado sin
+    // excepción) -> se limpia la selección para no dejar arrastrado
+    // un horario que ya no corresponde.
+    state.fechaISO = null; state.fechaLabel = null; state.hora = null; state.horaISO = null;
+    document.getElementById('timeGrid').innerHTML = '';
+    document.getElementById('next3').disabled = true;
+  }
+}
+
+/* Selecciona una fecha SIN reconstruir todo el selector -- solo mueve
+   la clase "selected" al chip correspondiente. Reconstruir todo el DOM
+   (como hacía antes) resetea el scroll horizontal a la posición
+   inicial en cualquier navegador -- por eso, al elegir una fecha
+   lejana (scrolleando con las flechas), la pantalla "saltaba" de
+   vuelta al principio, dando la sensación de que el click no
+   funcionaba. Confirmado como causa real, corregido acá. */
+function seleccionarFecha(iso, d){
+  state.fechaISO = iso;
+  state.fechaLabel = `${d.getDate()} de ${MON[d.getMonth()].charAt(0)+MON[d.getMonth()].slice(1).toLowerCase()}`;
+  state.hora = null;
+  document.querySelectorAll('.date-chip').forEach(el => el.classList.remove('selected'));
+  const chipEl = document.querySelector(`.date-chip[data-iso="${iso}"]`);
+  if(chipEl) chipEl.classList.add('selected');
+  cargarHorarios();
+}
+
+/* Las flechas desplazan el selector una "pantalla" por click. No se
+   deshabilitan automáticamente en los extremos -- ese cálculo dependía
+   de medir el ancho del selector, que puede estar oculto (display:none,
+   antes de llegar al paso 3) y medir 0, dejando la flecha bloqueada
+   por error incluso habiendo más fechas para mostrar. Más simple y
+   más confiable: siempre activas, sin efecto si ya no hay más para
+   ese lado. */
+document.getElementById('dateArrowLeft').addEventListener('click', () => {
+  const scroll = document.getElementById('dateScroll');
+  scroll.scrollBy({ left: -scroll.clientWidth * 0.8, behavior: 'smooth' });
+});
+document.getElementById('dateArrowRight').addEventListener('click', () => {
+  const scroll = document.getElementById('dateScroll');
+  scroll.scrollBy({ left: scroll.clientWidth * 0.8, behavior: 'smooth' });
 });
 
-renderList();
+/* Consulta el Endpoint 1 real (disponibilidad-real). En modo de prueba
+   devuelve horarios de ejemplo. Devuelve un array de {iso, label} -- ya
+   no strings sueltos, porque ahora necesitamos el ISO exacto para poder
+   crear la reserva real después, sin volver a calcular nada. */
+async function obtenerHorarios(roomSlug, fechaISO){
+  if(CONFIG.MOCK_MODE){
+    await new Promise(r => setTimeout(r, 500));
+    return MOCK_HORARIOS.map(h => ({ iso: `${fechaISO}T${h}:00-03:00`, label: h }));
+  }
+  try{
+    const res = await fetch(CONFIG.webhookHorarios, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        restaurant_id: restaurantData.id,
+        room_slug: roomSlug,
+        fecha: fechaISO,
+        personas: state.personas,
+      }),
+    });
+    const data = await res.json();
+    return (data.horarios || []).map(h => ({ iso: h.horario_iso, label: h.horario_label }));
+  }catch(e){
+    console.error('[Pura Vida widget] error consultando horarios', e);
+    return [];
+  }
+}
+
+async function cargarHorarios(){
+  const grid = document.getElementById('timeGrid');
+  grid.innerHTML = `<div class="time-loading">${T.horariosLoading}</div>`;
+  document.getElementById('next3').disabled = true;
+
+  const salon = CONFIG.salones.find(s => s.id === state.salon);
+  const horarios = await obtenerHorarios(salon.id, state.fechaISO);
+
+  grid.innerHTML = '';
+  if(horarios.length === 0){
+    grid.innerHTML = `<div class="time-empty">${T.horariosEmpty}</div>`;
+    return;
+  }
+
+  // Agrupa por franja del día (mañana/tarde/noche) leyendo la hora
+  // directo del ISO -- así, si un restaurante tiene un solo turno
+  // (ej. solo de noche), nunca aparece un título de franja vacío o
+  // sobrando; el título solo se muestra cuando de verdad hace falta
+  // separar 2 o más franjas con horarios reales.
+  const franjas = [
+    { id: 'manana', label: T.franjaManana, desde: 0, hasta: 12 },
+    { id: 'tarde',  label: T.franjaTarde,  desde: 12, hasta: 19 },
+    { id: 'noche',  label: T.franjaNoche,  desde: 19, hasta: 24 },
+  ];
+  const grupos = franjas.map(f => ({
+    ...f,
+    items: horarios.filter(h => {
+      const hora = parseInt(h.iso.slice(11, 13), 10);
+      return hora >= f.desde && hora < f.hasta;
+    })
+  })).filter(g => g.items.length > 0);
+
+  const mostrarTitulos = grupos.length > 1;
+
+  grupos.forEach(g => {
+    if(mostrarTitulos){
+      const titulo = document.createElement('div');
+      titulo.className = 'time-franja-label';
+      titulo.textContent = g.label;
+      grid.appendChild(titulo);
+    }
+    const fila = document.createElement('div');
+    fila.className = 'time-grid';
+    g.items.forEach(h => {
+      const slot = document.createElement('div');
+      slot.className = 'time-slot' + (state.horaISO === h.iso ? ' selected' : '');
+      slot.textContent = h.label;
+      slot.addEventListener('click', () => {
+        state.hora = h.label;
+        state.horaISO = h.iso;
+        cargarHorarios();
+        document.getElementById('next3').disabled = false;
+      });
+      fila.appendChild(slot);
+    });
+    grid.appendChild(fila);
+  });
+}
+
+function renderPrefijos(){
+  const sel = document.getElementById('prefijoSelect');
+  sel.innerHTML = '';
+  CONFIG.prefijos.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p.code;
+    opt.textContent = p.label;
+    sel.appendChild(opt);
+  });
+  sel.value = state.prefijo;
+  sel.addEventListener('change', () => { state.prefijo = sel.value; });
+}
+
+function validarDatos(){
+  const nombre = document.getElementById('nombreInput').value.trim();
+  const tel = document.getElementById('telInput').value.trim();
+  const telDigits = tel.replace(/\D/g,'');
+
+  const nombreOk = nombre.length > 3 && nombre.includes(' ');
+  document.getElementById('nombreError').classList.toggle('show', !nombreOk);
+
+  const telOk = telDigits.length >= 6;
+  document.getElementById('telError').classList.toggle('show', !telOk);
+
+  if(nombreOk && telOk){
+    state.nombre = nombre;
+    state.telefono = telDigits;
+    return true;
+  }
+  return false;
+}
+
+function renderResumen(){
+  const salon = CONFIG.salones.find(s => s.id === state.salon);
+  const card = document.getElementById('summaryCard');
+  card.innerHTML = `
+    <div class="summary-row"><span class="summary-row-label">${T.summaryEspacio}</span><span class="summary-row-val">${salon.nombre}</span></div>
+    <div class="summary-row"><span class="summary-row-label">${T.summaryPersonas}</span><span class="summary-row-val">${state.personas}</span></div>
+    <div class="summary-row"><span class="summary-row-label">${T.summaryFecha}</span><span class="summary-row-val">${state.fechaLabel}</span></div>
+    <div class="summary-row"><span class="summary-row-label">${T.summaryHorario}</span><span class="summary-row-val">${state.hora}</span></div>
+    <div class="summary-row"><span class="summary-row-label">${T.summaryNombre}</span><span class="summary-row-val">${state.nombre}</span></div>
+    <div class="summary-row"><span class="summary-row-label">${T.summaryTelefono}</span><span class="summary-row-val">${state.prefijo} ${state.telefono}</span></div>
+  `;
+}
+
+/* Crea la reserva real vía el Endpoint 2 (confirmar-reserva). En modo
+   de prueba solo simula el envío. */
+async function crearReserva(){
+  const salon = CONFIG.salones.find(s => s.id === state.salon);
+  const payload = {
+    restaurant_id: restaurantData.id,
+    room_slug: salon.id,
+    horario_iso: state.horaISO,
+    personas: state.personas,
+    nombre: state.nombre,
+    telefono: `${state.prefijo}${state.telefono}`,
+    notas: '',
+  };
+
+  if(CONFIG.MOCK_MODE){
+    await new Promise(r => setTimeout(r, 600));
+    console.log('[Pura Vida widget] MOCK — se hubiera creado esta reserva:', payload);
+    return { success: true };
+  }
+
+  try{
+    const res = await fetch(CONFIG.webhookReserva, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload),
+    });
+    return await res.json();
+  }catch(e){
+    console.error('[Pura Vida widget] error creando la reserva', e);
+    return { success: false };
+  }
+}
+
+document.getElementById('next1').addEventListener('click', () => goToStep(2));
+document.getElementById('back2').addEventListener('click', () => goToStep(1));
+document.getElementById('next2').addEventListener('click', () => { renderFechas(); goToStep(3); });
+document.getElementById('back3').addEventListener('click', () => goToStep(2));
+document.getElementById('cambiarSalonLink').addEventListener('click', (e) => { e.preventDefault(); goToStep(1); });
+document.getElementById('next3').addEventListener('click', () => goToStep(4));
+document.getElementById('back4').addEventListener('click', () => goToStep(3));
+document.getElementById('next4').addEventListener('click', () => {
+  if(validarDatos()){ renderResumen(); goToStep(5); }
+});
+document.getElementById('back5').addEventListener('click', () => goToStep(4));
+
+document.getElementById('confirmBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('confirmBtn');
+  btn.disabled = true;
+  btn.textContent = T.btnConfirmando;
+
+  const resultado = await crearReserva();
+
+  if(resultado.success){
+    document.getElementById('successTitle').textContent = T.successTitleOk;
+    document.getElementById('successSub').textContent = CONFIG.MOCK_MODE
+      ? T.successSubMock
+      : T.successSubOk;
+  }else{
+    document.getElementById('successTitle').textContent = T.successTitleErr;
+    // Nota: 'resultado.message' viene del backend (Endpoint 2), hoy solo
+    // en español -- si no hay mensaje específico, usamos el genérico ya
+    // traducido. Internacionalizar el backend queda como mejora futura.
+    document.getElementById('successSub').textContent = resultado.message
+      || T.successSubErrDefault;
+  }
+  goToStep(6);
+  btn.disabled = false;
+  btn.textContent = T.btnConfirmar;
+});
+
+const DIAS_SEMANA = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+
+function closedDaysToTexto(closedDays){
+  if(!closedDays || closedDays.length === 0) return null;
+  const nombres = closedDays.map(d => DIAS_SEMANA[d]);
+  return 'Cerrado ' + nombres.join(' y ');
+}
+
+/* Trae los salones activos de este restaurante directo de Supabase
+   (tabla rooms, filtrando por el slug del restaurante). Si algo falla
+   (RLS, red, etc.) usa CONFIG.salonesRespaldo para que la página
+   nunca quede rota. */
+async function cargarSalones(){
+  const sb = window.supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
+  const { data, error } = await sb
+    .from('rooms')
+    .select('slug, name, emoji, ghl_calendar_id, descripcion_fisica, closed_days, max_people, max_personas_por_reserva, restaurants!inner(slug)')
+    .eq('restaurants.slug', CONFIG.supabase.restaurantSlug)
+    .eq('active', true)
+    .order('sort_order');
+
+  if(error) throw error;
+  if(!data || data.length === 0) throw new Error('No hay salones activos cargados para este restaurante en Supabase.');
+
+  return data.map(row => ({
+    id: row.slug,
+    nombre: row.name,
+    icon: row.emoji || '🍽️',
+    calendarId: row.ghl_calendar_id,
+    desc: row.descripcion_fisica || '',
+    nota: closedDaysToTexto(row.closed_days),
+    closedDays: row.closed_days || [],
+    maxPeople: row.max_people || CONFIG.personasMaxPorDefecto,
+    maxPersonasPorReserva: row.max_personas_por_reserva || 8,
+  }));
+}
+
+/* Trae los avisos activos de "Apertura Especial" del restaurante, y
+   arma un Set con las fechas (YYYY-MM-DD) que cada salón tiene abiertas
+   por excepción -- para no bloquear en el selector un día que
+   normalmente está cerrado (rooms.closed_days) pero que un aviso real
+   activo abrió puntualmente. Se guarda en EXCEPCIONES_APERTURA, un
+   objeto { room_slug: Set(fechas) }, calculado una sola vez al cargar. */
+let EXCEPCIONES_APERTURA = {};
+async function cargarExcepcionesAperturaEspecial(){
+  try{
+    const sb = window.supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
+    const { data, error } = await sb.from('airis_avisos')
+      .select('fecha_desde, datos')
+      .eq('restaurant_id', restaurantData.id)
+      .eq('categoria', 'apertura_especial')
+      .eq('activo', true);
+    if(error) throw error;
+
+    const mapa = {};
+    (data || []).forEach(aviso => {
+      const rooms = aviso.datos?.rooms || [];
+      // Normalizamos a los primeros 10 caracteres (YYYY-MM-DD) --
+      // Supabase puede devolver fecha_desde como fecha pura o con hora
+      // y zona horaria incluida según el tipo real de la columna, y una
+      // comparación exacta de texto fallaba en silencio si no coincidía
+      // carácter por carácter. Esto funciona sea cual sea el formato real.
+      const fechaNormalizada = String(aviso.fecha_desde).slice(0, 10);
+      rooms.forEach(r => {
+        if(!mapa[r.room_slug]) mapa[r.room_slug] = new Set();
+        mapa[r.room_slug].add(fechaNormalizada);
+      });
+    });
+    EXCEPCIONES_APERTURA = mapa;
+    console.log('[Pura Vida widget] excepciones de apertura especial cargadas:', EXCEPCIONES_APERTURA);
+  }catch(e){
+    console.warn('[Pura Vida widget] no se pudieron cargar las excepciones de apertura especial (no bloqueante):', e);
+    EXCEPCIONES_APERTURA = {};
+  }
+}
+
+async function init(){
+  aplicarIdioma();
+  try{
+    restaurantData = await cargarRestaurante();
+    document.title = `${T.pageTitle} — ${restaurantData.name}`;
+    document.getElementById('topEyebrow').textContent = restaurantData.name;
+    aplicarMarca(restaurantData);
+    if(restaurantData.phone_prefix){
+      const yaExiste = CONFIG.prefijos.find(p => p.code === restaurantData.phone_prefix);
+      if(yaExiste) state.prefijo = restaurantData.phone_prefix;
+    }
+
+    CONFIG.salones = await cargarSalones();
+    await cargarExcepcionesAperturaEspecial();
+    if(!CONFIG.MOCK_MODE) document.getElementById('mockBanner').classList.add('hidden');
+
+    renderSalones();
+    renderPersonas();
+    renderFechas();
+    renderPrefijos();
+    renderProgress();
+  }catch(e){
+    console.error('[Pura Vida widget] error cargando datos de Supabase:', e);
+    mostrarErrorCarga(T.errorCarga);
+  }
+}
+/* ============================================================
+   Modal "Gestionar mi reserva" -- búsqueda por teléfono y
+   cancelación. Independiente del flujo de 6 pasos de arriba,
+   se puede abrir en cualquier momento desde el link del footer.
+   ============================================================ */
+function renderPrefijosModal(){
+  const sel = document.getElementById('modalPrefijoSelect');
+  sel.innerHTML = '';
+  CONFIG.prefijos.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p.code;
+    opt.textContent = p.label;
+    sel.appendChild(opt);
+  });
+  sel.value = state.prefijo;
+}
+
+function abrirModalGestionar(){
+  document.getElementById('modalGestionar').classList.add('open');
+  document.getElementById('modalResultados').innerHTML = '';
+  document.getElementById('modalTelInput').value = '';
+  renderPrefijosModal();
+}
+function cerrarModalGestionar(){
+  document.getElementById('modalGestionar').classList.remove('open');
+}
+document.getElementById('abrirGestionar').addEventListener('click', abrirModalGestionar);
+document.getElementById('cerrarGestionar').addEventListener('click', cerrarModalGestionar);
+document.getElementById('modalGestionar').addEventListener('click', (e) => {
+  if(e.target.id === 'modalGestionar') cerrarModalGestionar();
+});
+
+async function buscarMisReservas(){
+  const prefijo = document.getElementById('modalPrefijoSelect').value;
+  const telDigits = document.getElementById('modalTelInput').value.trim().replace(/\D/g,'');
+  const telefono = `${prefijo}${telDigits}`;
+  const btn = document.getElementById('modalBuscarBtn');
+  const resultados = document.getElementById('modalResultados');
+
+  btn.disabled = true;
+  btn.textContent = T.modalBuscando;
+  resultados.innerHTML = '';
+
+  try{
+    const res = await fetch(CONFIG.webhookBuscarReservas, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ restaurant_id: restaurantData.id, telefono }),
+    });
+    const data = await res.json();
+    renderReservasEncontradas(data.reservas || []);
+  }catch(e){
+    console.error('[Pura Vida widget] error buscando reservas', e);
+    renderReservasEncontradas([]);
+  }
+
+  btn.disabled = false;
+  btn.textContent = T.modalBuscarBtn;
+}
+document.getElementById('modalBuscarBtn').addEventListener('click', buscarMisReservas);
+
+function renderReservasEncontradas(reservas){
+  const cont = document.getElementById('modalResultados');
+  cont.innerHTML = '';
+
+  if(reservas.length === 0){
+    cont.innerHTML = `<div class="modal-empty">${T.modalEmpty}</div>`;
+    return;
+  }
+
+  reservas.forEach(r => {
+    const fecha = new Date(r.reserved_at);
+    const fechaLabel = fecha.toLocaleString(LANG, { timeZone: restaurantData?.timezone || 'America/Argentina/Buenos_Aires', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
+    const item = document.createElement('div');
+    item.className = 'reserva-item';
+    item.innerHTML = `
+      <div class="reserva-item-row"><span class="reserva-item-label">${T.summaryEspacio}</span><span class="reserva-item-val">${r.room_name}</span></div>
+      <div class="reserva-item-row"><span class="reserva-item-label">${T.summaryFecha}</span><span class="reserva-item-val">${fechaLabel}</span></div>
+      <div class="reserva-item-row"><span class="reserva-item-label">${T.summaryPersonas}</span><span class="reserva-item-val">${r.people_count} ${T.modalReservaPersonas}</span></div>
+      <button class="reserva-cancel-btn" data-id="${r.id}">${T.modalCancelarBtn}</button>
+    `;
+    item.querySelector('.reserva-cancel-btn').addEventListener('click', (e) => cancelarReserva(r.id, e.target));
+    cont.appendChild(item);
+  });
+}
+
+async function cancelarReserva(reservationId, btn){
+  if(!confirm(T.modalConfirmarCancelar)) return;
+
+  btn.disabled = true;
+  btn.textContent = T.modalCancelando;
+
+  try{
+    const res = await fetch(CONFIG.webhookCancelarReserva, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ reservation_id: reservationId }),
+    });
+    const data = await res.json();
+    const cont = document.getElementById('modalResultados');
+    if(data.success){
+      cont.innerHTML = `<div class="modal-msg ok">${T.modalCanceladaOk}</div>`;
+    }else{
+      cont.innerHTML = `<div class="modal-msg err">${T.modalCanceladaErr}</div>`;
+    }
+  }catch(e){
+    console.error('[Pura Vida widget] error cancelando reserva', e);
+    document.getElementById('modalResultados').innerHTML = `<div class="modal-msg err">${T.modalCanceladaErr}</div>`;
+  }
+}
+
+init();
 </script>
-
 </body>
 </html>
