@@ -23,21 +23,23 @@
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --azul:#8BAA7C;
-  --navy:#37432E;
+  --azul:#5170FF;
+  --navy:#0A0F2E;
   --violeta:#C9B28A;
-  --coral:#C97B4A;
-  --paper:#EEF2E4;
-  --blanco:#FBFAF5;
-  --card-bg:#FBFAF5;
-  --texto-oscuro:#2F3B28;
-  --texto-medio:#5F6B52;
+  --coral:#EB9292;
+  --paper:#F4F4F8;
+  --blanco:#FFFFFF;
+  --card-bg:#FFFFFF;
+  --texto-oscuro:#0A0F2E;
+  --texto-medio:#3a3f5c;
   --airis-blue:#5170FF;
   --font-display:'Bricolage Grotesque',sans-serif;
   --font-mono:'JetBrains Mono',monospace;
   --r:16px;
   --r-lg:24px;
 }
+body{opacity:0;transition:opacity .25s ease}
+body.marca-lista{opacity:1}
 html{scroll-behavior:smooth}
 body{
   background:var(--paper);
@@ -830,6 +832,7 @@ function aplicarMarca(restaurante){
   root.setProperty('--texto-medio', restaurante.color_texto_medio || b.colorTextoMedio);
   root.setProperty('--paper', restaurante.color_bg || b.bgColor);
   root.setProperty('--card-bg', restaurante.color_card || b.cardColor);
+  document.body.classList.add('marca-lista');
   // --blanco NO se pisa acá a propósito: es el color de texto/ícono
   // sobre fondos de acento (botones, chips seleccionados) -- tiene
   // que quedar blanco siempre, en cualquier tema, claro u oscuro.
@@ -1455,6 +1458,7 @@ async function init(){
     renderProgress();
   }catch(e){
     console.error('[Pura Vida widget] error cargando datos de Supabase:', e);
+    document.body.classList.add('marca-lista');
     mostrarErrorCarga(T.errorCarga);
   }
 }
