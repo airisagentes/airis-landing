@@ -433,6 +433,7 @@ body{
       <div class="step-hint" style="text-align:center;max-width:380px;margin-left:auto;margin-right:auto" id="successSub">
         Enviaremos tu confirmación por WhatsApp en unos minutos.
       </div>
+      <div id="successPoliticas" style="display:none;max-width:380px;margin:18px auto 0;padding:16px 18px;border-radius:14px;background:var(--card-bg);border:1px solid rgba(255,255,255,0.08);text-align:left;font-size:14px;line-height:1.6;color:var(--texto-medio);white-space:pre-line"></div>
     </div>
   </div>
 
@@ -829,7 +830,7 @@ let restaurantData = null; // se completa con cargarRestaurante()
 async function cargarRestaurante(){
   const sb = window.supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
 
-  const columnasCompletas = 'id, name, phone_prefix, timezone, whatsapp_numero, logo_type, logo_value, color_primario, color_oscuro, color_secundario, color_texto_oscuro, color_texto_medio, color_bg, color_card, bg_image';
+  const columnasCompletas = 'id, name, phone_prefix, timezone, whatsapp_numero, logo_type, logo_value, color_primario, color_oscuro, color_secundario, color_texto_oscuro, color_texto_medio, color_bg, color_card, bg_image, politicas_confirmacion';
   let { data, error } = await sb.from('restaurants').select(columnasCompletas).eq('slug', CONFIG.supabase.restaurantSlug).single();
 
   if(error){
@@ -1373,6 +1374,18 @@ document.getElementById('confirmBtn').addEventListener('click', async () => {
     document.getElementById('successSub').textContent = CONFIG.MOCK_MODE
       ? T.successSubMock
       : T.successSubOk;
+
+    // Bloque de políticas de confirmación (tolerancia, cancelación, etc.)
+    // -- personalizable por restaurante. Si el cliente no cargó nada acá,
+    // el bloque queda oculto por completo -- nunca inventamos una política
+    // genérica que el restaurante no confirmó explícitamente.
+    const politicasEl = document.getElementById('successPoliticas');
+    if(restaurantData?.politicas_confirmacion){
+      politicasEl.textContent = restaurantData.politicas_confirmacion;
+      politicasEl.style.display = 'block';
+    }else{
+      politicasEl.style.display = 'none';
+    }
   }else{
     document.getElementById('successTitle').textContent = T.successTitleErr;
     // Nota: 'resultado.message' viene del backend (Endpoint 2), hoy solo
