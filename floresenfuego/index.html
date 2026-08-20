@@ -75,13 +75,14 @@ body{
 
 .logo-badge{
   position:fixed;top:20px;left:20px;z-index:50;
-  width:68px;height:68px;border-radius:18px;
-  background:var(--azul);
+  width:90px;height:90px;border-radius:18px;
+  background:#000000;
   display:flex;align-items:center;justify-content:center;
   font-size:34px;
   box-shadow:0 8px 20px rgba(55,67,46,0.22);
+  overflow:hidden;
 }
-.logo-badge img{width:60%;height:60%;object-fit:contain}
+.logo-badge img{width:100%;height:100%;object-fit:cover;display:block}
 
 .top{max-width:640px;margin:0 auto 20px;text-align:center}
 .top-eyebrow{font-weight:800;font-size:16px;letter-spacing:-0.2px;color:var(--texto-medio);margin-bottom:6px}
@@ -227,7 +228,7 @@ body{
 .field-error{font-size:12px;color:var(--coral);margin-top:6px;display:none;font-weight:600}
 .field-error.show{display:block}
 
-.summary-card{background:linear-gradient(135deg, #2A1414, #1A0A0A);border-radius:var(--r);padding:20px;margin-bottom:22px}
+.summary-card{background:#1A1F14;border-radius:var(--r);padding:20px;margin-bottom:22px}
 .summary-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.08)}
 .summary-row:last-child{border-bottom:none}
 .summary-row-label{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(255,255,255,0.5)}
@@ -430,7 +431,7 @@ body{
       <div class="success-icon">✓</div>
       <div class="step-title" style="text-align:center" id="successTitle">¡Reserva exitosa!</div>
       <div class="step-hint" style="text-align:center;max-width:380px;margin-left:auto;margin-right:auto" id="successSub">
-        Ese día te enviaremos un recordatorio por WhatsApp.
+        Enviaremos tu confirmación por WhatsApp en unos minutos.
       </div>
     </div>
   </div>
@@ -490,7 +491,7 @@ const TRANSLATIONS = {
     grupoGrandeChip: 'Eventos y grupos grandes',
     grupoGrandeText: (n) => `Para grupos de ${n}+ personas armamos la reserva a medida contigo.`,
     grupoGrandeBtn: 'Escríbenos por WhatsApp',
-    whatsappMensaje: (salon) => `Hola! Quiero reservar en ${salon} para un grupo grande / evento.\nEstos son los datos:\n• Total de personas:\n• Día y hora:\n¿Me ayudan a coordinar? Gracias!`,
+    whatsappMensaje: (salon) => `Hola! Quiero reservar ${salon} para un grupo grande / evento. ¿Me ayudan a coordinar? Gracias.`,
     step3Title: 'Elige la fecha y el horario',
     step3Hint: 'Consultando disponibilidad real.',
     horariosLoading: 'Consultando horarios disponibles...',
@@ -513,7 +514,7 @@ const TRANSLATIONS = {
     btnConfirmar: 'Confirmar reserva', btnConfirmando: 'Confirmando...',
     successTitleOk: '¡Reserva exitosa!',
     successSubMock: 'Esto fue una simulación (modo de prueba) — no se creó ninguna reserva real todavía.',
-    successSubOk: 'Ese día te enviaremos un recordatorio por WhatsApp.',
+    successSubOk: 'Te enviaremos la confirmación por WhatsApp en unos minutos.',
     successTitleErr: 'Hubo un problema',
     successSubErrDefault: 'No pudimos confirmar tu reserva. Prueba de nuevo en unos minutos.',
     footerLabel: 'Desarrollado por',
@@ -546,7 +547,7 @@ const TRANSLATIONS = {
     grupoGrandeChip: 'Events & large groups',
     grupoGrandeText: (n) => `For groups of ${n}+ people, we'll tailor the reservation with you.`,
     grupoGrandeBtn: 'Message us on WhatsApp',
-    whatsappMensaje: (salon) => `Hi! I'd like to book ${salon} for a large group / event.\nHere are the details:\n• Total number of people:\n• Date and time:\nCan you help me coordinate? Thank you!`,
+    whatsappMensaje: (salon) => `Hi! I'd like to book ${salon} for a large group / event. Can you help me coordinate? Thank you.`,
     step3Title: 'Choose date and time',
     step3Hint: 'Checking real availability.',
     horariosLoading: 'Checking available times...',
@@ -569,7 +570,7 @@ const TRANSLATIONS = {
     btnConfirmar: 'Confirm reservation', btnConfirmando: 'Confirming...',
     successTitleOk: 'Reservation confirmed!',
     successSubMock: 'This was a simulation (test mode) — no real reservation was created yet.',
-    successSubOk: "We'll send you a WhatsApp reminder on the day of your reservation.",
+    successSubOk: "We'll send your confirmation via WhatsApp shortly.",
     successTitleErr: 'Something went wrong',
     successSubErrDefault: "We couldn't confirm your reservation. Please try again in a few minutes.",
     footerLabel: 'Powered by',
@@ -602,7 +603,7 @@ const TRANSLATIONS = {
     grupoGrandeChip: 'Eventos e grupos grandes',
     grupoGrandeText: (n) => `Para grupos de ${n}+ pessoas, montamos a reserva sob medida com você.`,
     grupoGrandeBtn: 'Fale conosco no WhatsApp',
-    whatsappMensaje: (salon) => `Olá! Quero reservar em ${salon} para um grupo grande / evento.\nAqui estão os dados:\n• Total de pessoas:\n• Dia e horário:\nPodem me ajudar a organizar? Obrigado!`,
+    whatsappMensaje: (salon) => `Olá! Quero reservar ${salon} para um grupo grande / evento. Podem me ajudar a organizar? Obrigado.`,
     step3Title: 'Escolha a data e o horário',
     step3Hint: 'Consultando disponibilidade real.',
     horariosLoading: 'Consultando horários disponíveis...',
@@ -625,7 +626,7 @@ const TRANSLATIONS = {
     btnConfirmar: 'Confirmar reserva', btnConfirmando: 'Confirmando...',
     successTitleOk: 'Reserva confirmada!',
     successSubMock: 'Isso foi uma simulação (modo de teste) — nenhuma reserva real foi criada ainda.',
-    successSubOk: 'Nesse dia, enviaremos um lembrete pelo WhatsApp.',
+    successSubOk: 'Enviaremos a confirmação pelo WhatsApp em breve.',
     successTitleErr: 'Ocorreu um problema',
     successSubErrDefault: 'Não conseguimos confirmar sua reserva. Tente novamente em alguns minutos.',
     footerLabel: 'Desenvolvido por',
