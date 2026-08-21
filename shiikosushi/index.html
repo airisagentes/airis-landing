@@ -55,13 +55,37 @@
 }
 body{opacity:0;transition:opacity .25s ease}
 body.marca-lista{opacity:1}
-html{scroll-behavior:smooth}
+
+/* ============================================================
+   📌 LOGO SIEMPRE FIJO, TOMA 2 (21/08) -- pedido explícito de Camila:
+   "necesito que se quede QUIETO... si o si". La solución anterior
+   (position:absolute + JS que recalculaba top/left en cada scroll)
+   seguía sin funcionar en el navegador real que probó -- algunos
+   navegadores in-app no disparan el evento "scroll" de forma
+   confiable o no exponen bien window.scrollY, así que ese cálculo
+   quedaba desincronizado.
+   Esta vez el enfoque es distinto y no depende de ningún evento de
+   scroll ni de que el navegador soporte bien position:fixed: html/body
+   quedan con overflow:hidden (el documento en sí NUNCA scrollea) y
+   todo el contenido de la página vive adentro de #pageScroll, un div
+   propio con overflow-y:auto que es el único que se mueve. El logo
+   (hermano de #pageScroll, no hijo) queda position:absolute respecto
+   de body -- como body nunca scrollea, el logo nunca se mueve, sin
+   trucos ni cálculos: es geometría simple, no comportamiento del
+   navegador. Esto es lo mismo que se usa en apps híbridas para tener
+   una barra superior fija de verdad en cualquier WebView. */
+html,body{height:100vh;height:100dvh;overflow:hidden;margin:0}
 body{
+  position:relative;
   background:var(--paper);
   color:var(--texto-oscuro);
   font-family:var(--font-display);
-  min-height:100svh;
   -webkit-font-smoothing:antialiased;
+}
+.page-scroll{
+  position:absolute;inset:0;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  scroll-behavior:smooth;
   padding:104px 16px 80px;
 }
 
@@ -322,8 +346,13 @@ body{
 }
 .gestionar-link:hover{color:var(--airis-blue)}
 .modal-overlay{
-  display:none;position:fixed;inset:0;background:rgba(10,15,46,0.55);
+  /* position:absolute (no fixed), mismo motivo que .logo-badge/.page-scroll:
+     body ya no scrollea nunca, así que absolute respecto de body cubre
+     toda la pantalla igual que fixed, sin depender de que el navegador
+     soporte bien position:fixed. */
+  display:none;position:absolute;inset:0;background:rgba(10,15,46,0.55);
   z-index:100;align-items:center;justify-content:center;padding:16px;
+  overflow-y:auto;
 }
 .modal-overlay.open{display:flex}
 .modal-box{
@@ -372,6 +401,8 @@ body{
 <body>
 
 <div class="logo-badge" id="logoBadge"></div>
+
+<div class="page-scroll" id="pageScroll">
 
 <div class="mock-banner" id="mockBanner"></div>
 
@@ -506,6 +537,8 @@ body{
   </div>
   <a class="airis-footer-link" href="https://www.airisworld.com" target="_blank">www.airisworld.com</a>
 </div>
+
+</div><!-- /#pageScroll -->
 
 <!-- Modal "Gestionar mi reserva" -->
 <div class="modal-overlay" id="modalGestionar">
@@ -1035,7 +1068,8 @@ function goToStep(n){
   document.querySelector(`.step[data-step="${n}"]`).classList.add('active');
   state.step = n;
   renderProgress();
-  window.scrollTo({top:0, behavior:'smooth'});
+  const scrollEl = document.getElementById('pageScroll');
+  if(scrollEl) scrollEl.scrollTo({top:0, behavior:'smooth'});
 }
 
 function renderSalones(){
@@ -1555,41 +1589,12 @@ async function cargarExcepcionesAperturaEspecial(){
   }
 }
 
-/* ============================================================
-   📌 LOGO SIEMPRE FIJO — sin depender de position:fixed.
-   Pedido de Camila (21/08): el logo/burbuja de arriba a la izquierda
-   no debe moverse NUNCA al hacer scroll. Ya publicado en GitHub Pages,
-   confirmó en su celular real que igual se movía -- esto pasa porque
-   varios navegadores in-app (el de Instagram y, en algunos Android, el
-   de WhatsApp) no respetan position:fixed y lo tratan como si fuera
-   position:static, así que el elemento termina scrolleando con el resto
-   de la página. En Chrome/Safari "normales" position:fixed funciona
-   bien, pero en esos navegadores in-app no hay forma confiable de
-   arreglarlo solo con CSS.
-   La solución que sí funciona en todos lados: el logo queda en
-   position:absolute (ver CSS de .logo-badge) y acá, con JS, se
-   recalcula su posición en cada scroll para que en pantalla se vea
-   siempre en el mismo lugar -- el mismo efecto visual de "fijo", pero
-   hecho a mano en vez de depender de que el navegador soporte
-   position:fixed. rAF (requestAnimationFrame) evita que esto haga que
-   el scroll se sienta trabado en celulares más viejos. */
-function pinLogoBadge(){
-  const el = document.getElementById('logoBadge');
-  if(!el) return;
-  el.style.top = (window.scrollY + 20) + 'px';
-  el.style.left = (window.scrollX + 20) + 'px';
-}
-(function initPinLogoBadge(){
-  let ticking = false;
-  function onScrollOrResize(){
-    if(ticking) return;
-    ticking = true;
-    window.requestAnimationFrame(() => { pinLogoBadge(); ticking = false; });
-  }
-  window.addEventListener('scroll', onScrollOrResize, { passive:true });
-  window.addEventListener('resize', onScrollOrResize);
-  pinLogoBadge();
-})();
+/* 📌 LOGO SIEMPRE FIJO -- ver el bloque de comentarios largo en el CSS,
+   junto a "html,body{overflow:hidden}" y ".page-scroll". Ya no hace
+   falta nada acá en JS: el documento (html/body) no scrollea nunca,
+   todo el contenido vive adentro de #pageScroll (que sí scrollea), y
+   el logo es un hermano de #pageScroll con position:absolute respecto
+   de body -- por pura geometría, sin JS ni trucos, nunca se mueve. */
 
 async function init(){
   aplicarIdioma();
