@@ -91,12 +91,30 @@ body{
   font-family:var(--font-display);
   -webkit-font-smoothing:antialiased;
 }
-.page-scroll{
+/* Pedido de Camila (21/08, tercera vuelta): además del logo, que el
+   nombre del restaurante, "Reserva tu mesa" y la barra de pasos
+   también queden fijos arriba -- que lo único que se mueva al
+   scrollear sea la burbuja (el contenido de cada paso) para abajo.
+   #appShell es un contenedor flex en columna: #pageHeader no scrollea
+   (crece lo que necesite su contenido) y #pageScroll ocupa el resto
+   del alto disponible y es el único que scrollea -- min-height:0 es
+   necesario para que un hijo flex pueda scrollear en vez de estirarse
+   más allá del contenedor. */
+.app-shell{
   position:absolute;inset:0;
+  display:flex;flex-direction:column;
+}
+.page-header{
+  flex:0 0 auto;
+  padding:104px 16px 0;
+}
+.page-scroll{
+  flex:1 1 auto;
+  min-height:0;
   overflow-y:auto;-webkit-overflow-scrolling:touch;
   overscroll-behavior:contain;
   scroll-behavior:smooth;
-  padding:104px 16px 80px;
+  padding:6px 16px 80px;
 }
 
 .mock-banner{
@@ -334,7 +352,7 @@ body{
   display:flex;flex-direction:column;align-items:center;gap:6px;
 }
 .airis-footer-row{display:flex;align-items:baseline;justify-content:center;gap:6px}
-.airis-footer-label{font-size:11px;color:var(--texto-medio);font-family:var(--font-mono);letter-spacing:0.04em}
+.airis-footer-label{font-size:11px;color:var(--texto-medio);font-family:var(--font-display);letter-spacing:0.04em}
 /* Color fijo a propósito (NO var(--texto-oscuro)) -- el isologo "airis."
    del pie de página es la marca de Airis, no la del cliente, y no debe
    cambiar de color aunque aplicarMarca() pise las variables de marca del
@@ -343,14 +361,14 @@ body{
 .airis-footer-logo{font-weight:800;font-size:14px;letter-spacing:-0.3px;color:#0A0F2E}
 .airis-footer-logo span{color:var(--airis-blue)}
 .airis-footer-link{
-  font-family:var(--font-mono);font-size:11px;color:var(--texto-medio);
+  font-family:var(--font-display);font-size:11px;color:var(--texto-medio);
   text-decoration:none;transition:color .2s;
 }
 .airis-footer-link:hover{color:var(--airis-blue)}
 
 /* ==== Modal "Gestionar mi reserva" ==== */
 .gestionar-link{
-  font-family:var(--font-mono);font-size:11px;color:var(--texto-medio);
+  font-family:var(--font-display);font-size:11px;color:var(--texto-medio);
   background:none;border:none;cursor:pointer;text-decoration:underline;
   padding:0;margin-top:4px;
 }
@@ -413,23 +431,29 @@ body{
 
 <div class="logo-badge" id="logoBadge"></div>
 
-<div class="page-scroll" id="pageScroll">
+<div class="app-shell" id="appShell">
 
-<div class="mock-banner" id="mockBanner"></div>
+<div class="page-header" id="pageHeader">
 
-<div class="top">
-  <div class="top-eyebrow" id="topEyebrow"></div>
-  <div class="top-title" id="topTitle">Reserva tu mesa</div>
-  <div class="top-sub" id="topSub"></div>
-</div>
+  <div class="mock-banner" id="mockBanner"></div>
 
-<div class="progress-wrap">
-  <div class="progress-bar" id="progressBar"></div>
-  <div class="progress-label">
-    <span id="progressStepLabel">Paso 1 de 5</span>
-    <span id="progressStepName">Elige el espacio</span>
+  <div class="top">
+    <div class="top-eyebrow" id="topEyebrow"></div>
+    <div class="top-title" id="topTitle">Reserva tu mesa</div>
+    <div class="top-sub" id="topSub"></div>
   </div>
-</div>
+
+  <div class="progress-wrap">
+    <div class="progress-bar" id="progressBar"></div>
+    <div class="progress-label">
+      <span id="progressStepLabel">Paso 1 de 5</span>
+      <span id="progressStepName">Elige el espacio</span>
+    </div>
+  </div>
+
+</div><!-- /#pageHeader -->
+
+<div class="page-scroll" id="pageScroll">
 
 <div class="widget">
 
@@ -550,6 +574,8 @@ body{
 </div>
 
 </div><!-- /#pageScroll -->
+
+</div><!-- /#appShell -->
 
 <!-- Modal "Gestionar mi reserva" -->
 <div class="modal-overlay" id="modalGestionar">
