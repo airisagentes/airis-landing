@@ -74,7 +74,14 @@ body{
 .mock-banner.hidden{display:none}
 
 .logo-badge{
-  position:fixed;top:20px;left:20px;z-index:50;
+  /* position:absolute (NO fixed) a propósito -- ver comentario largo
+     junto a pinLogoBadge() en el <script>: varios navegadores in-app
+     (Instagram/WhatsApp/TikTok) directamente ignoran position:fixed y
+     lo tratan como si no estuviera, haciendo que el elemento scrollee
+     con la página. Acá se logra el mismo efecto visual de "fijo" a mano
+     con JS, que funciona en cualquier navegador sin depender de que
+     soporte bien position:fixed. */
+  position:absolute;top:20px;left:20px;z-index:50;
   width:128px;height:46px;border-radius:12px;
   background:#FFFFFF;
   display:flex;align-items:center;justify-content:center;
@@ -82,6 +89,7 @@ body{
   font-size:34px;
   box-shadow:0 8px 20px rgba(10,15,46,0.18);
   overflow:hidden;
+  will-change:top,left;
 }
 /* object-fit:contain (no cover) porque el logo de Shiiko es un isologo
    horizontal transparente -- con "cover" se recortaría, acá se ve
@@ -1546,6 +1554,42 @@ async function cargarExcepcionesAperturaEspecial(){
     EXCEPCIONES_APERTURA = {};
   }
 }
+
+/* ============================================================
+   📌 LOGO SIEMPRE FIJO — sin depender de position:fixed.
+   Pedido de Camila (21/08): el logo/burbuja de arriba a la izquierda
+   no debe moverse NUNCA al hacer scroll. Ya publicado en GitHub Pages,
+   confirmó en su celular real que igual se movía -- esto pasa porque
+   varios navegadores in-app (el de Instagram y, en algunos Android, el
+   de WhatsApp) no respetan position:fixed y lo tratan como si fuera
+   position:static, así que el elemento termina scrolleando con el resto
+   de la página. En Chrome/Safari "normales" position:fixed funciona
+   bien, pero en esos navegadores in-app no hay forma confiable de
+   arreglarlo solo con CSS.
+   La solución que sí funciona en todos lados: el logo queda en
+   position:absolute (ver CSS de .logo-badge) y acá, con JS, se
+   recalcula su posición en cada scroll para que en pantalla se vea
+   siempre en el mismo lugar -- el mismo efecto visual de "fijo", pero
+   hecho a mano en vez de depender de que el navegador soporte
+   position:fixed. rAF (requestAnimationFrame) evita que esto haga que
+   el scroll se sienta trabado en celulares más viejos. */
+function pinLogoBadge(){
+  const el = document.getElementById('logoBadge');
+  if(!el) return;
+  el.style.top = (window.scrollY + 20) + 'px';
+  el.style.left = (window.scrollX + 20) + 'px';
+}
+(function initPinLogoBadge(){
+  let ticking = false;
+  function onScrollOrResize(){
+    if(ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(() => { pinLogoBadge(); ticking = false; });
+  }
+  window.addEventListener('scroll', onScrollOrResize, { passive:true });
+  window.addEventListener('resize', onScrollOrResize);
+  pinLogoBadge();
+})();
 
 async function init(){
   aplicarIdioma();
