@@ -425,9 +425,25 @@ body{
   .widget{padding:36px 40px}
 }
 
+/* margin-top 14px (antes 28px) y layout en fila (antes columna) -- pedido
+   de Camila (21/08, sexta vuelta): acercar "¿Necesitas cancelar?" del
+   "Desarrollado por airis." de abajo, Y de paso poner "Desarrollado por
+   airis." a la izquierda con "www.airisworld.com" a la derecha, en la
+   misma línea, en vez de uno arriba del otro -- eso ahorra el alto de
+   una línea entera de texto. Como .widget (la burbuja naranja) tiene
+   flex:1 1 auto y ocupa lo que sobra del alto disponible de #pageScroll,
+   ese espacio ahorrado en el footer se lo queda automáticamente la
+   burbuja -- no hace falta tocar ningún alto fijo de .widget. */
 .airis-footer{
-  max-width:640px;margin:28px auto 0;
-  display:flex;flex-direction:column;align-items:center;gap:6px;
+  /* width:100% -- sin esto, el margin:auto (que centra el bloque cuando
+     el ancho de pantalla supera los 640px) hace que el propio flex
+     container se achique al ancho de su contenido ("Desarrollado por
+     airis." + link pegados), y ahí justify-content:space-between no
+     tiene ningún espacio libre para repartir -- por eso quedaban pegados
+     sin nada de aire entremedio. width:100% (tope max-width:640px) es
+     el mismo patrón que ya usa .widget más arriba. */
+  width:100%;max-width:640px;margin:14px auto 0;
+  display:flex;flex-direction:row;align-items:baseline;justify-content:space-between;
 }
 /* gap 3px (antes 6px) -- pedido de Camila (21/08): el letter-spacing de
    "Desarrollado por" agrega aire extra después de la última letra, así
@@ -440,7 +456,13 @@ body{
    cambiar de color aunque aplicarMarca() pise las variables de marca del
    restaurante. Bug encontrado 21/08: heredaba var(--texto-oscuro), por
    eso se veía violeta en Shiiko en vez del color propio de Airis. */
-.airis-footer-logo{font-weight:800;font-size:14px;letter-spacing:-0.3px;color:#0A0F2E}
+/* font-size 11px (antes 14px) -- pedido de Camila (21/08, séptima vuelta):
+   "Desarrollado por" y "airis." quedaban con dos tamaños distintos (el
+   isologo se veía más grande que el texto de al lado). Se baja al mismo
+   11px que ya usan .airis-footer-label y .airis-footer-link -- el
+   tamaño chico estándar que se usa en todo el pie de página / textos
+   secundarios de este widget -- así los tres quedan parejos. */
+.airis-footer-logo{font-weight:800;font-size:11px;letter-spacing:-0.2px;color:#0A0F2E}
 .airis-footer-logo span{color:var(--airis-blue)}
 .airis-footer-link{
   font-family:var(--font-display);font-size:11px;color:var(--texto-medio);
@@ -652,7 +674,7 @@ body{
 
 </div>
 
-<div style="text-align:center;margin-top:20px">
+<div style="text-align:center;margin-top:10px">
   <button class="gestionar-link" id="abrirGestionar"></button>
 </div>
 
