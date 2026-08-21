@@ -512,7 +512,7 @@ body{
 
   <div class="step" data-step="6">
     <div class="success-box">
-      <div class="success-icon">✓</div>
+      <div class="success-icon" id="successIcon">✓</div>
       <div class="step-title" style="text-align:center" id="successTitle">¡Reserva exitosa!</div>
       <div class="step-hint" style="text-align:center;max-width:380px;margin-left:auto;margin-right:auto" id="successSub">
         Enviaremos tu confirmación por WhatsApp en unos minutos.
@@ -1484,6 +1484,13 @@ document.getElementById('confirmBtn').addEventListener('click', async () => {
   btn.textContent = T.btnConfirmando;
 
   const resultado = await crearReserva();
+
+  // Bug encontrado por Camila (21/08): el ícono de la pantalla final
+  // estaba fijo en ✓ (tilde) en el HTML y nunca cambiaba, así que un
+  // error de verdad ("Hubo un problema") se mostraba igual con el
+  // tilde de éxito -- confuso para el comensal. Ahora se actualiza acá
+  // según haya funcionado o no.
+  document.getElementById('successIcon').textContent = resultado.success ? '✓' : '✕';
 
   if(resultado.success){
     document.getElementById('successTitle').textContent = T.successTitleOk;
