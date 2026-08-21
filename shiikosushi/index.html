@@ -106,7 +106,10 @@ body{
 }
 .page-header{
   flex:0 0 auto;
-  padding:104px 16px 0;
+  /* 76px (antes 104px) -- pedido de Camila (21/08): acercar el título
+     al logo. El logo mide 46px y arranca a 20px del borde, o sea que
+     termina en 66px -- 76px deja apenas 10px de aire libre. */
+  padding:76px 16px 0;
 }
 .page-scroll{
   flex:1 1 auto;
@@ -114,7 +117,7 @@ body{
   overflow-y:auto;-webkit-overflow-scrolling:touch;
   overscroll-behavior:contain;
   scroll-behavior:smooth;
-  padding:6px 16px 80px;
+  padding:0 16px 80px;
 }
 
 .mock-banner{
@@ -149,11 +152,17 @@ body{
 .logo-badge img{width:100%;height:100%;object-fit:contain;display:block}
 
 .top{max-width:640px;margin:0 auto 20px;text-align:center}
-.top-eyebrow{font-weight:800;font-size:16px;letter-spacing:-0.2px;color:var(--texto-medio);margin-bottom:6px}
+/* display:none -- pedido de Camila (21/08): sacar el nombre del
+   restaurante ("Shiiko Sushi") de arriba de "Reserva tu mesa". El JS
+   le sigue asignando el texto (queda disponible por si algún día se
+   quiere volver a mostrar), pero no se ve. */
+.top-eyebrow{display:none;font-weight:800;font-size:16px;letter-spacing:-0.2px;color:var(--texto-medio);margin-bottom:6px}
 .top-title{font-weight:800;font-size:clamp(26px,7vw,34px);letter-spacing:-1px;color:var(--navy);margin-bottom:8px}
 .top-sub{font-size:14px;color:var(--texto-medio);line-height:1.5;max-width:420px;margin:0 auto 28px}
 
-.progress-wrap{max-width:640px;margin:0 auto 28px}
+/* margin-bottom 14px (antes 28px) -- pedido de Camila (21/08): achicar
+   el espacio puntual entre la barra de pasos y la burbuja. */
+.progress-wrap{max-width:640px;margin:0 auto 14px}
 .progress-bar{display:flex;gap:6px;margin-bottom:10px}
 .progress-seg{flex:1;height:4px;border-radius:100px;background:rgba(81,112,255,0.15);overflow:hidden}
 .progress-seg-fill{height:100%;width:0%;background:var(--azul);border-radius:100px}
