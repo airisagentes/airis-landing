@@ -774,9 +774,11 @@ const CONFIG = {
     bgColor: '#F4F4F8', bgImage: '', cardColor: '#FFFFFF',
   },
 
-  // true = usa horarios de ejemplo y NO crea reservas reales todavía.
-  // Poner en false cuando Lucas tenga los webhooks de n8n listos.
-  MOCK_MODE: true,
+  // false = ya NO usa horarios de ejemplo -- consulta disponibilidad real
+  // y crea reservas reales contra los webhooks de n8n / GHL. Activado
+  // el 21/08 a pedido de Camila, para hacer pruebas reales end-to-end
+  // antes de pasarle el link al cliente.
+  MOCK_MODE: false,
 
   // URLs reales de los 3 endpoints (confirmados con evidencia real, 15/8/2026)
   webhookHorarios: 'https://n8n.airisworld.com/webhook/disponibilidad-real',
