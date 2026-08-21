@@ -93,15 +93,18 @@ body{
   font-family:var(--font-display);
   -webkit-font-smoothing:antialiased;
 }
-/* Pedido de Camila (21/08, tercera vuelta): además del logo, que el
-   nombre del restaurante, "Reserva tu mesa" y la barra de pasos
-   también queden fijos arriba -- que lo único que se mueva al
-   scrollear sea la burbuja (el contenido de cada paso) para abajo.
-   #appShell es un contenedor flex en columna: #pageHeader no scrollea
-   (crece lo que necesite su contenido) y #pageScroll ocupa el resto
-   del alto disponible y es el único que scrollea -- min-height:0 es
-   necesario para que un hijo flex pueda scrollear en vez de estirarse
-   más allá del contenedor. */
+/* Pedido de Camila (21/08, octava vuelta -- vuelta atrás parcial): no
+   le gustó cómo quedó todo el header (nombre + título + subtítulo +
+   barra de pasos) clavado arriba y solo el contenido de la burbuja
+   moviéndose puertas adentro. Ahora el corte es más arriba: SOLO el
+   logo y el título "Reserva tu mesa" quedan fijos -- el subtítulo, la
+   barra de pasos y la burbuja naranja entera pasan a moverse con el
+   scroll, como en la versión anterior a la "burbuja fija". #appShell
+   sigue siendo el mismo contenedor flex en columna: #pageHeader no
+   scrollea (crece lo que necesite su contenido, ahora mucho menos) y
+   #pageScroll ocupa el resto del alto disponible y es el que scrollea
+   -- min-height:0 es necesario para que un hijo flex pueda scrollear
+   en vez de estirarse más allá del contenedor. */
 .app-shell{
   position:absolute;inset:0;
   display:flex;flex-direction:column;
@@ -110,23 +113,30 @@ body{
   flex:0 0 auto;
   /* 76px (antes 104px) -- pedido de Camila (21/08): acercar el título
      al logo. El logo mide 46px y arranca a 20px del borde, o sea que
-     termina en 66px -- 76px deja apenas 10px de aire libre. */
-  padding:76px 16px 0;
+     termina en 66px -- 76px deja apenas 10px de aire libre.
+     padding-bottom 16px (antes 20px, y antes de eso el subtítulo sumaba
+     otros 20+28px propios) -- pedido de Camila (21/08, novena vuelta):
+     "quedó demasiada distancia entre Reserva tu mesa y la descripción
+     de abajo" + ahora el subtítulo vuelve a vivir DENTRO de #pageHeader
+     (fijo, ver .top más abajo), así que este padding es el único que
+     separa la descripción de la barra de pasos que sigue scrolleando
+     -- chico y parejo con el resto de los espacios de la página. */
+  padding:76px 16px 16px;
 }
-/* Idea de Camila (21/08, cuarta vuelta): que la burbuja naranja en sí
-   quede clavada en su lugar (ni se mueve ni cambia de tamaño), y que
-   si el contenido de un paso no entra, scrollee puertas adentro de la
-   burbuja nada más -- no la página completa. Por eso #pageScroll deja
-   de ser el que scrollea (ahora es puro layout, flex en columna) y ese
-   trabajo pasa a .widget (la burbuja), que sí tiene overflow-y:auto.
-   El "gestionar reserva" y el pie de página de Airis quedan como
-   hermanos de .widget adentro de este mismo flex, siempre visibles,
-   sin scrollear nunca. */
+/* #pageScroll vuelve a ser el que scrollea (como en la segunda vuelta
+   del bug del logo, antes de la idea de la "burbuja fija") -- ahora
+   contiene el subtítulo, la barra de pasos, la burbuja y el pie de
+   página, todo moviéndose junto. overscroll-behavior:contain sigue
+   siendo clave acá (ver comentario largo arriba, junto a html/body)
+   para que el rebote elástico del celular no se sienta como si el
+   logo/título se movieran. */
 .page-scroll{
   flex:1 1 auto;
   min-height:0;
   display:flex;flex-direction:column;
   padding:0 16px 16px;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;scroll-behavior:smooth;
 }
 
 .mock-banner{
@@ -160,18 +170,35 @@ body{
    completo dentro del badge blanco, legible contra cualquier bg_image. */
 .logo-badge img{width:100%;height:100%;object-fit:contain;display:block}
 
-.top{max-width:640px;margin:0 auto 20px;text-align:center}
+/* margin sin bottom (antes 20px) -- pedido de Camila (21/08, novena
+   vuelta): el subtítulo vuelve a vivir DENTRO de #pageHeader (fijo,
+   junto al título), así que ya no hace falta este margen extra acá --
+   el espacio antes de la barra de pasos que sigue lo da el
+   padding-bottom de #pageHeader nada más (ver arriba), para evitar que
+   se sumen dos espacios y quede "una distancia gigante" como reportó. */
+.top{max-width:640px;margin:0 auto;text-align:center}
 /* display:none -- pedido de Camila (21/08): sacar el nombre del
    restaurante ("Shiiko Sushi") de arriba de "Reserva tu mesa". El JS
    le sigue asignando el texto (queda disponible por si algún día se
    quiere volver a mostrar), pero no se ve. */
 .top-eyebrow{display:none;font-weight:800;font-size:16px;letter-spacing:-0.2px;color:var(--texto-medio);margin-bottom:6px}
 .top-title{font-weight:800;font-size:clamp(26px,7vw,34px);letter-spacing:-1px;color:var(--navy);margin-bottom:8px}
-.top-sub{font-size:14px;color:var(--texto-medio);line-height:1.5;max-width:420px;margin:0 auto 28px}
+/* .top-sub vuelve a vivir DENTRO de #pageHeader (fijo) -- pedido de
+   Camila (21/08, novena vuelta): "vamos a dejarlo estático hasta la
+   descripción de abajo". Sin margen propio (antes 20px arriba + 28px
+   abajo, quedaba enorme) -- el padding-bottom de #pageHeader ya se
+   encarga de separarlo de la barra de pasos que sigue. */
+.top-sub{font-size:14px;color:var(--texto-medio);line-height:1.5;max-width:420px;margin:0 auto;text-align:center}
 
 /* margin-bottom 14px (antes 28px) -- pedido de Camila (21/08): achicar
-   el espacio puntual entre la barra de pasos y la burbuja. */
-.progress-wrap{max-width:640px;margin:0 auto 14px}
+   el espacio puntual entre la barra de pasos y la burbuja.
+   width:100% agregado (21/08, octava vuelta): ahora que .progress-wrap
+   vive directo dentro de #pageScroll (que es flex-column), sin esto el
+   margin:auto lo encogía al ancho de su contenido -- mismo bug que ya
+   habíamos pisado en .airis-footer -- y "PASO 1 DE 5" quedaba pegado
+   sin espacio a "ELIGE EL ESPACIO" porque justify-content:space-between
+   no tenía ningún espacio libre para repartir. */
+.progress-wrap{width:100%;max-width:640px;margin:0 auto 14px}
 .progress-bar{display:flex;gap:6px;margin-bottom:10px}
 .progress-seg{flex:1;height:4px;border-radius:100px;background:rgba(81,112,255,0.15);overflow:hidden}
 .progress-seg-fill{height:100%;width:0%;background:var(--azul);border-radius:100px}
@@ -179,6 +206,11 @@ body{
 .progress-label{font-family:var(--font-mono);font-size:11px;color:var(--azul);letter-spacing:0.08em;text-transform:uppercase;display:flex;justify-content:space-between}
 .progress-label span:last-child{color:var(--texto-medio)}
 
+/* .widget vuelve a ser una tarjeta simple, como antes de la idea de la
+   "burbuja fija" -- pedido de Camila (21/08, octava vuelta): "la
+   burbuja naranja con el contenido dentro que sea como era antes". Ya
+   no tiene alto propio ni scroll interno: crece con su contenido y es
+   #pageScroll el que scrollea la página entera (ver arriba). */
 .widget{
   width:100%;max-width:640px;margin:0 auto;
   background:var(--card-bg);
@@ -186,54 +218,15 @@ body{
   border-radius:var(--r-lg);
   padding:28px 22px;
   box-shadow:0 12px 40px rgba(10,15,46,0.06);
-  /* la burbuja es ahora el elemento que scrollea puertas adentro,
-     no la página -- ver comentario largo junto a #pageScroll arriba. */
-  flex:1 1 auto;min-height:0;
-  overflow-y:auto;-webkit-overflow-scrolling:touch;
-  overscroll-behavior:contain;scroll-behavior:smooth;
-  /* display:flex, SIN justify-content acá -- pedido de Camila (21/08,
-     cuarta vuelta): con justify-content:center puesto directo en
-     .widget, se centraba el paso ENTERO como un solo bloque, título
-     incluido -- eso hacía que el título ("Elige el espacio", "¿Cuántas
-     personas...", etc) quedara a distinta altura en cada paso según
-     cuánto contenido tuviera debajo. Ahora el centrado se mueve adentro
-     de cada paso (ver .step-body más abajo): el título queda siempre
-     pegado arriba, a la misma altura en los 5 pasos, y solo lo que va
-     DESPUÉS del título (texto de ayuda + contenido + botones) se centra
-     en el espacio que sobra. */
-  display:flex;flex-direction:column;
 }
 .step{display:none;animation:fadeIn .4s ease}
-/* flex column + flex-grow:1: el paso activo ocupa todo el alto
-   disponible de .widget (que es su padre flex) cuando el contenido es
-   corto, para que .step-title quede arriba fijo y .step-body (ver
-   abajo) pueda repartirse y centrar el resto del espacio.
-   OJO -- acá había un bug (21/08, quinta vuelta, reportado por Camila:
-   "no se mueve el contenido de la burbuja"): al ponerle min-height:0
-   además de flex-grow, el paso quedaba habilitado para ENCOGERSE por
-   debajo de su propio contenido en vez de desbordar -- así, un paso
-   con más contenido que el alto disponible (ej: paso 3 con muchos
-   horarios) se comprimía/recortaba en vez de activar el scroll interno
-   de .widget. flex-shrink:0 es la corrección: el paso puede CRECER para
-   llenar el espacio libre (paso corto → se centra bien), pero nunca se
-   encoge por debajo de lo que su contenido necesita (paso largo →
-   desborda .widget, que sigue teniendo overflow-y:auto y scrollea). */
-.step.active{display:flex;flex-direction:column;flex:1 0 auto}
-/* Todo lo que va después del título de cada paso (hint + contenido +
-   nav-row) vive adentro de este wrapper -- pedido de Camila (21/08):
-   quería el título siempre a la misma altura, pero el resto "con
-   espacio, más centrado, más armonioso" como ya estaba. safe center
-   con center como respaldo, mismo motivo que antes: evita que el
-   contenido se recorte arriba si es más largo que el alto disponible.
-   flex-shrink:0 por el mismo motivo que en .step.active de arriba: sin
-   esto, este bloque también podía comprimirse en vez de desbordar y
-   dejar scrollear a .widget. */
-.step-body{
-  flex:1 0 auto;
-  display:flex;flex-direction:column;
-  justify-content:center;
-  justify-content:safe center;
-}
+.step.active{display:block}
+/* .step-body ya no necesita centrar ni repartir nada (eso solo hacía
+   falta cuando .widget tenía alto fijo) -- vuelve a ser un bloque
+   normal, el título y el resto del contenido fluyen uno debajo del
+   otro como cualquier documento. Se deja la clase en el HTML (no hace
+   falta tocarlo) pero sin ningún estilo especial. */
+.step-body{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
 /* var(--blanco) a propósito, NO var(--navy): la burbuja general
@@ -401,7 +394,7 @@ body{
    se moviera (ver comentario junto a .step-body). El paso 6 no tiene
    el problema de "título a distinta altura" (es un solo bloque, ícono +
    título + texto), así que simplemente se centra entero como antes. */
-.success-box{text-align:center;padding:20px 0 4px;flex:1 0 auto;display:flex;flex-direction:column;justify-content:center;justify-content:safe center}
+.success-box{text-align:center;padding:20px 0 4px}
 .success-icon{
   width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.18);
   display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:30px;color:var(--blanco);
@@ -547,17 +540,17 @@ body{
     <div class="top-sub" id="topSub"></div>
   </div>
 
-  <div class="progress-wrap">
-    <div class="progress-bar" id="progressBar"></div>
-    <div class="progress-label">
-      <span id="progressStepLabel">Paso 1 de 5</span>
-      <span id="progressStepName">Elige el espacio</span>
-    </div>
-  </div>
-
 </div><!-- /#pageHeader -->
 
 <div class="page-scroll" id="pageScroll">
+
+<div class="progress-wrap">
+  <div class="progress-bar" id="progressBar"></div>
+  <div class="progress-label">
+    <span id="progressStepLabel">Paso 1 de 5</span>
+    <span id="progressStepName">Elige el espacio</span>
+  </div>
+</div>
 
 <div class="widget" id="widgetCard">
 
@@ -1220,9 +1213,9 @@ function goToStep(n){
   document.querySelector(`.step[data-step="${n}"]`).classList.add('active');
   state.step = n;
   renderProgress();
-  // La burbuja (#widgetCard) es ahora la que scrollea puertas adentro,
-  // no #pageScroll -- al cambiar de paso, la volvemos a arrancar arriba.
-  const scrollEl = document.getElementById('widgetCard');
+  // #pageScroll vuelve a ser el que scrollea (pedido de Camila 21/08,
+  // octava vuelta) -- al cambiar de paso, lo arrancamos arriba de nuevo.
+  const scrollEl = document.getElementById('pageScroll');
   if(scrollEl) scrollEl.scrollTo({top:0, behavior:'smooth'});
 }
 
