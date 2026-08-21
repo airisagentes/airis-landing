@@ -418,25 +418,16 @@ body{
   .widget{padding:36px 40px}
 }
 
-/* margin-top 14px (antes 28px) y layout en fila (antes columna) -- pedido
-   de Camila (21/08, sexta vuelta): acercar "¿Necesitas cancelar?" del
-   "Desarrollado por airis." de abajo, Y de paso poner "Desarrollado por
-   airis." a la izquierda con "www.airisworld.com" a la derecha, en la
-   misma línea, en vez de uno arriba del otro -- eso ahorra el alto de
-   una línea entera de texto. Como .widget (la burbuja naranja) tiene
-   flex:1 1 auto y ocupa lo que sobra del alto disponible de #pageScroll,
-   ese espacio ahorrado en el footer se lo queda automáticamente la
-   burbuja -- no hace falta tocar ningún alto fijo de .widget. */
+/* Vuelta atrás (21/08, décima vuelta) -- pedido de Camila: "volvelo a la
+   idea inicial, que esté abajo de la pregunta de cancelar reserva pero
+   centrado en el medio, como estaba antes. primero el desarrollado por...
+   abajo la página web". Se prueba la fila (una sola línea, izquierda/
+   derecha) pero no convenció -- vuelve a ser columna centrada: primero
+   "Desarrollado por airis." y debajo "www.airisworld.com", los dos
+   centrados, tal cual el diseño original. */
 .airis-footer{
-  /* width:100% -- sin esto, el margin:auto (que centra el bloque cuando
-     el ancho de pantalla supera los 640px) hace que el propio flex
-     container se achique al ancho de su contenido ("Desarrollado por
-     airis." + link pegados), y ahí justify-content:space-between no
-     tiene ningún espacio libre para repartir -- por eso quedaban pegados
-     sin nada de aire entremedio. width:100% (tope max-width:640px) es
-     el mismo patrón que ya usa .widget más arriba. */
-  width:100%;max-width:640px;margin:14px auto 0;
-  display:flex;flex-direction:row;align-items:baseline;justify-content:space-between;
+  max-width:640px;margin:14px auto 0;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
 }
 /* gap 3px (antes 6px) -- pedido de Camila (21/08): el letter-spacing de
    "Desarrollado por" agrega aire extra después de la última letra, así
@@ -655,9 +646,10 @@ body{
     <div class="success-box">
       <div class="success-icon" id="successIcon">✓</div>
       <div class="step-title" style="text-align:center" id="successTitle">¡Reserva exitosa!</div>
-      <div class="step-hint" style="text-align:center;max-width:380px;margin-left:auto;margin-right:auto" id="successSub">
-        Enviaremos tu confirmación por WhatsApp en unos minutos.
-      </div>
+      <!-- vacío en el HTML a propósito -- la JS lo llena solo en el caso de
+           error (en éxito se deja oculto, pedido de Camila 21/08: sacar el
+           mensaje "Tu mesa queda reservada. ¡Te esperamos!" de acá). -->
+      <div class="step-hint" style="text-align:center;max-width:380px;margin-left:auto;margin-right:auto" id="successSub"></div>
       <!-- background:var(--blanco) a propósito, NO var(--card-bg): esta burbuja está anidada
            dentro de .widget, que ahora es naranja -- si usara --card-bg quedaría del mismo
            color que el fondo y se perdería como "burbuja" separada. -->
@@ -1639,9 +1631,15 @@ document.getElementById('confirmBtn').addEventListener('click', async () => {
 
   if(resultado.success){
     document.getElementById('successTitle').textContent = T.successTitleOk;
-    document.getElementById('successSub').textContent = CONFIG.MOCK_MODE
-      ? T.successSubMock
-      : T.successSubOk;
+    // Pedido de Camila (21/08): sacar el mensaje "Tu mesa queda reservada.
+    // ¡Te esperamos!" de abajo del título en la pantalla de éxito -- la
+    // burbuja blanca de políticas (tolerancia, etc.) de más abajo queda
+    // igual, sin tocar. El mensaje de ERROR sigue mostrándose normal (el
+    // comensal necesita saber qué pasó si algo falla), solo se vacía/oculta
+    // en el caso de éxito.
+    const subEl = document.getElementById('successSub');
+    subEl.textContent = '';
+    subEl.style.display = 'none';
 
     // Bloque de políticas de confirmación (tolerancia, cancelación, etc.)
     // -- personalizable por restaurante. Si el cliente no cargó nada acá,
@@ -1659,8 +1657,9 @@ document.getElementById('confirmBtn').addEventListener('click', async () => {
     // Nota: 'resultado.message' viene del backend (Endpoint 2), hoy solo
     // en español -- si no hay mensaje específico, usamos el genérico ya
     // traducido. Internacionalizar el backend queda como mejora futura.
-    document.getElementById('successSub').textContent = resultado.message
-      || T.successSubErrDefault;
+    const subEl = document.getElementById('successSub');
+    subEl.style.display = '';
+    subEl.textContent = resultado.message || T.successSubErrDefault;
   }
   goToStep(6);
   btn.disabled = false;
