@@ -111,13 +111,20 @@ body{
      termina en 66px -- 76px deja apenas 10px de aire libre. */
   padding:76px 16px 0;
 }
+/* Idea de Camila (21/08, cuarta vuelta): que la burbuja naranja en sí
+   quede clavada en su lugar (ni se mueve ni cambia de tamaño), y que
+   si el contenido de un paso no entra, scrollee puertas adentro de la
+   burbuja nada más -- no la página completa. Por eso #pageScroll deja
+   de ser el que scrollea (ahora es puro layout, flex en columna) y ese
+   trabajo pasa a .widget (la burbuja), que sí tiene overflow-y:auto.
+   El "gestionar reserva" y el pie de página de Airis quedan como
+   hermanos de .widget adentro de este mismo flex, siempre visibles,
+   sin scrollear nunca. */
 .page-scroll{
   flex:1 1 auto;
   min-height:0;
-  overflow-y:auto;-webkit-overflow-scrolling:touch;
-  overscroll-behavior:contain;
-  scroll-behavior:smooth;
-  padding:0 16px 80px;
+  display:flex;flex-direction:column;
+  padding:0 16px 16px;
 }
 
 .mock-banner{
@@ -171,15 +178,60 @@ body{
 .progress-label span:last-child{color:var(--texto-medio)}
 
 .widget{
-  max-width:640px;margin:0 auto;
+  width:100%;max-width:640px;margin:0 auto;
   background:var(--card-bg);
   border:1.5px solid rgba(81,112,255,0.15);
   border-radius:var(--r-lg);
   padding:28px 22px;
   box-shadow:0 12px 40px rgba(10,15,46,0.06);
+  /* la burbuja es ahora el elemento que scrollea puertas adentro,
+     no la página -- ver comentario largo junto a #pageScroll arriba. */
+  flex:1 1 auto;min-height:0;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;scroll-behavior:smooth;
+  /* display:flex, SIN justify-content acá -- pedido de Camila (21/08,
+     cuarta vuelta): con justify-content:center puesto directo en
+     .widget, se centraba el paso ENTERO como un solo bloque, título
+     incluido -- eso hacía que el título ("Elige el espacio", "¿Cuántas
+     personas...", etc) quedara a distinta altura en cada paso según
+     cuánto contenido tuviera debajo. Ahora el centrado se mueve adentro
+     de cada paso (ver .step-body más abajo): el título queda siempre
+     pegado arriba, a la misma altura en los 5 pasos, y solo lo que va
+     DESPUÉS del título (texto de ayuda + contenido + botones) se centra
+     en el espacio que sobra. */
+  display:flex;flex-direction:column;
 }
 .step{display:none;animation:fadeIn .4s ease}
-.step.active{display:block}
+/* flex column + flex-grow:1: el paso activo ocupa todo el alto
+   disponible de .widget (que es su padre flex) cuando el contenido es
+   corto, para que .step-title quede arriba fijo y .step-body (ver
+   abajo) pueda repartirse y centrar el resto del espacio.
+   OJO -- acá había un bug (21/08, quinta vuelta, reportado por Camila:
+   "no se mueve el contenido de la burbuja"): al ponerle min-height:0
+   además de flex-grow, el paso quedaba habilitado para ENCOGERSE por
+   debajo de su propio contenido en vez de desbordar -- así, un paso
+   con más contenido que el alto disponible (ej: paso 3 con muchos
+   horarios) se comprimía/recortaba en vez de activar el scroll interno
+   de .widget. flex-shrink:0 es la corrección: el paso puede CRECER para
+   llenar el espacio libre (paso corto → se centra bien), pero nunca se
+   encoge por debajo de lo que su contenido necesita (paso largo →
+   desborda .widget, que sigue teniendo overflow-y:auto y scrollea). */
+.step.active{display:flex;flex-direction:column;flex:1 0 auto}
+/* Todo lo que va después del título de cada paso (hint + contenido +
+   nav-row) vive adentro de este wrapper -- pedido de Camila (21/08):
+   quería el título siempre a la misma altura, pero el resto "con
+   espacio, más centrado, más armonioso" como ya estaba. safe center
+   con center como respaldo, mismo motivo que antes: evita que el
+   contenido se recorte arriba si es más largo que el alto disponible.
+   flex-shrink:0 por el mismo motivo que en .step.active de arriba: sin
+   esto, este bloque también podía comprimirse en vez de desbordar y
+   dejar scrollear a .widget. */
+.step-body{
+  flex:1 0 auto;
+  display:flex;flex-direction:column;
+  justify-content:center;
+  justify-content:safe center;
+}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
 /* var(--blanco) a propósito, NO var(--navy): la burbuja general
@@ -219,7 +271,11 @@ body{
 .salon-card.selected .salon-check{background:var(--azul);border-color:var(--azul)}
 .salon-card.selected .salon-check::after{content:'✓';color:var(--blanco);font-size:12px;font-weight:700}
 
-.personas-box{display:flex;align-items:center;justify-content:center;gap:28px;padding:36px 0 24px}
+/* padding-top 10px (antes 36px) -- pedido de Camila (21/08): acercar el
+   selector de personas al texto "Incluí a todos los comensales..." en
+   el paso 2. Solo afecta este paso -- .personas-box no se usa en
+   ningún otro. */
+.personas-box{display:flex;align-items:center;justify-content:center;gap:28px;padding:10px 0 24px}
 .stepper-btn{
   width:52px;height:52px;border-radius:50%;
   border:1.5px solid rgba(81,112,255,0.25);background:var(--paper);
@@ -299,6 +355,11 @@ body{
 /* color:var(--blanco), NO var(--azul) -- mismo motivo que .date-arrow:
    iba naranja sobre naranja. */
 .section-mini-label{font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--blanco);margin:20px 0 4px;display:block}
+/* margin-top 4px (antes 20px, heredado de .section-mini-label) --
+   pedido de Camila (21/08): con la burbuja de "Salón Shiiko" sacada,
+   acercar "Fecha" al texto "Consultando disponibilidad real" de arriba.
+   Solo afecta esta etiqueta puntual (id), no toca "Horario" ni el resto. */
+#fechaMiniLabel{margin-top:4px}
 
 .salon-resumen-row{
   display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px 14px;
@@ -332,7 +393,13 @@ body{
 .summary-row-label{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(10,15,46,0.55)}
 .summary-row-val{font-size:14px;font-weight:700;color:#0A0F2E;text-align:right}
 
-.success-box{text-align:center;padding:20px 0 4px}
+/* .success-box también necesita su propio centrado ahora: antes lo
+   centraba .widget (justify-content:center sobre TODO el paso activo),
+   pero eso se sacó de .widget para que el título de los pasos 1-5 no
+   se moviera (ver comentario junto a .step-body). El paso 6 no tiene
+   el problema de "título a distinta altura" (es un solo bloque, ícono +
+   título + texto), así que simplemente se centra entero como antes. */
+.success-box{text-align:center;padding:20px 0 4px;flex:1 0 auto;display:flex;flex-direction:column;justify-content:center;justify-content:safe center}
 .success-icon{
   width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.18);
   display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:30px;color:var(--blanco);
@@ -360,7 +427,11 @@ body{
   max-width:640px;margin:28px auto 0;
   display:flex;flex-direction:column;align-items:center;gap:6px;
 }
-.airis-footer-row{display:flex;align-items:baseline;justify-content:center;gap:6px}
+/* gap 3px (antes 6px) -- pedido de Camila (21/08): el letter-spacing de
+   "Desarrollado por" agrega aire extra después de la última letra, así
+   que con 6px de gap se veía más separado del isologo "airis." de lo
+   que el número sugiere. */
+.airis-footer-row{display:flex;align-items:baseline;justify-content:center;gap:3px}
 .airis-footer-label{font-size:11px;color:var(--texto-medio);font-family:var(--font-display);letter-spacing:0.04em}
 /* Color fijo a propósito (NO var(--texto-oscuro)) -- el isologo "airis."
    del pie de página es la marca de Airis, no la del cliente, y no debe
@@ -464,93 +535,102 @@ body{
 
 <div class="page-scroll" id="pageScroll">
 
-<div class="widget">
+<div class="widget" id="widgetCard">
 
   <div class="step active" data-step="1">
     <div class="step-title" id="step1Title"></div>
-    <div class="step-hint" id="step1Hint"></div>
-    <div class="salon-grid" id="salonGrid">
-      <div class="time-loading">Cargando salones...</div>
-    </div>
-    <div class="nav-row">
-      <button class="btn btn-next" id="next1" disabled></button>
+    <div class="step-body">
+      <div class="step-hint" id="step1Hint"></div>
+      <div class="salon-grid" id="salonGrid">
+        <div class="time-loading">Cargando salones...</div>
+      </div>
+      <div class="nav-row">
+        <button class="btn btn-next" id="next1" disabled></button>
+      </div>
     </div>
   </div>
 
   <div class="step" data-step="2">
     <div class="step-title" id="step2Title"></div>
-    <div class="step-hint">Incluí a todos los comensales de la mesa.</div>
-    <div class="personas-box">
-      <button class="stepper-btn" id="personasMinus">−</button>
-      <div class="personas-num" id="personasNum">2</div>
-      <button class="stepper-btn" id="personasPlus">+</button>
-    </div>
-    <div class="personas-quick" id="personasQuick"></div>
-    <div id="grupoGrandeBox" style="display:none;text-align:center;margin-top:18px;padding:16px;background:var(--paper);border-radius:var(--r);border:1.5px dashed rgba(81,112,255,0.3)">
-      <p style="font-size:13px;color:var(--texto-medio);margin-bottom:10px;line-height:1.5" id="grupoGrandeTexto"></p>
-      <a id="grupoGrandeBtn" href="#" style="display:inline-block;font-family:var(--font-display);font-weight:700;font-size:13.5px;padding:11px 20px;border-radius:100px;background:var(--navy);color:var(--blanco);text-decoration:none"></a>
-    </div>
-    <div class="nav-row">
-      <button class="btn btn-back" id="back2"></button>
-      <button class="btn btn-next" id="next2"></button>
+    <div class="step-body">
+      <div class="step-hint">Incluí a todos los comensales de la mesa.</div>
+      <div class="personas-box">
+        <button class="stepper-btn" id="personasMinus">−</button>
+        <div class="personas-num" id="personasNum">2</div>
+        <button class="stepper-btn" id="personasPlus">+</button>
+      </div>
+      <div class="personas-quick" id="personasQuick"></div>
+      <div id="grupoGrandeBox" style="display:none;text-align:center;margin-top:18px;padding:16px;background:var(--paper);border-radius:var(--r);border:1.5px dashed rgba(81,112,255,0.3)">
+        <p style="font-size:13px;color:var(--texto-medio);margin-bottom:10px;line-height:1.5" id="grupoGrandeTexto"></p>
+        <a id="grupoGrandeBtn" href="#" style="display:inline-block;font-family:var(--font-display);font-weight:700;font-size:13.5px;padding:11px 20px;border-radius:100px;background:var(--navy);color:var(--blanco);text-decoration:none"></a>
+      </div>
+      <div class="nav-row">
+        <button class="btn btn-back" id="back2"></button>
+        <button class="btn btn-next" id="next2"></button>
+      </div>
     </div>
   </div>
 
   <div class="step" data-step="3">
     <div class="step-title" id="step3Title"></div>
-    <div class="step-hint" id="disponibilidadHint"></div>
-    <!-- Sin link de "cambiar espacio" a propósito: este restaurante tiene un solo
-         salón, no hay a qué cambiar. -->
-    <div id="salonResumenRow" class="salon-resumen-row">
-      <span id="salonResumenTexto"></span>
-    </div>
-    <span class="section-mini-label">Fecha</span>
-    <div class="date-scroll-wrap">
-      <button class="date-arrow date-arrow-left" id="dateArrowLeft" aria-label="Fechas anteriores">‹</button>
-      <div class="date-scroll" id="dateScroll"></div>
-      <button class="date-arrow date-arrow-right" id="dateArrowRight" aria-label="Más fechas">›</button>
-    </div>
-    <span class="section-mini-label">Horario</span>
-    <div class="time-groups" id="timeGrid"></div>
-    <div class="nav-row">
-      <button class="btn btn-back" id="back3"></button>
-      <button class="btn btn-next" id="next3" disabled></button>
+    <div class="step-body">
+      <div class="step-hint" id="disponibilidadHint"></div>
+      <!-- Burbuja de "Salón Shiiko" sacada a pedido de Camila (21/08): con
+           un solo salón no aporta nada remarcarlo acá. El span#salonResumenTexto
+           que la JS seguía llenando ya no existe -- esa asignación está
+           protegida con "if(resumenTexto)" así que no rompe nada. -->
+      <span class="section-mini-label" id="fechaMiniLabel">Fecha</span>
+      <div class="date-scroll-wrap">
+        <button class="date-arrow date-arrow-left" id="dateArrowLeft" aria-label="Fechas anteriores">‹</button>
+        <div class="date-scroll" id="dateScroll"></div>
+        <button class="date-arrow date-arrow-right" id="dateArrowRight" aria-label="Más fechas">›</button>
+      </div>
+      <span class="section-mini-label">Horario</span>
+      <div class="time-groups" id="timeGrid"></div>
+      <div class="nav-row">
+        <button class="btn btn-back" id="back3"></button>
+        <button class="btn btn-next" id="next3" disabled></button>
+      </div>
     </div>
   </div>
 
   <div class="step" data-step="4">
     <div class="step-title" id="step4Title"></div>
-    <div class="step-hint" id="step4Hint"></div>
-    <div class="form-field">
-      <label for="nombreInput" id="labelNombre"></label>
-      <input type="text" id="nombreInput" autocomplete="name">
-      <div class="field-error" id="nombreError"></div>
-    </div>
-    <div class="form-field">
-      <label for="telInput" id="labelTelefono"></label>
-      <div class="tel-row">
-        <select id="prefijoSelect"></select>
-        <input type="tel" id="telInput" autocomplete="tel">
+    <div class="step-body">
+      <div class="step-hint" id="step4Hint"></div>
+      <div class="form-field">
+        <label for="nombreInput" id="labelNombre"></label>
+        <input type="text" id="nombreInput" autocomplete="name">
+        <div class="field-error" id="nombreError"></div>
       </div>
-      <div class="field-error" id="telError"></div>
-    </div>
-    <div class="form-field">
-      <label for="notaInput" id="labelNota"></label>
-      <input type="text" id="notaInput">
-    </div>
-    <div class="nav-row">
-      <button class="btn btn-back" id="back4"></button>
-      <button class="btn btn-next" id="next4"></button>
+      <div class="form-field">
+        <label for="telInput" id="labelTelefono"></label>
+        <div class="tel-row">
+          <select id="prefijoSelect"></select>
+          <input type="tel" id="telInput" autocomplete="tel">
+        </div>
+        <div class="field-error" id="telError"></div>
+      </div>
+      <div class="form-field">
+        <label for="notaInput" id="labelNota"></label>
+        <input type="text" id="notaInput">
+      </div>
+      <div class="nav-row">
+        <button class="btn btn-back" id="back4"></button>
+        <button class="btn btn-next" id="next4"></button>
+      </div>
     </div>
   </div>
 
   <div class="step" data-step="5">
     <div class="step-title" id="step5Title"></div>
-    <div class="step-hint" id="step5Hint"></div>
-    <div class="summary-card" id="summaryCard"></div>
-    <div class="nav-row">
-      <button class="btn btn-back" id="back5"></button>
-      <button class="btn btn-next" id="confirmBtn"></button>
+    <div class="step-body">
+      <div class="step-hint" id="step5Hint"></div>
+      <div class="summary-card" id="summaryCard"></div>
+      <div class="nav-row">
+        <button class="btn btn-back" id="back5"></button>
+        <button class="btn btn-next" id="confirmBtn"></button>
+      </div>
     </div>
   </div>
 
@@ -1116,7 +1196,9 @@ function goToStep(n){
   document.querySelector(`.step[data-step="${n}"]`).classList.add('active');
   state.step = n;
   renderProgress();
-  const scrollEl = document.getElementById('pageScroll');
+  // La burbuja (#widgetCard) es ahora la que scrollea puertas adentro,
+  // no #pageScroll -- al cambiar de paso, la volvemos a arrancar arriba.
+  const scrollEl = document.getElementById('widgetCard');
   if(scrollEl) scrollEl.scrollTo({top:0, behavior:'smooth'});
 }
 
