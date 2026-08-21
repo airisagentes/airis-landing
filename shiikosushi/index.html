@@ -425,8 +425,13 @@ body{
    derecha) pero no convenció -- vuelve a ser columna centrada: primero
    "Desarrollado por airis." y debajo "www.airisworld.com", los dos
    centrados, tal cual el diseño original. */
+/* margin-top 28px (antes 14px) -- pedido de Camila (21/08, undécima
+   vuelta): "¿Necesitas cancelar?" y "Desarrollado por airis." quedaban
+   muy juntos, siendo dos cosas sin relación entre sí (una es soporte al
+   comensal, la otra es el crédito de Airis) -- necesitaban más aire
+   entre medio para distinguirse como bloques separados. */
 .airis-footer{
-  max-width:640px;margin:14px auto 0;
+  max-width:640px;margin:28px auto 0;
   display:flex;flex-direction:column;align-items:center;gap:6px;
 }
 /* gap 3px (antes 6px) -- pedido de Camila (21/08): el letter-spacing de
