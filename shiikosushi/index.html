@@ -721,7 +721,12 @@ const TRANSLATIONS = {
     grupoGrandeChip: 'Eventos y grupos grandes',
     grupoGrandeText: (n) => `Para grupos de ${n}+ personas armamos la reserva a medida contigo.`,
     grupoGrandeBtn: 'Escríbenos por WhatsApp',
-    whatsappMensaje: () => `Hola! Quiero consultar por una reserva de grupo grande / evento en Shiiko Sushi. ¿Me ayudan a coordinar? Gracias.`,
+    // Mensaje pedido por Camila (21/08): plantilla con los campos vacíos
+    // a propósito -- esto se dispara desde el Paso 2 (antes de elegir
+    // fecha/hora), así que el comensal completa esos datos a mano al
+    // mandar el WhatsApp. Un solo salón -- no se menciona el nombre del
+    // espacio en el mensaje.
+    whatsappMensaje: () => `Hola Shiiko! Quiero reservar, es por un evento / grupo grande.\nEstos son los datos:\n\n* Total de personas:\n* Fecha y hora:\n\n¿Me ayudan con la reserva? Gracias!`,
     step3Title: 'Elige la fecha y el horario',
     step3Hint: 'Consultando disponibilidad real.',
     horariosLoading: 'Consultando horarios disponibles...',
