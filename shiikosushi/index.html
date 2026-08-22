@@ -476,29 +476,40 @@ body{
   overflow-y:auto;
 }
 .modal-overlay.open{display:flex}
+/* Pedido de Camila (21/08): esta burbuja ("Tu reserva" / gestionar-
+   cancelar) deja de compartir --card-bg (el naranja semi-transparente
+   de la burbuja de reserva) y pasa a un violeta sólido y nítido propio
+   -- var(--navy) es el mismo violeta que ya se usa en "Reserva tu mesa"
+   y en los botones .btn-next, así que queda consistente con el resto
+   de la marca en vez de un color nuevo inventado. */
 .modal-box{
-  background:var(--card-bg);border-radius:var(--r-lg);padding:26px 22px;
+  background:var(--navy);border-radius:var(--r-lg);padding:26px 22px;
   max-width:440px;width:100%;max-height:85vh;overflow-y:auto;
   overscroll-behavior:contain;
   box-shadow:0 20px 60px rgba(10,15,46,0.25);
 }
 .modal-close{
   float:right;background:none;border:none;font-size:20px;cursor:pointer;
-  color:var(--texto-medio);line-height:1;padding:4px;
+  color:var(--blanco);line-height:1;padding:4px;
 }
-/* .modal-box también usa --card-bg (ahora naranja) para su fondo, así
-   que el título del modal "Gestionar mi reserva" necesita el mismo
-   ajuste que .step-title. Si preferís que ese modal se quede blanco
-   en vez de naranja, avisame y lo desacoplo de --card-bg. */
 .modal-title{font-weight:800;font-size:19px;color:var(--blanco);margin-bottom:6px;clear:both}
-.modal-hint{font-size:13px;color:var(--texto-medio);margin-bottom:18px;line-height:1.5}
+/* color:var(--blanco) (antes var(--texto-medio), gris pensado para
+   fondo claro) -- pedido de Camila: todo el texto de esta burbuja pasa
+   a blanco, ahora que el fondo es violeta sólido en vez de claro. */
+.modal-hint{font-size:13px;color:var(--blanco);margin-bottom:18px;line-height:1.5}
 .modal-tel-row{display:flex;gap:8px;margin-bottom:8px}
 .modal-tel-row select{flex:0 0 118px}
 .modal-tel-row input{flex:1}
+/* background:var(--blanco);color:#0A0F2E (antes fondo azul, letra
+   blanca) -- pedido de Camila: el botón "Buscar mis reservas" pasa a
+   blanco sólido con letra negra. #0A0F2E literal a propósito (mismo
+   patrón que .summary-row-val): ni --navy ni --texto-oscuro sirven acá
+   porque aplicarMarca() los pisa con el color de marca del cliente
+   (hoy violeta), y este texto tiene que quedar negro siempre. */
 .modal-btn{
   width:100%;font-family:var(--font-display);font-weight:700;font-size:14px;
   padding:12px;border-radius:100px;border:none;cursor:pointer;
-  background:var(--azul);color:var(--blanco);margin-top:6px;
+  background:var(--blanco);color:#0A0F2E;margin-top:6px;
 }
 .modal-btn:disabled{opacity:0.5;cursor:not-allowed}
 .reserva-item{
@@ -506,7 +517,7 @@ body{
   padding:14px;margin-top:12px;
 }
 .reserva-item-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px}
-.reserva-item-label{color:var(--texto-medio)}
+.reserva-item-label{color:var(--blanco)}
 .reserva-item-val{font-weight:700;color:var(--blanco)}
 .reserva-cancel-btn{
   width:100%;margin-top:10px;font-family:var(--font-display);font-weight:700;
@@ -514,7 +525,7 @@ body{
   background:none;color:var(--coral);cursor:pointer;
 }
 .reserva-cancel-btn:hover{background:var(--coral);color:var(--blanco)}
-.modal-empty{font-size:13px;color:var(--texto-medio);text-align:center;padding:16px 0}
+.modal-empty{font-size:13px;color:var(--blanco);text-align:center;padding:16px 0}
 .modal-msg{font-size:13px;text-align:center;padding:10px;border-radius:var(--r);margin-top:10px}
 .modal-msg.ok{background:rgba(139,170,124,0.12);color:var(--azul)}
 .modal-msg.err{background:rgba(201,123,74,0.12);color:var(--coral)}
