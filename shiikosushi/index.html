@@ -2,7 +2,18 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- maximum-scale=1, user-scalable=no -- pedido de Camila (21/08): en el
+     Paso 4 (datos de contacto) el mismo problema seguía pasando ("se
+     agranda el espacio... se deforma toda la landing") aunque los
+     campos ya estaban en 16px (el mínimo que evita el zoom automático
+     de iOS). Subir la letra a 16px reduce el disparador MÁS COMÚN, pero
+     no es 100% infalible en todos los iPhone/versiones de iOS -- la
+     forma segura de garantizar que nunca más pase es directamente
+     avisarle al navegador que esta página no admite zoom (ni el
+     automático al enfocar un campo, ni el manual con los dedos). Como
+     es un formulario de un solo propósito (reservar), no un artículo
+     largo para leer, perder el pinch-zoom no afecta la experiencia. -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title id="pageTitle">Reservá tu mesa — Shiiko Sushi</title>
 <meta name="description" content="Reservá tu mesa en Shiiko Sushi. Elegí el salón, la fecha y el horario que prefieras.">
 
@@ -367,13 +378,25 @@ body{
 .form-field label{display:block;font-size:12.5px;font-weight:700;color:var(--blanco);margin-bottom:7px;letter-spacing:0.01em}
 .form-field input,.form-field select{
   width:100%;border:1.5px solid rgba(81,112,255,0.2);border-radius:12px;
-  padding:13px 14px;font-family:var(--font-display);font-size:15px;color:var(--texto-oscuro);
+  /* font-size 16px (antes 15px) -- mismo motivo que .modal-tel-row más
+     abajo: por debajo de 16px, Safari en iPhone hace zoom automático de
+     toda la página al tocar el campo, y ese zoom es lo que descuadraba
+     todo (reportado por Camila 21/08, en el modal, pero el mismo campo
+     de teléfono de este formulario tenía exactamente el mismo riesgo). */
+  padding:13px 14px;font-family:var(--font-display);font-size:16px;color:var(--texto-oscuro);
   background:var(--paper);outline:none;transition:border-color .2s;
 }
 .form-field input:focus,.form-field select:focus{border-color:var(--azul)}
 .tel-row{display:flex;gap:8px}
-.tel-row select{flex:0 0 118px}
-.tel-row input{flex:1}
+/* min-width:0 en AMBOS -- sin esto, el <select> de prefijo (que tiene
+   opciones largas, ej "🇦🇷 +54 Argentina") impone un ancho mínimo
+   automático basado en su contenido que puede ganarle al flex-basis de
+   118px, empujando al campo de teléfono a casi desaparecer al lado.
+   min-width:0 apaga ese mínimo automático y deja que el recorte lo haga
+   el propio <select> (nativo, sin admitir menos de 118px igual, por el
+   flex-shrink:0), tal cual se ve el resto del diseño. */
+.tel-row select{flex:0 0 118px;min-width:0}
+.tel-row input{flex:1;min-width:0}
 .field-error{font-size:12px;color:var(--coral);margin-top:6px;display:none;font-weight:600}
 .field-error.show{display:block}
 
@@ -497,9 +520,24 @@ body{
    fondo claro) -- pedido de Camila: todo el texto de esta burbuja pasa
    a blanco, ahora que el fondo es violeta sólido en vez de claro. */
 .modal-hint{font-size:13px;color:var(--blanco);margin-bottom:18px;line-height:1.5}
+/* Pedido de Camila (21/08): "está descuadrado... cuando escribís el
+   teléfono se hace zoom y se descuadra todo". Este campo no tenía NADA
+   de estilo propio (ni padding, ni tamaño de letra) -- quedaba con el
+   tamaño nativo del navegador, que en iPhone suele ser menor a 16px.
+   Safari hace zoom automático de TODA la página al enfocar cualquier
+   input/select con font-size menor a 16px -- ese zoom es justo lo que
+   se ve como "descuadre". La solución es forzar 16px (nunca menos) y
+   de paso darle el mismo estilo visual (padding, borde, fondo) que ya
+   usan los inputs del Paso 4, para que se vea prolijo y no como un
+   campo nativo suelto. */
 .modal-tel-row{display:flex;gap:8px;margin-bottom:8px}
-.modal-tel-row select{flex:0 0 118px}
-.modal-tel-row input{flex:1}
+.modal-tel-row select,.modal-tel-row input{
+  font-family:var(--font-display);font-size:16px;color:var(--texto-oscuro);
+  border:1.5px solid rgba(81,112,255,0.2);border-radius:12px;
+  padding:12px 14px;background:var(--paper);outline:none;
+}
+.modal-tel-row select{flex:0 0 118px;min-width:0}
+.modal-tel-row input{flex:1;min-width:0}
 /* background:var(--blanco);color:#0A0F2E (antes fondo azul, letra
    blanca) -- pedido de Camila: el botón "Buscar mis reservas" pasa a
    blanco sólido con letra negra. #0A0F2E literal a propósito (mismo
