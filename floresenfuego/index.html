@@ -380,6 +380,7 @@ body{
       <span id="salonResumenTexto"></span>
       <a href="#" id="cambiarSalonLink" class="cambiar-salon-link"></a>
     </div>
+    <div id="avisoVentanaReservaRow" class="time-empty" style="display:none;"></div>
     <span class="section-mini-label">Fecha</span>
     <div class="date-scroll-wrap">
       <button class="date-arrow date-arrow-left" id="dateArrowLeft" aria-label="Fechas anteriores">‹</button>
@@ -497,6 +498,9 @@ const TRANSLATIONS = {
     step3Hint: 'Consultando disponibilidad real.',
     horariosLoading: 'Consultando horarios disponibles...',
     horariosEmpty: 'No hay horarios libres para esta fecha. Prueba con otro día.',
+    avisoVentanaReserva: (open, close) => `Reservas anticipadas de ${open} a ${close}hs. Después de ese horario, te recibimos por orden de llegada según disponibilidad.`,
+    avisoVentanaCerradaHoy: (open, close) => `Las reservas anticipadas de hoy fueron de ${open} a ${close}hs. ¡Después de este horario, te recibimos por orden de llegada!`,
+    avisoSinDisponibilidad: 'En este momento no tenemos disponibilidad para la fecha elegida.',
     franjaManana: 'Mañana', franjaTarde: 'Tarde', franjaNoche: 'Noche',
     step4Title: 'Tus datos de contacto',
     step4Hint: 'Solo necesitamos esto para confirmarte la reserva.',
@@ -553,6 +557,9 @@ const TRANSLATIONS = {
     step3Hint: 'Checking real availability.',
     horariosLoading: 'Checking available times...',
     horariosEmpty: 'No available times for this date. Try another day.',
+    avisoVentanaReserva: (open, close) => `Advance reservations from ${open} to ${close}. After that time, we welcome you on a walk-in basis, subject to availability.`,
+    avisoVentanaCerradaHoy: (open, close) => `Today's advance reservations were from ${open} to ${close}. After that time, we welcome you on a walk-in basis!`,
+    avisoSinDisponibilidad: 'We currently have no availability for the selected date.',
     franjaManana: 'Morning', franjaTarde: 'Afternoon', franjaNoche: 'Evening',
     step4Title: 'Your contact details',
     step4Hint: "We just need this to confirm your reservation.",
@@ -609,6 +616,9 @@ const TRANSLATIONS = {
     step3Hint: 'Consultando disponibilidade real.',
     horariosLoading: 'Consultando horários disponíveis...',
     horariosEmpty: 'Não há horários livres para esta data. Tente outro dia.',
+    avisoVentanaReserva: (open, close) => `Reservas antecipadas das ${open} às ${close}h. Após esse horário, recebemos por ordem de chegada, sujeito à disponibilidade.`,
+    avisoVentanaCerradaHoy: (open, close) => `As reservas antecipadas de hoje foram das ${open} às ${close}h. Após esse horário, recebemos por ordem de chegada!`,
+    avisoSinDisponibilidad: 'No momento não temos disponibilidade para a data escolhida.',
     franjaManana: 'Manhã', franjaTarde: 'Tarde', franjaNoche: 'Noite',
     step4Title: 'Seus dados de contato',
     step4Hint: 'Precisamos só disso para confirmar sua reserva.',
@@ -830,12 +840,12 @@ let restaurantData = null; // se completa con cargarRestaurante()
 async function cargarRestaurante(){
   const sb = window.supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
 
-  const columnasCompletas = 'id, name, phone_prefix, timezone, whatsapp_numero, logo_type, logo_value, color_primario, color_oscuro, color_secundario, color_texto_oscuro, color_texto_medio, color_bg, color_card, bg_image, politicas_confirmacion';
+  const columnasCompletas = 'id, name, phone_prefix, timezone, whatsapp_numero, logo_type, logo_value, color_primario, color_oscuro, color_secundario, color_texto_oscuro, color_texto_medio, color_bg, color_card, bg_image, politicas_confirmacion, open_time, close_time, ventana_reserva_restringida, mensaje_orden_llegada';
   let { data, error } = await sb.from('restaurants').select(columnasCompletas).eq('slug', CONFIG.supabase.restaurantSlug).single();
 
   if(error){
     console.warn('[Pura Vida widget] columnas de marca no encontradas todavía (¿corriste el SQL?), sigo solo con datos base:', error.message);
-    const basico = await sb.from('restaurants').select('id, name, phone_prefix, timezone, whatsapp_numero').eq('slug', CONFIG.supabase.restaurantSlug).single();
+    const basico = await sb.from('restaurants').select('id, name, phone_prefix, timezone, whatsapp_numero, open_time, close_time, ventana_reserva_restringida, mensaje_orden_llegada').eq('slug', CONFIG.supabase.restaurantSlug).single();
     if(basico.error) throw basico.error;
     data = basico.data;
   }
@@ -1097,6 +1107,24 @@ function renderFechas(){
   const resumenTexto = document.getElementById('salonResumenTexto');
   if(resumenTexto) resumenTexto.textContent = salonActual ? `${salonActual.icon} ${salonActual.nombre}` : '';
 
+  /* Aviso temprano de ventana de reserva -- 100% dinámico, nunca
+     hardcodeado. Solo se muestra si restaurants.ventana_reserva_restringida
+     es true (default). Un cliente que reserva todo el día (false) nunca
+     ve este aviso, el widget se comporta igual que antes de este cambio. */
+  const avisoRow = document.getElementById('avisoVentanaReservaRow');
+  if(avisoRow){
+    const restringida = restaurantData?.ventana_reserva_restringida !== false; // default true
+    if(restringida && restaurantData?.open_time && restaurantData?.close_time){
+      avisoRow.textContent = T.avisoVentanaReserva(
+        restaurantData.open_time.slice(0,5),
+        restaurantData.close_time.slice(0,5)
+      );
+      avisoRow.style.display = '';
+    } else {
+      avisoRow.style.display = 'none';
+    }
+  }
+
   if(state.salon){
     console.log('[Pura Vida widget] DIAGNÓSTICO -- salón elegido:', state.salon,
       '| días cerrados de este salón:', closedDays,
@@ -1219,11 +1247,49 @@ async function cargarHorarios(){
   document.getElementById('next3').disabled = true;
 
   const salon = CONFIG.salones.find(s => s.id === state.salon);
+
+  /* Chequeo real, 100% dinámico: ¿la fecha elegida es HOY (en el
+     timezone real del restaurante) y ya pasó el close_time real de
+     hoy? Si es así, no hace falta ni esperar la respuesta del webhook
+     de horarios -- ya sabemos que no va a haber ninguno disponible
+     para reserva anticipada hoy. Se muestra el aviso de orden de
+     llegada en vez del genérico "sin disponibilidad", que sería
+     engañoso en este caso puntual (no es que esté lleno, es que ya
+     cerró la ventana de reservas anticipadas de hoy).
+     Nunca se ejecuta si ventana_reserva_restringida = false. */
+  const restringida = restaurantData?.ventana_reserva_restringida !== false;
+  if(restringida && restaurantData?.close_time && restaurantData?.timezone){
+    const ahoraEnTz = new Date().toLocaleString('en-US', { timeZone: restaurantData.timezone });
+    const ahora = new Date(ahoraEnTz);
+    const yyyy = ahora.getFullYear();
+    const mm = String(ahora.getMonth() + 1).padStart(2, '0');
+    const dd = String(ahora.getDate()).padStart(2, '0');
+    const hoyEnTz = `${yyyy}-${mm}-${dd}`;
+    const esHoy = state.fechaISO === hoyEnTz;
+    if(esHoy){
+      const [hC, mC] = restaurantData.close_time.slice(0,5).split(':').map(Number);
+      const minutosCierre = hC * 60 + mC;
+      const minutosAhora = ahora.getHours() * 60 + ahora.getMinutes();
+      if(minutosAhora >= minutosCierre){
+        const textoOverride = restaurantData?.mensaje_orden_llegada;
+        const open = restaurantData.open_time ? restaurantData.open_time.slice(0,5) : '';
+        const close = restaurantData.close_time.slice(0,5);
+        grid.innerHTML = `<div class="time-empty">${
+          textoOverride
+            ? textoOverride.replace('{open_time}', open).replace('{close_time}', close)
+            : T.avisoVentanaCerradaHoy(open, close)
+        }</div>`;
+        document.getElementById('next3').disabled = true;
+        return;
+      }
+    }
+  }
+
   const horarios = await obtenerHorarios(salon.id, state.fechaISO);
 
   grid.innerHTML = '';
   if(horarios.length === 0){
-    grid.innerHTML = `<div class="time-empty">${T.horariosEmpty}</div>`;
+    grid.innerHTML = `<div class="time-empty">${T.avisoSinDisponibilidad}</div>`;
     return;
   }
 
