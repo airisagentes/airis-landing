@@ -1247,6 +1247,7 @@ async function cargarHorarios(){
   document.getElementById('next3').disabled = true;
 
   const salon = CONFIG.salones.find(s => s.id === state.salon);
+  const avisoRow = document.getElementById('avisoVentanaReservaRow');
 
   /* Chequeo real, 100% dinámico: ¿la fecha elegida es HOY (en el
      timezone real del restaurante) y ya pasó el close_time real de
@@ -1271,6 +1272,12 @@ async function cargarHorarios(){
       const minutosCierre = hC * 60 + mC;
       const minutosAhora = ahora.getHours() * 60 + ahora.getMinutes();
       if(minutosAhora >= minutosCierre){
+        /* El Mensaje 2 (abajo) ya dice exactamente lo mismo que el
+           Mensaje 1 (aviso temprano, arriba) -- mostrar los 2 juntos
+           se leía redundante y poco prolijo. Se oculta el de arriba
+           mientras se muestra este, y se restaura más abajo si el
+           cliente elige otra fecha donde este caso no aplica. */
+        if(avisoRow) avisoRow.style.display = 'none';
         const textoOverride = restaurantData?.mensaje_orden_llegada;
         const open = restaurantData.open_time ? restaurantData.open_time.slice(0,5) : '';
         const close = restaurantData.close_time.slice(0,5);
@@ -1283,6 +1290,13 @@ async function cargarHorarios(){
         return;
       }
     }
+  }
+
+  /* Si llegamos hasta acá, no aplica el caso "hoy, pasado el horario"
+     -- restaurar el aviso temprano por si había quedado oculto de una
+     selección de fecha anterior en la misma sesión del widget. */
+  if(avisoRow && restringida && restaurantData?.open_time && restaurantData?.close_time){
+    avisoRow.style.display = '';
   }
 
   const horarios = await obtenerHorarios(salon.id, state.fechaISO);
