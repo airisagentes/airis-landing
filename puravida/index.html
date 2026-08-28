@@ -62,7 +62,7 @@ body{
   font-family:var(--font-display);
   min-height:100svh;
   -webkit-font-smoothing:antialiased;
-  padding:104px 16px 80px;
+  padding:32px 16px 80px;
 }
 
 .mock-banner{
@@ -259,7 +259,7 @@ body{
   max-width:640px;margin:28px auto 0;
   display:flex;flex-direction:column;align-items:center;gap:6px;
 }
-.airis-footer-row{display:flex;align-items:baseline;justify-content:center;gap:6px}
+.airis-footer-row{display:flex;align-items:baseline;justify-content:center;gap:3px}
 .airis-footer-label{font-size:11px;color:var(--texto-medio);font-family:var(--font-display);letter-spacing:0.04em}
 .airis-footer-logo{font-weight:800;font-size:14px;letter-spacing:-0.3px;color:var(--texto-oscuro)}
 .airis-footer-logo span{color:var(--airis-blue)}
@@ -322,8 +322,6 @@ body{
 </style>
 </head>
 <body>
-
-<div class="logo-badge" id="logoBadge"></div>
 
 <div class="mock-banner hidden" id="mockBanner"></div>
 
@@ -893,6 +891,7 @@ function aplicarMarca(restaurante){
   }
 
   const logoEl = document.getElementById('logoBadge');
+  if(logoEl){
   if(!restaurante.logo_value){
     logoEl.style.display = 'none';
   }else{
@@ -904,6 +903,7 @@ function aplicarMarca(restaurante){
     }else{
       logoEl.textContent = logoValue;
     }
+  }
   }
 }
 
