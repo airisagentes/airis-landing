@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title id="pageTitle">Reservá tu mesa — Pura Vida</title>
 <meta name="description" content="Reservá tu mesa en Pura Vida. Elegí el salón, la fecha y el horario que prefieras.">
 
@@ -90,7 +90,7 @@ body{
 
 .progress-wrap{max-width:640px;margin:0 auto 28px}
 .progress-bar{display:flex;gap:6px;margin-bottom:10px}
-.progress-seg{flex:1;height:4px;border-radius:100px;background:rgba(81,112,255,0.15);overflow:hidden}
+.progress-seg{flex:1;height:4px;border-radius:100px;background:rgba(139,170,124,0.15);overflow:hidden}
 .progress-seg-fill{height:100%;width:0%;background:var(--azul);border-radius:100px}
 .progress-seg.done .progress-seg-fill,.progress-seg.active .progress-seg-fill{width:100%}
 .progress-label{font-family:var(--font-mono);font-size:11px;color:var(--azul);letter-spacing:0.08em;text-transform:uppercase;display:flex;justify-content:space-between}
@@ -99,7 +99,7 @@ body{
 .widget{
   max-width:640px;margin:0 auto;
   background:var(--card-bg);
-  border:1.5px solid rgba(81,112,255,0.15);
+  border:1.5px solid rgba(139,170,124,0.15);
   border-radius:var(--r-lg);
   padding:28px 22px;
   box-shadow:0 12px 40px rgba(10,15,46,0.06);
@@ -114,23 +114,23 @@ body{
 .salon-grid{display:grid;grid-template-columns:1fr;gap:10px}
 .salon-card{
   display:flex;align-items:center;gap:14px;
-  border:1.5px solid rgba(81,112,255,0.15);
+  border:1.5px solid rgba(139,170,124,0.15);
   border-radius:var(--r);padding:14px 16px;
   cursor:pointer;transition:border-color .2s,background .2s;
   background:var(--paper);
 }
-.salon-card:hover{border-color:rgba(81,112,255,0.4)}
-.salon-card.selected{border-color:var(--azul);background:rgba(81,112,255,0.06)}
+.salon-card:hover{border-color:rgba(139,170,124,0.4)}
+.salon-card.selected{border-color:var(--azul);background:rgba(139,170,124,0.06)}
 .salon-icon{
   width:44px;height:44px;border-radius:12px;flex-shrink:0;
-  background:rgba(81,112,255,0.12);
+  background:rgba(139,170,124,0.12);
   display:flex;align-items:center;justify-content:center;font-size:20px;
 }
 .salon-info h4{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:2px}
 .salon-info p{font-size:12.5px;color:var(--texto-medio)}
 .salon-check{
   margin-left:auto;width:20px;height:20px;border-radius:50%;
-  border:1.5px solid rgba(81,112,255,0.3);flex-shrink:0;
+  border:1.5px solid rgba(139,170,124,0.3);flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
 }
 .salon-card.selected .salon-check{background:var(--azul);border-color:var(--azul)}
@@ -139,29 +139,29 @@ body{
 .personas-box{display:flex;align-items:center;justify-content:center;gap:28px;padding:36px 0 24px}
 .stepper-btn{
   width:52px;height:52px;border-radius:50%;
-  border:1.5px solid rgba(81,112,255,0.25);background:var(--paper);
+  border:1.5px solid rgba(139,170,124,0.25);background:var(--paper);
   font-size:22px;font-weight:700;color:var(--azul);cursor:pointer;
   display:flex;align-items:center;justify-content:center;
   transition:background .2s,border-color .2s;
 }
-.stepper-btn:hover{background:rgba(81,112,255,0.1);border-color:var(--azul)}
+.stepper-btn:hover{background:rgba(139,170,124,0.1);border-color:var(--azul)}
 .stepper-btn:disabled{opacity:0.35;cursor:not-allowed}
 .personas-num{font-size:40px;font-weight:800;color:var(--navy);min-width:64px;text-align:center;letter-spacing:-2px}
 .personas-quick{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
 .quick-chip{
   font-family:var(--font-mono);font-size:12.5px;font-weight:500;
-  border:1.5px solid rgba(81,112,255,0.2);border-radius:100px;
+  border:1.5px solid rgba(139,170,124,0.2);border-radius:100px;
   padding:7px 16px;cursor:pointer;color:var(--texto-medio);background:var(--card-bg);
   transition:border-color .2s,color .2s;
 }
-.quick-chip:hover,.quick-chip.selected{border-color:var(--azul);color:var(--azul);background:rgba(81,112,255,0.06)}
+.quick-chip:hover,.quick-chip.selected{border-color:var(--azul);color:var(--azul);background:rgba(139,170,124,0.06)}
 
 .date-scroll{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 12px;scrollbar-width:none}
 .date-scroll::-webkit-scrollbar{display:none}
 .date-scroll-wrap{position:relative;display:flex;align-items:center;gap:4px}
 .date-scroll-wrap .date-scroll{flex:1;min-width:0}
 .date-arrow{
-  flex-shrink:0;width:30px;height:30px;border-radius:50%;border:1.5px solid rgba(81,112,255,0.25);
+  flex-shrink:0;width:30px;height:30px;border-radius:50%;border:1.5px solid rgba(139,170,124,0.25);
   background:var(--card-bg);color:var(--azul);font-size:18px;line-height:1;cursor:pointer;
   display:flex;align-items:center;justify-content:center;transition:opacity 0.15s;
 }
@@ -169,11 +169,11 @@ body{
 .date-arrow:disabled{opacity:0.25;cursor:default;pointer-events:none}
 .date-chip{
   flex-shrink:0;min-width:62px;
-  border:1.5px solid rgba(81,112,255,0.18);border-radius:14px;
+  border:1.5px solid rgba(139,170,124,0.18);border-radius:14px;
   padding:10px 6px;text-align:center;cursor:pointer;background:var(--paper);
   transition:border-color .2s,background .2s;
 }
-.date-chip:hover{border-color:rgba(81,112,255,0.45)}
+.date-chip:hover{border-color:rgba(139,170,124,0.45)}
 .date-chip.selected{border-color:var(--azul);background:var(--azul);color:var(--blanco)}
 .date-chip.closed{opacity:0.35;cursor:not-allowed;pointer-events:none;background:var(--paper)}
 .date-dow{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:0.05em;opacity:0.7}
@@ -187,12 +187,12 @@ body{
 .time-franja-label:first-child{margin-top:0}
 .time-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:18px;min-height:52px}
 .time-slot{
-  border:1.5px solid rgba(81,112,255,0.18);border-radius:12px;
+  border:1.5px solid rgba(139,170,124,0.18);border-radius:12px;
   padding:11px 6px;text-align:center;font-size:13.5px;font-weight:600;
   color:var(--navy);cursor:pointer;background:var(--paper);
   transition:border-color .2s,background .2s,color .2s;
 }
-.time-slot:hover{border-color:rgba(81,112,255,0.45)}
+.time-slot:hover{border-color:rgba(139,170,124,0.45)}
 .time-slot.selected{border-color:var(--azul);background:var(--azul);color:var(--blanco)}
 .time-loading,.time-empty{
   grid-column:1/-1;text-align:center;font-family:var(--font-mono);
@@ -203,7 +203,7 @@ body{
 .salon-resumen-row{
   display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px 14px;
   padding:10px 14px;margin-bottom:6px;
-  background:var(--paper);border:1px solid rgba(81,112,255,0.15);border-radius:12px;
+  background:var(--paper);border:1px solid rgba(139,170,124,0.15);border-radius:12px;
 }
 .salon-resumen-row span:first-child{font-size:13px;color:var(--texto-medio);font-weight:600}
 .cambiar-salon-link{
@@ -216,18 +216,18 @@ body{
 .form-field{margin-bottom:18px}
 .form-field label{display:block;font-size:12.5px;font-weight:700;color:var(--navy);margin-bottom:7px;letter-spacing:0.01em}
 .form-field input,.form-field select{
-  width:100%;border:1.5px solid rgba(81,112,255,0.2);border-radius:12px;
-  padding:13px 14px;font-family:var(--font-display);font-size:15px;color:var(--texto-oscuro);
+  width:100%;border:1.5px solid rgba(139,170,124,0.2);border-radius:12px;
+  padding:13px 14px;font-family:var(--font-display);font-size:16px;color:var(--texto-oscuro);
   background:var(--paper);outline:none;transition:border-color .2s;
 }
 .form-field input:focus,.form-field select:focus{border-color:var(--azul)}
 .tel-row{display:flex;gap:8px}
-.tel-row select{flex:0 0 118px}
-.tel-row input{flex:1}
+.tel-row select{flex:0 0 118px;min-width:0}
+.tel-row input{flex:1;min-width:0}
 .field-error{font-size:12px;color:var(--coral);margin-top:6px;display:none;font-weight:600}
 .field-error.show{display:block}
 
-.summary-card{background:#1A1F14;border-radius:var(--r);padding:20px;margin-bottom:22px}
+.summary-card{background:rgba(139,170,124,0.85);border-radius:var(--r);padding:20px;margin-bottom:22px}
 .summary-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.08)}
 .summary-row:last-child{border-bottom:none}
 .summary-row-label{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(255,255,255,0.5)}
@@ -235,7 +235,7 @@ body{
 
 .success-box{text-align:center;padding:20px 0 4px}
 .success-icon{
-  width:64px;height:64px;border-radius:50%;background:rgba(81,112,255,0.12);
+  width:64px;height:64px;border-radius:50%;background:rgba(139,170,124,0.12);
   display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:30px;color:var(--azul);
 }
 
@@ -246,7 +246,7 @@ body{
   text-decoration:none;transition:transform .2s,opacity .2s;text-align:center;
 }
 .btn:disabled{opacity:0.4;cursor:not-allowed}
-.btn-back{background:var(--paper);color:var(--navy);border:1.5px solid rgba(81,112,255,0.18);flex:0 0 auto}
+.btn-back{background:var(--paper);color:var(--navy);border:1.5px solid rgba(139,170,124,0.18);flex:0 0 auto}
 .btn-next{background:var(--azul);color:var(--blanco);flex:1}
 .btn-next:not(:disabled):hover{transform:translateY(-2px);opacity:0.92}
 
@@ -260,18 +260,18 @@ body{
   display:flex;flex-direction:column;align-items:center;gap:6px;
 }
 .airis-footer-row{display:flex;align-items:baseline;justify-content:center;gap:6px}
-.airis-footer-label{font-size:11px;color:var(--texto-medio);font-family:var(--font-mono);letter-spacing:0.04em}
+.airis-footer-label{font-size:11px;color:var(--texto-medio);font-family:var(--font-display);letter-spacing:0.04em}
 .airis-footer-logo{font-weight:800;font-size:14px;letter-spacing:-0.3px;color:var(--texto-oscuro)}
 .airis-footer-logo span{color:var(--airis-blue)}
 .airis-footer-link{
-  font-family:var(--font-mono);font-size:11px;color:var(--texto-medio);
+  font-family:var(--font-display);font-size:11px;color:var(--texto-medio);
   text-decoration:none;transition:color .2s;
 }
 .airis-footer-link:hover{color:var(--airis-blue)}
 
 /* ==== Modal "Gestionar mi reserva" ==== */
 .gestionar-link{
-  font-family:var(--font-mono);font-size:11px;color:var(--texto-medio);
+  font-family:var(--font-display);font-size:11px;color:var(--texto-medio);
   background:none;border:none;cursor:pointer;text-decoration:underline;
   padding:0;margin-top:4px;
 }
@@ -293,8 +293,9 @@ body{
 .modal-title{font-weight:800;font-size:19px;color:var(--navy);margin-bottom:6px;clear:both}
 .modal-hint{font-size:13px;color:var(--texto-medio);margin-bottom:18px;line-height:1.5}
 .modal-tel-row{display:flex;gap:8px;margin-bottom:8px}
-.modal-tel-row select{flex:0 0 118px}
-.modal-tel-row input{flex:1}
+.modal-tel-row select,.modal-tel-row input{font-size:16px}
+.modal-tel-row select{flex:0 0 118px;min-width:0}
+.modal-tel-row input{flex:1;min-width:0}
 .modal-btn{
   width:100%;font-family:var(--font-display);font-weight:700;font-size:14px;
   padding:12px;border-radius:100px;border:none;cursor:pointer;
@@ -302,7 +303,7 @@ body{
 }
 .modal-btn:disabled{opacity:0.5;cursor:not-allowed}
 .reserva-item{
-  border:1.5px solid rgba(81,112,255,0.15);border-radius:var(--r);
+  border:1.5px solid rgba(139,170,124,0.15);border-radius:var(--r);
   padding:14px;margin-top:12px;
 }
 .reserva-item-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px}
@@ -324,7 +325,7 @@ body{
 
 <div class="logo-badge" id="logoBadge"></div>
 
-<div class="mock-banner" id="mockBanner"></div>
+<div class="mock-banner hidden" id="mockBanner"></div>
 
 <div class="top">
   <div class="top-eyebrow" id="topEyebrow"></div>
@@ -362,7 +363,7 @@ body{
       <button class="stepper-btn" id="personasPlus">+</button>
     </div>
     <div class="personas-quick" id="personasQuick"></div>
-    <div id="grupoGrandeBox" style="display:none;text-align:center;margin-top:18px;padding:16px;background:var(--paper);border-radius:var(--r);border:1.5px dashed rgba(81,112,255,0.3)">
+    <div id="grupoGrandeBox" style="display:none;text-align:center;margin-top:18px;padding:16px;background:var(--paper);border-radius:var(--r);border:1.5px dashed rgba(139,170,124,0.3)">
       <p style="font-size:13px;color:var(--texto-medio);margin-bottom:10px;line-height:1.5" id="grupoGrandeTexto"></p>
       <a id="grupoGrandeBtn" href="#" style="display:inline-block;font-family:var(--font-display);font-weight:700;font-size:13.5px;padding:11px 20px;border-radius:100px;background:var(--coral);color:var(--blanco);text-decoration:none"></a>
     </div>
@@ -409,6 +410,10 @@ body{
         <input type="tel" id="telInput" autocomplete="tel">
       </div>
       <div class="field-error" id="telError"></div>
+    </div>
+    <div class="form-field">
+      <label for="notaInput" id="labelNota"></label>
+      <input type="text" id="notaInput">
     </div>
     <div class="nav-row">
       <button class="btn btn-back" id="back4"></button>
@@ -508,6 +513,9 @@ const TRANSLATIONS = {
     labelTelefono: 'Teléfono (con código de país)',
     placeholderTelefono: 'Ej: 261 534 7036',
     errorTelefono: 'Ingresa un número válido, solo dígitos.',
+    labelNota: 'Notas',
+    placeholderNota: 'Ej: alergia',
+    summaryNota: 'Notas',
     step5Title: 'Confirma tu reserva',
     step5Hint: 'Revisa que esté todo bien antes de enviarla.',
     summaryEspacio: 'Espacio', summaryPersonas: 'Personas', summaryFecha: 'Fecha',
@@ -567,6 +575,9 @@ const TRANSLATIONS = {
     labelTelefono: 'Phone (with country code)',
     placeholderTelefono: 'E.g: 555 123 4567',
     errorTelefono: 'Enter a valid number, digits only.',
+    labelNota: 'Notes',
+    placeholderNota: 'E.g: allergy',
+    summaryNota: 'Notes',
     step5Title: 'Confirm your reservation',
     step5Hint: 'Check that everything looks right before sending it.',
     summaryEspacio: 'Space', summaryPersonas: 'People', summaryFecha: 'Date',
@@ -626,6 +637,9 @@ const TRANSLATIONS = {
     labelTelefono: 'Telefone (com código do país)',
     placeholderTelefono: 'Ex: 11 91234-5678',
     errorTelefono: 'Informe um número válido, somente dígitos.',
+    labelNota: 'Notas',
+    placeholderNota: 'Ex: alergia',
+    summaryNota: 'Notas',
     step5Title: 'Confirme sua reserva',
     step5Hint: 'Revise se está tudo certo antes de enviar.',
     summaryEspacio: 'Espaço', summaryPersonas: 'Pessoas', summaryFecha: 'Data',
@@ -687,7 +701,12 @@ const CONFIG = {
     logoType: 'emoji', logoValue: '🍽️',
     colorPrimario: '#5170FF', colorOscuro: '#0A0F2E', colorSecundario: '#EB9292',
     colorTextoOscuro: '#0A0F2E', colorTextoMedio: '#3a3f5c',
-    bgColor: '#F4F4F8', bgImage: '', cardColor: '#FFFFFF',
+    // bgImage: PRUEBA TEMPORAL de fondo con foto, a pedido de Camila.
+    // Ruta relativa -- funciona si este archivo y la foto están en la
+    // misma carpeta al abrirlo. Si se aprueba, subir la foto a Supabase
+    // Storage y cargar esa URL en restaurants.bg_image (columna real);
+    // ahí se puede sacar esta línea de prueba.
+    bgColor: '#F4F4F8', bgImage: 'puravida-fondo-vivero.jpg', cardColor: '#FFFFFF',
   },
 
   // true = usa horarios de ejemplo y NO crea reservas reales todavía.
@@ -927,6 +946,8 @@ function aplicarIdioma(){
   document.getElementById('nombreError').textContent = T.errorNombre;
   document.getElementById('labelTelefono').textContent = T.labelTelefono;
   document.getElementById('telInput').placeholder = T.placeholderTelefono;
+  document.getElementById('labelNota').textContent = T.labelNota;
+  document.getElementById('notaInput').placeholder = T.placeholderNota;
   document.getElementById('telError').textContent = T.errorTelefono;
   document.getElementById('back4').textContent = T.btnVolver;
   document.getElementById('next4').textContent = T.btnVerResumen;
@@ -946,7 +967,7 @@ function aplicarIdioma(){
 const state = {
   step: 1, salon: null, personas: 2,
   fechaISO: null, fechaLabel: null, hora: null, horaISO: null,
-  nombre: '', prefijo: detectarPrefijoDefault(), telefono: '',
+  nombre: '', prefijo: detectarPrefijoDefault(), telefono: '', nota: '',
 };
 
 const totalSteps = 5;
@@ -1367,6 +1388,7 @@ function validarDatos(){
   if(nombreOk && telOk){
     state.nombre = nombre;
     state.telefono = telDigits;
+    state.nota = document.getElementById('notaInput').value.trim();
     return true;
   }
   return false;
@@ -1375,6 +1397,9 @@ function validarDatos(){
 function renderResumen(){
   const salon = CONFIG.salones.find(s => s.id === state.salon);
   const card = document.getElementById('summaryCard');
+  const notaRow = state.nota
+    ? `<div class="summary-row"><span class="summary-row-label">${T.summaryNota}</span><span class="summary-row-val">${state.nota}</span></div>`
+    : '';
   card.innerHTML = `
     <div class="summary-row"><span class="summary-row-label">${T.summaryEspacio}</span><span class="summary-row-val">${salon.nombre}</span></div>
     <div class="summary-row"><span class="summary-row-label">${T.summaryPersonas}</span><span class="summary-row-val">${state.personas}</span></div>
@@ -1382,6 +1407,7 @@ function renderResumen(){
     <div class="summary-row"><span class="summary-row-label">${T.summaryHorario}</span><span class="summary-row-val">${state.hora}</span></div>
     <div class="summary-row"><span class="summary-row-label">${T.summaryNombre}</span><span class="summary-row-val">${state.nombre}</span></div>
     <div class="summary-row"><span class="summary-row-label">${T.summaryTelefono}</span><span class="summary-row-val">${state.prefijo} ${state.telefono}</span></div>
+    ${notaRow}
   `;
 }
 
@@ -1396,7 +1422,7 @@ async function crearReserva(){
     personas: state.personas,
     nombre: state.nombre,
     telefono: `${state.prefijo}${state.telefono}`,
-    notas: '',
+    notas: state.nota,
   };
 
   if(CONFIG.MOCK_MODE){
@@ -1545,7 +1571,7 @@ async function init(){
 
     CONFIG.salones = await cargarSalones();
     await cargarExcepcionesAperturaEspecial();
-    if(!CONFIG.MOCK_MODE) document.getElementById('mockBanner').classList.add('hidden');
+    if(CONFIG.MOCK_MODE) document.getElementById('mockBanner').classList.remove('hidden');
 
     renderSalones();
     renderPersonas();
