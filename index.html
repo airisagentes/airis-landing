@@ -695,7 +695,9 @@ section{padding:72px 20px}
   display:grid;grid-template-columns:1fr 1fr;gap:6px 20px;
   margin-bottom:26px;
 }
-.plan-features-grid ul{list-style:none;margin:0;padding:0;font-size:12.5px;line-height:1.9}
+.plan-features-grid ul{list-style:none;margin:0;padding:0;font-size:12.5px;line-height:1.45}
+.plan-features-grid li{margin-bottom:6px}
+.plan-features-grid li:last-child{margin-bottom:0}
 .plan-cta{
   display:block;width:100%;text-align:center;
   font-family:var(--font-display);font-weight:700;font-size:14px;
@@ -717,6 +719,10 @@ section{padding:72px 20px}
 .plan-card-violeta .plan-header{border-bottom-color:rgba(10,15,46,0.15)}
 .plan-card-violeta .plan-price-suffix{opacity:0.6}
 .plan-card-violeta .plan-cta{background:var(--navy);color:var(--blanco)}
+
+.plan-card-coral{background:var(--coral);color:var(--navy)}
+.plan-card-coral .plan-header{border-bottom-color:rgba(10,15,46,0.15)}
+.plan-card-coral .plan-cta{background:var(--navy);color:var(--blanco)}
 
 .plan-arrow{
   position:absolute;top:50%;transform:translateY(-50%);
@@ -807,13 +813,31 @@ section{padding:72px 20px}
 .cta-right{display:flex;flex-direction:column;align-items:center;gap:18px}
 .cta-right-text{
   font-size:13px;color:var(--texto-medio);line-height:1.55;
-  max-width:280px;font-weight:500;
+  max-width:320px;font-weight:500;
 }
-.cta-right .btn-bubble{white-space:nowrap;font-size:13px;padding:13px 24px}
+.wsp-form{
+  display:flex;flex-direction:column;gap:10px;width:100%;max-width:320px;
+}
+.wsp-input{
+  font-family:var(--font-display);font-size:14px;color:var(--texto-oscuro);
+  background:var(--blanco);border:1.5px solid rgba(10,15,46,0.14);
+  border-radius:var(--r);padding:12px 16px;width:100%;box-sizing:border-box;
+  outline:none;transition:border-color 0.2s;
+}
+.wsp-input::placeholder{color:var(--texto-medio);opacity:0.6}
+.wsp-input:focus{border-color:var(--azul)}
+.wsp-phone-row{display:flex;gap:8px}
+.wsp-select{flex:0 0 128px;padding-left:10px;padding-right:6px;cursor:pointer}
+.wsp-phone-row .wsp-input:not(.wsp-select){flex:1;min-width:0}
+.wsp-form-btn{
+  font-family:var(--font-display);font-weight:700;font-size:14px;
+  background:var(--navy);color:var(--blanco);border:none;border-radius:100px;
+  padding:13px 24px;cursor:pointer;transition:transform 0.2s,opacity 0.2s;
+}
+.wsp-form-btn:hover{transform:translateY(-2px);opacity:0.92}
 @media(min-width:640px){
   .cta-title{font-size:26px}
-  .cta-right-text{font-size:15px;max-width:340px}
-  .cta-right .btn-bubble{font-size:15px;padding:15px 30px}
+  .cta-right-text{font-size:15px;max-width:400px}
 }
 @media(min-width:900px){
   .cta-final-v2{padding:88px 20px}
@@ -823,8 +847,10 @@ section{padding:72px 20px}
   }
   .cta-left{flex:1.3;max-width:600px}
   .cta-title{text-align:left;margin-bottom:0;font-size:28px}
-  .cta-right{align-items:flex-end;text-align:right;flex:1;max-width:340px}
+  .cta-right{align-items:flex-end;text-align:right;flex:1;max-width:400px}
   .cta-right-text{text-align:right;max-width:100%}
+  .wsp-form{align-items:flex-end}
+  .wsp-input:not(.wsp-select){text-align:right}
 }
 @media(min-width:1200px){
   .cta-title{font-size:32px}
@@ -1184,10 +1210,10 @@ footer{
     <a href="#garantia" class="nav-link">Garantía</a>
     <a href="#planes" class="nav-link">Planes</a>
     <a href="#faq" class="nav-link">FAQ</a>
-    <a href="https://api.airisworld.com/widget/booking/rcfPZX2CkYCW2lBdbQav" target="_blank" class="nav-cta nav-cta-mobile-only">Auditoría Free</a>
+    <a href="#cta" class="nav-cta nav-cta-mobile-only">Auditoría Free</a>
   </div>
   <div class="nav-right">
-    <a href="https://api.airisworld.com/widget/booking/rcfPZX2CkYCW2lBdbQav" target="_blank" class="nav-cta nav-cta-desktop-only">Auditoría Free</a>
+    <a href="#cta" class="nav-cta nav-cta-desktop-only">Auditoría Free</a>
     <button class="nav-hamburger" id="navHamburger" aria-label="Abrir menú" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
@@ -1213,7 +1239,7 @@ footer{
       <p class="hero-desc fade-in">
         <span style="white-space:nowrap">Airis gestiona</span><br><span style="white-space:nowrap">— desde la consulta hasta la reseña —</span><br><span style="white-space:nowrap">sin molestar a tu equipo.</span><br><span style="white-space:nowrap">24/7 en WhatsApp e Instagram.</span>
       </p>
-      <a href="https://api.airisworld.com/widget/booking/rcfPZX2CkYCW2lBdbQav" target="_blank" class="btn-bubble fade-in">Empezar gratis</a>
+      <a href="#cta" class="btn-bubble fade-in">Empezar gratis</a>
     </div>
   </div>
   <a href="#como" class="scroll-cue fade-in" aria-label="Descubrí más desplazándote hacia abajo">
@@ -1518,7 +1544,7 @@ footer{
 
   </div>
   <div style="text-align:center;margin-top:40px">
-    <a href="https://api.airisworld.com/widget/booking/rcfPZX2CkYCW2lBdbQav" target="_blank" class="btn-bubble fade-in">QUIERO MIS 30 DÍAS GRATIS →</a>
+    <a href="#cta" class="btn-bubble fade-in">Empezar gratis →</a>
   </div>
   <div class="urgency-strip">
     <div class="marquee">
@@ -1585,7 +1611,7 @@ footer{
 <!-- PLANES -->
 <section class="planes" id="planes">
   <span class="section-label fade-in" style="color:var(--azul)">Empezá hoy</span>
-  <h2 class="section-title fade-in">Tres planes para elegir</h2>
+  <h2 class="section-title fade-in">Nuestros planes</h2>
   <p class="section-sub fade-in" style="margin:0 auto">Elegí el que se ajuste al tamaño de tu operación.</p>
 
   <div class="plan-carousel fade-in">
@@ -1595,18 +1621,36 @@ footer{
     <div class="plan-window">
       <div class="plan-track">
 
+        <!-- PLAN BASE -->
+        <div class="plan-slide">
+          <div class="plan-card plan-card-coral">
+            <div class="plan-header">
+              <h3 class="plan-name">Plan Base</h3>
+            </div>
+            <div class="plan-features-grid">
+              <ul>
+                <li>✓ Página personalizada de reservas en tiempo real</li>
+              </ul>
+              <ul>
+                <li>✓ App del equipo (funciones esenciales)</li>
+                <li>✓ Dashboard del dueño (métricas esenciales)</li>
+              </ul>
+            </div>
+            <a href="#cta" class="plan-cta">Comenzar →</a>
+          </div>
+        </div>
+
         <!-- PLAN STANDARD - POPULAR -->
         <div class="plan-slide">
           <div class="plan-card plan-card-azul">
             <span class="plan-badge">POPULAR</span>
             <div class="plan-header">
-              <span class="plan-price">$200 <span class="plan-price-usd">USD</span><span class="plan-price-suffix">/mes</span></span>
               <h3 class="plan-name">Plan Standard</h3>
             </div>
             <div class="plan-features-grid">
               <ul>
                 <li>✓ WhatsApp e Instagram</li>
-                <li>✓ Google Calendar</li>
+                <li>✓ Página personalizada de reservas en tiempo real</li>
                 <li>✓ Agente con IA</li>
                 <li>✓ Reservas en tiempo real</li>
                 <li>✓ Confirmación / recordatorios</li>
@@ -1616,10 +1660,11 @@ footer{
                 <li>✓ Capacitación</li>
                 <li>✓ Soporte por WhatsApp</li>
                 <li>✓ App del equipo</li>
+                <li>✓ App del dueño</li>
                 <li>✓ 1 cuenta de WhatsApp</li>
               </ul>
             </div>
-            <a href="https://api.airisworld.com/widget/booking/rcfPZX2CkYCW2lBdbQav" target="_blank" class="plan-cta">Comenzar →</a>
+            <a href="#cta" class="plan-cta">Comenzar →</a>
           </div>
         </div>
 
@@ -1627,7 +1672,6 @@ footer{
         <div class="plan-slide">
           <div class="plan-card plan-card-navy">
             <div class="plan-header">
-              <span class="plan-price">$300 <span class="plan-price-usd">USD</span><span class="plan-price-suffix">/mes</span></span>
               <h3 class="plan-name">Plan Full</h3>
             </div>
             <div class="plan-features-grid">
@@ -1636,11 +1680,10 @@ footer{
                 <li>✓ Hasta 3 cuentas de WhatsApp</li>
               </ul>
               <ul>
-                <li>✓ App del dueño (métricas y posicionamiento en Google)</li>
                 <li>✓ Soporte prioritario</li>
               </ul>
             </div>
-            <a href="https://api.airisworld.com/widget/booking/rcfPZX2CkYCW2lBdbQav" target="_blank" class="plan-cta">Comenzar →</a>
+            <a href="#cta" class="plan-cta">Comenzar →</a>
           </div>
         </div>
 
@@ -1649,14 +1692,12 @@ footer{
           <div class="plan-card plan-card-violeta">
             <span class="plan-badge plan-badge-violeta">EMPRESAS</span>
             <div class="plan-header">
-              <span class="plan-price">Desde $350 <span class="plan-price-usd">USD</span><span class="plan-price-suffix">/mes</span></span>
               <h3 class="plan-name">Plan Custom</h3>
             </div>
             <div class="plan-features-grid">
               <ul>
                 <li>✓ Todo lo del Full</li>
                 <li>✓ Más de 3 cuentas de WhatsApp</li>
-                <li>✓ Flujos de comunicación a medida</li>
               </ul>
               <ul>
                 <li>✓ Capacitación intensiva y personalizada</li>
@@ -1676,6 +1717,7 @@ footer{
         <button class="plan-dot active" aria-label="Ver plan 1"></button>
         <button class="plan-dot" aria-label="Ver plan 2"></button>
         <button class="plan-dot" aria-label="Ver plan 3"></button>
+        <button class="plan-dot" aria-label="Ver plan 4"></button>
       </div>
       <button class="plan-arrow plan-arrow-next plan-arrow-mobile" aria-label="Plan siguiente">›</button>
     </div>
@@ -1780,8 +1822,41 @@ footer{
       <h2 class="cta-title fade-in"><span style="white-space:nowrap">Nunca más un mensaje sin responder.</span><br><span style="white-space:nowrap">Nunca más una reseña positiva perdida.</span><br><span class="accent" style="white-space:nowrap">Probá 30 días gratis.</span></h2>
     </div>
     <div class="cta-right fade-in">
-      <p class="cta-right-text"><strong>Te mostramos el sistema funcionando en vivo, en nuestros clientes.</strong> Escribinos y arrancamos.</p>
-      <a href="https://api.airisworld.com/widget/booking/rcfPZX2CkYCW2lBdbQav" target="_blank" class="btn-bubble">AGENDAR MI DEMO GRATIS →</a>
+      <form class="wsp-form" id="wspForm" novalidate>
+        <input type="text" id="wspNombre" class="wsp-input" placeholder="Nombre y apellido" autocomplete="name" required>
+        <input type="text" id="wspRestaurante" class="wsp-input" placeholder="Nombre de tu restaurante" autocomplete="organization" required>
+        <input type="text" id="wspRedes" class="wsp-input" placeholder="Redes sociales (Instagram, etc.)">
+        <div class="wsp-phone-row">
+          <select id="wspCodigoPais" class="wsp-input wsp-select" aria-label="Código de país">
+            <option value="+54">Argentina +54</option>
+            <option value="+52">México +52</option>
+            <option value="+57">Colombia +57</option>
+            <option value="+56">Chile +56</option>
+            <option value="+51">Perú +51</option>
+            <option value="+598">Uruguay +598</option>
+            <option value="+595">Paraguay +595</option>
+            <option value="+591">Bolivia +591</option>
+            <option value="+593">Ecuador +593</option>
+            <option value="+58">Venezuela +58</option>
+            <option value="+55">Brasil +55</option>
+            <option value="+507">Panamá +507</option>
+            <option value="+506">Costa Rica +506</option>
+            <option value="+502">Guatemala +502</option>
+            <option value="+503">El Salvador +503</option>
+            <option value="+504">Honduras +504</option>
+            <option value="+505">Nicaragua +505</option>
+            <option value="+1">Estados Unidos +1</option>
+            <option value="+34">España +34</option>
+            <option value="+39">Italia +39</option>
+            <option value="+33">Francia +33</option>
+            <option value="+49">Alemania +49</option>
+            <option value="+44">Reino Unido +44</option>
+          </select>
+          <input type="tel" id="wspTelefono" class="wsp-input" placeholder="Número de WhatsApp" autocomplete="tel" required>
+        </div>
+        <button type="submit" class="wsp-form-btn">Enviar por WhatsApp →</button>
+      </form>
+      <p class="cta-right-text"><strong>Te mostramos el sistema funcionando en vivo,<br>en nuestros clientes.</strong> Escribinos y arrancamos.</p>
     </div>
   </div>
   <div class="urgency-strip">
@@ -1952,6 +2027,28 @@ document.querySelectorAll('.stat-card').forEach(el => statObs.observe(el));
   }, { rootMargin: '-40% 0px -55% 0px', threshold: 0 });
 
   sections.forEach(section => spyObs.observe(section));
+})();
+
+// FORMULARIO CTA -> WHATSAPP
+(function(){
+  const form = document.getElementById('wspForm');
+  if(!form) return;
+  const WSP_NUMBER = '5492615347036';
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    const nombre = document.getElementById('wspNombre').value.trim();
+    const restaurante = document.getElementById('wspRestaurante').value.trim();
+    const redes = document.getElementById('wspRedes').value.trim();
+    const codigoPais = document.getElementById('wspCodigoPais').value;
+    const telefono = document.getElementById('wspTelefono').value.trim();
+    if(!nombre || !restaurante || !telefono) return;
+    let mensaje = `Hola Airis! Soy ${nombre}, del restaurante ${restaurante}. Mi WhatsApp es ${codigoPais} ${telefono}.`;
+    if(redes) mensaje += ` Mis redes sociales: ${redes}.`;
+    mensaje += ' Quiero más información sobre sus planes y el sistema!';
+    const url = `https://wa.me/${WSP_NUMBER}?text=${encodeURIComponent(mensaje)}`;
+    window.open(url, '_blank');
+    form.reset();
+  });
 })();
 
 // CARRUSEL DE PLANES
