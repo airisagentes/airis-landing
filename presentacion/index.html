@@ -57,18 +57,9 @@
     background:rgba(8,15,45,.75);border:1px solid var(--line);backdrop-filter:blur(6px);opacity:.0;transform:scale(.8);transition:.25s}
   .hot.on .badge{opacity:1;transform:scale(1)}
   .hot svg{width:18px;height:18px}
+  .hot.phone .badge{width:28px;height:28px;right:8px;top:8px}
+  .hot.phone svg{width:13px;height:13px}
 
-  /* ===== BOTÓN "VER EN GRANDE" ===== */
-  #bigBtn{position:absolute;left:50%;bottom:14px;transform:translate(-50%,20px);opacity:0;pointer-events:none;
-    display:flex;align-items:center;gap:10px;padding:11px 18px 11px 14px;white-space:nowrap;
-    background:var(--azul);color:#fff;font-weight:600;font-size:14px;border-radius:22px 9px 22px 9px;
-    box-shadow:0 0 0 0 rgba(74,108,255,.6);animation:bubblePulse 2.2s infinite;transition:opacity .3s, transform .3s, border-radius .3s}
-  #bigBtn.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
-  #bigBtn:hover{border-radius:9px 22px 9px 22px}
-  #bigBtn small{font-weight:500;opacity:.8}
-  #bigBtn svg{width:18px;height:18px;flex:none}
-  body.v #bigBtn{bottom:auto;top:14px}
-  body.portrait:not(.v) #bigBtn{bottom:auto;top:calc(100% + 14px);font-size:13px}
   @keyframes bubblePulse{0%{box-shadow:0 0 0 0 rgba(74,108,255,.55)}70%{box-shadow:0 0 0 14px rgba(74,108,255,0)}100%{box-shadow:0 0 0 0 rgba(74,108,255,0)}}
 
   /* ===== PLAY GRANDE / FIN ===== */
@@ -76,7 +67,6 @@
   #bigPlay span{pointer-events:auto;cursor:pointer}
   #hots{position:absolute;inset:0;pointer-events:none;z-index:2}
   .hot{pointer-events:auto}
-  #bigBtn{z-index:3}
   #bigPlay.on{display:grid}
   #bigPlay span{width:84px;height:84px;border-radius:50%;background:var(--azul);display:grid;place-items:center;animation:bubblePulse 2.2s infinite}
   #bigPlay svg{width:34px;height:34px;margin-left:5px}
@@ -110,14 +100,6 @@
   body.touch #fsBtn{display:none}
   @media (max-width:520px){ #time{display:none} #bar{gap:8px;padding-left:10px;padding-right:10px} #rotBtn{padding:0 11px;font-size:12px} }
 
-  /* ===== TOAST ===== */
-  #toast{position:fixed;left:50%;top:calc(16px + env(safe-area-inset-top));transform:translate(-50%,-20px);opacity:0;pointer-events:none;
-    display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:14px;background:var(--panel);border:1px solid var(--line);font-size:14px;transition:.35s;z-index:60;width:max-content;max-width:calc(100% - 32px);line-height:1.35}
-  #toast.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
-  #toastX{width:30px;height:30px;margin:-4px -6px -4px 2px;border-radius:50%;display:grid;place-items:center;flex:none;opacity:.8}
-  #toast #toastX svg{width:16px;height:16px;animation:none}
-  #toast svg{width:22px;height:22px;flex:none;animation:rot 1.6s ease-in-out infinite}
-  @keyframes rot{0%,30%{transform:rotate(0)}60%,100%{transform:rotate(-90deg)}}
 
   /* ===== LIGHTBOX DE DEMOS ===== */
   #lb{position:fixed;inset:0;z-index:50;display:none;flex-direction:column;background:rgba(4,8,26,.94);backdrop-filter:blur(10px)}
@@ -135,8 +117,6 @@
   .pill{padding:8px 13px;border-radius:999px;border:1px solid var(--line);font-size:12px;color:var(--muted);transition:.2s}
   .pill:hover{color:var(--txt)}
   .pill.cur{background:var(--azul);border-color:var(--azul);color:#fff}
-  #lbHint{display:none;font-size:12px;color:var(--muted);text-align:center;padding:0 16px 4px}
-  body.touch.portrait #lbHint.land{display:block}
 </style>
 </head>
 <body>
@@ -147,10 +127,6 @@
       <video id="vH" playsinline muted preload="auto" poster="poster-16x9.jpg"><source src="presentacion-16x9.mp4" type="video/mp4"></video>
       <video id="vV" playsinline muted preload="metadata" poster="poster-9x16.jpg"><source src="presentacion-9x16.mp4" type="video/mp4"></video>
       <div id="hots"></div>
-      <button id="bigBtn" aria-label="Ver demo en grande">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
-        <span>Ver en grande <small id="bigLbl"></small></span>
-      </button>
       <button id="bigPlay" aria-label="Reproducir"><span><svg viewBox="0 0 24 24" fill="#fff"><path d="M7 4.5v15l13-7.5z"/></svg></span></button>
       <div id="endCard">
         <div class="mono" style="font-size:11px;color:var(--azul-2)">// El primer paso</div>
@@ -169,19 +145,14 @@
     <div id="seek"><div id="track"><div id="fill"></div></div><div id="knob"></div><div id="tip"></div></div>
     <div id="time" class="mono">0:00 / 0:00</div>
     <button id="rotBtn" aria-label="Ver en horizontal">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="11" rx="2"/><path d="M8 3.5 5.5 5 7 7.5"/></svg>
+      <svg id="icoH" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2.5" y="6.5" width="19" height="11" rx="2.5"/><path d="M18.5 10.5v3"/></svg>
+      <svg id="icoV" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M10.5 18.5h3"/></svg>
       <span id="rotLbl">Ver en horizontal</span>
     </button>
     <button class="ic" id="fsBtn" aria-label="Pantalla completa">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
     </button>
   </div>
-</div>
-
-<div id="toast">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="3" width="10" height="18" rx="2"/></svg>
-  <span>Girá la pantalla para una mejor experiencia</span>
-  <button id="toastX" aria-label="Cerrar aviso"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
 </div>
 
 <div id="lb" role="dialog" aria-modal="true" aria-labelledby="lbTitle">
@@ -191,7 +162,6 @@
     <button class="ic" id="lbClose" aria-label="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
   </div>
   <div id="lbBody"><video id="lbVid" playsinline muted loop controls></video></div>
-  <div id="lbHint" class="land">Girá la pantalla para una mejor experiencia ↻</div>
   <div id="lbFoot"></div>
 </div>
 
@@ -235,6 +205,8 @@ function applyLayout(){
   if (wantV !== isV) swapTo(wantV);
   const narrow = innerWidth < 400;
   $("#rotLbl").textContent = forceH ? (narrow ? "Vertical" : "Volver a vertical") : (narrow ? "Horizontal" : "Ver en horizontal");
+  $("#icoH").style.display = forceH ? "none" : "";
+  $("#icoV").style.display = forceH ? "" : "none";
   $("#rotBtn").style.display = (isTouch && portrait) ? "" : "none";
   placeHots();
 }
@@ -263,18 +235,14 @@ $("#rotBtn").onclick = async () => {
   if (el.requestFullscreen) {
     try { await el.requestFullscreen({ navigationUI:"hide" }); await screen.orientation.lock("landscape"); return; } catch(e){}
   }
-  // iPhone (Safari no permite forzar la rotación): mostramos el aviso para que gire el celu
-  toast();
 };
-function toast(){ $("#toast").classList.add("on"); }
-function hideToast(){ $("#toast").classList.remove("on"); }
-$("#toastX").onclick = hideToast;
+function hideToast(){}
 
 /* ============ HOTSPOTS + BOTÓN VER EN GRANDE ============ */
 const hotsEl = $("#hots");
 DEMOS.forEach((d,i) => {
   const b = document.createElement("button");
-  b.className = "hot"; b.setAttribute("aria-label","Ver en grande: "+d.bloque);
+  b.className = d.land ? "hot" : "hot phone"; b.setAttribute("aria-label","Ver en grande: "+d.bloque);
   b.innerHTML = '<span class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></span>';
   b.onclick = e => { e.stopPropagation(); openLB(i); };
   hotsEl.appendChild(b); d.el = b;
@@ -289,10 +257,7 @@ function updateDemo(t){
   if (i === activeDemo) return;
   activeDemo = i;
   DEMOS.forEach((d,j) => d.el.classList.toggle("on", j===i));
-  $("#bigBtn").classList.toggle("on", i >= 0);
-  if (i >= 0) $("#bigLbl").textContent = "· " + DEMOS[i].bloque;
 }
-$("#bigBtn").onclick = e => { e.stopPropagation(); if (activeDemo >= 0) openLB(activeDemo); };
 
 /* ============ LIGHTBOX ============ */
 const lb = $("#lb"), lbVid = $("#lbVid");
@@ -305,7 +270,6 @@ function openLB(i){
   if (!lb.classList.contains("on")) { wasPlayingBeforeLB = !cur().paused; cur().pause(); }
   $("#lbKicker").textContent = "Bloque " + d.n + " · " + d.bloque;
   $("#lbTitle").textContent = d.title;
-  $("#lbHint").className = d.land ? "land" : "";
   DEMOS.forEach((x,j)=>x.pill.classList.toggle("cur", j===i));
   d.pill.scrollIntoView({inline:"center",block:"nearest"});
   lbVid.src = d.src; lbVid.currentTime = 0; lbVid.play().catch(()=>{});
