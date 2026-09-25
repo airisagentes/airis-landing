@@ -53,12 +53,12 @@
   .hot{position:absolute;display:none;border-radius:18px;cursor:zoom-in;outline:1.5px solid transparent;transition:outline-color .25s, background .25s}
   .hot.on{display:block}
   .hot:hover{outline-color:rgba(109,139,255,.8);background:rgba(74,108,255,.08)}
-  .hot .badge{position:absolute;right:10px;top:10px;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;
+  .hot .badge{position:absolute;right:8px;top:8px;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;
     background:rgba(8,15,45,.75);border:1px solid var(--line);backdrop-filter:blur(6px);opacity:.0;transform:scale(.8);transition:.25s}
   .hot.on .badge{opacity:1;transform:scale(1)}
-  .hot svg{width:18px;height:18px}
-  .hot.phone .badge{width:28px;height:28px;right:8px;top:8px}
-  .hot.phone svg{width:13px;height:13px}
+  .hot svg{width:13px;height:13px}
+  .ctaHot{position:absolute;display:none;border-radius:999px;cursor:pointer;pointer-events:auto;-webkit-tap-highlight-color:transparent}
+  .ctaHot.on{display:block}
 
   @keyframes bubblePulse{0%{box-shadow:0 0 0 0 rgba(74,108,255,.55)}70%{box-shadow:0 0 0 14px rgba(74,108,255,0)}100%{box-shadow:0 0 0 0 rgba(74,108,255,0)}}
 
@@ -171,6 +171,12 @@
 const CTA_URL = "https://wa.me/5492615347036?text=Hola%20Airis%21%20Vi%20la%20presentaci%C3%B3n%20del%20servicio%20y%20quiero%20m%C3%A1s%20info%20sobre%20el%20sistema%20y%20los%20planes.%0AGracias%21";
 
 // Tramos de cada demo dentro de la presentación (segundos) + zona clickeable en % del cuadro [x, y, ancho, alto]
+// Botones del video que llevan a WhatsApp ("Quiero mi auditoría" y "Auditoría free"): tramo en segundos + zona en % [x, y, ancho, alto]
+const CTAS = [
+  { from:208.8, to:215.8, h:[5,55,29,13], v:[6,55.5,56,9.5] },   // Quiero mi auditoría
+  { from:218.3, to:999,   h:[32,71,19,11], v:[19,64.5,32,7.5] },  // Auditoría free
+];
+
 const DEMOS = [
   { n:"01", bloque:"Agente conversacional", title:"Responde, informa y deriva.",            src:"demo-1-agente.mp4",          land:false, from:32,  to:60,  h:[64,8,27,88],  v:[22,39,56,55] },
   { n:"02", bloque:"Link de reservas",      title:"Link de reservas personalizado.",        src:"demo-2-link-reservas.mp4",   land:false, from:60,  to:90,  h:[61,8,31,88],  v:[18,39,64,55] },
@@ -208,7 +214,7 @@ function applyLayout(){
   $("#icoH").style.display = forceH ? "none" : "";
   $("#icoV").style.display = forceH ? "" : "none";
   $("#rotBtn").style.display = (isTouch && portrait) ? "" : "none";
-  placeHots();
+  placeHots(); placeCtas();
 }
 function swapTo(vertical){
   const from = cur(), to = vertical ? vV : vH;
@@ -251,6 +257,18 @@ function placeHots(){
   const key = body.classList.contains("v") ? "v" : "h";
   DEMOS.forEach(d => { const [x,y,w,h] = d[key]; Object.assign(d.el.style,{left:x+"%",top:y+"%",width:w+"%",height:h+"%"}); });
 }
+CTAS.forEach(c => {
+  const a = document.createElement("a");
+  a.className = "ctaHot"; a.target = "_blank"; a.rel = "noopener"; a.href = CTA_URL;
+  a.setAttribute("aria-label", "Quiero mi auditoría (WhatsApp)");
+  a.addEventListener("click", e => e.stopPropagation());
+  hotsEl.appendChild(a); c.el = a;
+});
+function placeCtas(){
+  const key = body.classList.contains("v") ? "v" : "h";
+  CTAS.forEach(c => { const [x,y,w,h] = c[key]; Object.assign(c.el.style,{left:x+"%",top:y+"%",width:w+"%",height:h+"%"}); });
+}
+function updateCtas(t){ CTAS.forEach(c => c.el.classList.toggle("on", t >= c.from && t < c.to)); }
 let activeDemo = -1;
 function updateDemo(t){
   const i = DEMOS.findIndex(d => t >= d.from && t < d.to);
@@ -316,7 +334,7 @@ function tick(){
   $("#time").textContent = fmt(t)+" / "+fmt(d);
   $("#playBtn").innerHTML = (v.paused || v.ended) ? ICON_PLAY : ICON_PAUSE;
   $("#bigPlay").classList.toggle("on", v.paused && !v.ended && !lb.classList.contains("on") && !scrubbing);
-  updateDemo(t);
+  updateDemo(t); updateCtas(t);
 }
 function buildChapters(){
   const d = cur().duration || 223.5, tr = $("#track");
