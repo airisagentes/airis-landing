@@ -238,6 +238,8 @@ body{
   width:64px;height:64px;border-radius:50%;background:rgba(139,170,124,0.12);
   display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:30px;color:var(--azul);
 }
+/* Reserva fallida: cruz roja sobre fondo rojo suave */
+.success-icon.error{background:rgba(217,48,37,0.12);color:#D93025;}
 
 .nav-row{display:flex;gap:10px;margin-top:26px}
 .btn{
@@ -431,7 +433,7 @@ body{
 
   <div class="step" data-step="6">
     <div class="success-box">
-      <div class="success-icon">✓</div>
+      <div class="success-icon" id="successIcon">✓</div>
       <div class="step-title" style="text-align:center" id="successTitle">¡Reserva exitosa!</div>
       <div class="step-hint" style="text-align:center;max-width:380px;margin-left:auto;margin-right:auto" id="successSub">
         Ese día te enviaremos un recordatorio por WhatsApp.
@@ -911,6 +913,7 @@ function mostrarErrorCarga(mensaje){
   document.getElementById('mockBanner').classList.add('hidden');
   document.querySelector('.widget').innerHTML = `
     <div style="text-align:center;padding:20px 0">
+      <div class="success-icon error">✕</div>
       <div class="step-title">${T.successTitleErr}</div>
       <div class="step-hint">${mensaje}</div>
     </div>`;
@@ -1463,12 +1466,17 @@ document.getElementById('confirmBtn').addEventListener('click', async () => {
 
   const resultado = await crearReserva();
 
+  const successIcon = document.getElementById('successIcon');
   if(resultado.success){
+    successIcon.textContent = '✓';
+    successIcon.classList.remove('error');
     document.getElementById('successTitle').textContent = T.successTitleOk;
     document.getElementById('successSub').textContent = CONFIG.MOCK_MODE
       ? T.successSubMock
       : T.successSubOk;
   }else{
+    successIcon.textContent = '✕';
+    successIcon.classList.add('error');
     document.getElementById('successTitle').textContent = T.successTitleErr;
     // Nota: 'resultado.message' viene del backend (Endpoint 2), hoy solo
     // en español -- si no hay mensaje específico, usamos el genérico ya
