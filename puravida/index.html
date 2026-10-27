@@ -862,14 +862,17 @@ let restaurantData = null; // se completa con cargarRestaurante()
 const SENA_WEBHOOK_ESTADO = 'https://n8n.airisworld.com/webhook/senas-estado';
 const SENA_STORAGE_KEY = 'airis_sena_' + CONFIG.supabase.restaurantSlug;
 let SENA_CFG = null; // config de seña del local (solo para mostrar avisos)
+let MENSAJE_CONSULTAS = null; // texto propio del local para "Consultas" (opcional)
 let senaTimer = null, senaPoll = null;
 
 const SENA_TXT = {
   es: {
-    avisoTitulo: 'Esta reserva lleva seña',
-    avisoTexto: (monto, min) => `Para confirmarla pagarás una seña de ${monto} con Mercado Pago (tarjeta de crédito o débito, no hace falta tener cuenta). Se descuenta del total de tu consumo. Tienes ${min} minutos para pagarla.`,
-    avisoDevolucion: (h) => h > 0 ? `Si cancelas hasta ${h} horas antes, te la devolvemos automáticamente.` : 'Si cancelas, te la devolvemos automáticamente.',
-    btnContinuarPago: 'Continuar al pago →',
+    avisoTitulo: 'Seña para confirmar tu reserva',
+    avisoDescuento: 'Se descuenta del total del consumo',
+    avisoMinutos: (min) => `Tienes ${min} minutos para completar el pago`,
+    avisoDevolucion: (h) => h > 0 ? `Cancelación con devolución automática hasta ${h} hs antes de la reserva` : 'Cancelación con devolución automática',
+    avisoPago: 'Pago seguro con Mercado Pago · Débito · Crédito',
+    btnContinuarPago: 'Continuar al pago seguro →',
     pagoTitulo: 'Falta un paso: paga la seña',
     pagoTexto: (monto) => `Tu lugar quedó guardado. Para confirmar la reserva, paga la seña de ${monto} con Mercado Pago.`,
     pagoTiempo: 'Tiempo para pagar',
@@ -889,13 +892,15 @@ const SENA_TXT = {
     detalle: (r) => [r.local, r.salon, r.fecha && r.hora ? `${r.fecha} · ${r.hora} hs` : '', r.personas ? `${r.personas} personas` : ''].filter(Boolean).join(' · '),
     montoPagado: (m) => `Seña pagada: ${m} (se descuenta de tu consumo)`,
     consultasChip: 'Consultas',
-    consultasMensaje: (rest) => `Hola! Tengo una consulta sobre una reserva en ${rest}.`,
+    consultasMensaje: (rest) => `¡Hola! Quisiera hacer una consulta sobre una reserva en ${rest}.`,
   },
   en: {
-    avisoTitulo: 'This booking requires a deposit',
-    avisoTexto: (monto, min) => `To confirm it you will pay a ${monto} deposit with Mercado Pago (credit or debit card, no account needed). It is deducted from your bill. You have ${min} minutes to pay.`,
-    avisoDevolucion: (h) => h > 0 ? `If you cancel at least ${h} hours before, it is refunded automatically.` : 'If you cancel, it is refunded automatically.',
-    btnContinuarPago: 'Continue to payment →',
+    avisoTitulo: 'Deposit to confirm your booking',
+    avisoDescuento: 'Deducted from your final bill',
+    avisoMinutos: (min) => `You have ${min} minutes to complete the payment`,
+    avisoDevolucion: (h) => h > 0 ? `Automatic refund if you cancel up to ${h} hrs before your booking` : 'Automatic refund if you cancel',
+    avisoPago: 'Secure payment with Mercado Pago · Debit · Credit',
+    btnContinuarPago: 'Continue to secure payment →',
     pagoTitulo: 'One more step: pay the deposit',
     pagoTexto: (monto) => `Your table is on hold. To confirm the booking, pay the ${monto} deposit with Mercado Pago.`,
     pagoTiempo: 'Time left to pay',
@@ -915,13 +920,15 @@ const SENA_TXT = {
     detalle: (r) => [r.local, r.salon, r.fecha && r.hora ? `${r.fecha} · ${r.hora}` : '', r.personas ? `${r.personas} people` : ''].filter(Boolean).join(' · '),
     montoPagado: (m) => `Deposit paid: ${m} (deducted from your bill)`,
     consultasChip: 'Questions',
-    consultasMensaje: (rest) => `Hi! I have a question about a booking at ${rest}.`,
+    consultasMensaje: (rest) => `Hi! I'd like to ask about a reservation at ${rest}.`,
   },
   pt: {
-    avisoTitulo: 'Esta reserva exige um sinal',
-    avisoTexto: (monto, min) => `Para confirmá-la você vai pagar um sinal de ${monto} com Mercado Pago (cartão de crédito ou débito, não precisa de conta). O valor é descontado da sua conta. Você tem ${min} minutos para pagar.`,
-    avisoDevolucion: (h) => h > 0 ? `Se cancelar até ${h} horas antes, devolvemos automaticamente.` : 'Se cancelar, devolvemos automaticamente.',
-    btnContinuarPago: 'Continuar para o pagamento →',
+    avisoTitulo: 'Sinal para confirmar sua reserva',
+    avisoDescuento: 'Descontado do total do consumo',
+    avisoMinutos: (min) => `Você tem ${min} minutos para concluir o pagamento`,
+    avisoDevolucion: (h) => h > 0 ? `Cancelamento com devolução automática até ${h} h antes da reserva` : 'Cancelamento com devolução automática',
+    avisoPago: 'Pagamento seguro com Mercado Pago · Débito · Crédito',
+    btnContinuarPago: 'Continuar para o pagamento seguro →',
     pagoTitulo: 'Falta um passo: pague o sinal',
     pagoTexto: (monto) => `Seu lugar está reservado. Para confirmar, pague o sinal de ${monto} com Mercado Pago.`,
     pagoTiempo: 'Tempo para pagar',
@@ -941,7 +948,7 @@ const SENA_TXT = {
     detalle: (r) => [r.local, r.salon, r.fecha && r.hora ? `${r.fecha} · ${r.hora}` : '', r.personas ? `${r.personas} pessoas` : ''].filter(Boolean).join(' · '),
     montoPagado: (m) => `Sinal pago: ${m} (descontado da sua conta)`,
     consultasChip: 'Dúvidas',
-    consultasMensaje: (rest) => `Olá! Tenho uma dúvida sobre uma reserva em ${rest}.`,
+    consultasMensaje: (rest) => `Olá! Gostaria de fazer uma consulta sobre uma reserva no ${rest}.`,
   },
 };
 const ST = SENA_TXT[LANG] || SENA_TXT.es;
@@ -952,8 +959,8 @@ function senaFmt(n){ const v = Number(n); return Number.isFinite(v) ? '$\u00a0' 
 /* Lee la config de seña del local. Consulta aparte y no bloqueante:
    si falla, la página funciona igual que siempre. */
 async function cargarConfigSena(){
+  const sb = window.supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
   try{
-    const sb = window.supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
     const { data, error } = await sb.from('restaurants')
       .select('sena_activa, sena_modo, sena_desde_personas, sena_tipo_monto, sena_monto, sena_minutos_pago, sena_devolucion_horas, mp_conectado')
       .eq('slug', CONFIG.supabase.restaurantSlug).single();
@@ -963,6 +970,14 @@ async function cargarConfigSena(){
     console.warn('[widget] no se pudo leer la config de seña (no bloqueante):', e?.message || e);
     SENA_CFG = null;
   }
+  // Mensaje propio del local para "Consultas" (columna opcional; si no existe o está vacía, va el predeterminado)
+  try{
+    const { data, error } = await sb.from('restaurants').select('mensaje_consultas')
+      .eq('slug', CONFIG.supabase.restaurantSlug).single();
+    if(!error && data && typeof data.mensaje_consultas === 'string' && data.mensaje_consultas.trim()){
+      MENSAJE_CONSULTAS = data.mensaje_consultas.trim();
+    }
+  }catch(e){ MENSAJE_CONSULTAS = null; }
 }
 
 /* Monto estimado que se va a pedir (solo para el aviso; el real lo calcula la base). */
@@ -975,7 +990,23 @@ function senaMontoEstimado(personas){
   return c.sena_tipo_monto === 'por_persona' ? Math.round(m * personas * 100) / 100 : m;
 }
 
-/* Aviso en el resumen (paso 5) y texto del botón. */
+/* Íconos simples (trazo, color del local) para el cartel de seña. */
+const SENA_ICONOS = {
+  descuento: '<path d="M20 6 9 17l-5-5"/>',
+  reloj: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  devolucion: '<path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>',
+  candado: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+};
+function senaFila(icono, texto){
+  return `<div style="display:flex;align-items:center;gap:12px;padding:7px 0">
+    <span style="flex:none;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb, var(--azul) 14%, transparent)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--azul)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${SENA_ICONOS[icono]}</svg>
+    </span>
+    <span style="font-size:13.5px;line-height:1.4;color:var(--texto-oscuro,#0A0F2E)">${senaEsc(texto)}</span>
+  </div>`;
+}
+
+/* Cartel de seña en el resumen (paso 5) y texto del botón. */
 function senaActualizarResumen(){
   const btn = document.getElementById('confirmBtn');
   let box = document.getElementById('senaAviso');
@@ -988,13 +1019,20 @@ function senaActualizarResumen(){
   if(!box){
     box = document.createElement('div');
     box.id = 'senaAviso';
-    box.style.cssText = 'background:var(--paper,#fff);border:1.5px solid var(--azul);border-radius:var(--r,16px);padding:14px 16px;margin:-8px 0 20px;font-size:13.5px;line-height:1.5;color:var(--texto-oscuro,#0A0F2E)';
+    box.style.cssText = 'background:var(--paper,#fff);border:1px solid color-mix(in srgb, var(--azul) 35%, transparent);border-radius:var(--r,16px);padding:16px 18px 10px;margin:-8px 0 22px';
     document.getElementById('summaryCard').insertAdjacentElement('afterend', box);
   }
   const min = SENA_CFG.sena_minutos_pago || 15;
-  box.innerHTML = `<div style="font-weight:800;margin-bottom:4px">💳 ${senaEsc(ST.avisoTitulo)}</div>
-    <div>${senaEsc(ST.avisoTexto(senaFmt(monto), min))}</div>
-    <div style="margin-top:4px;color:var(--texto-medio,#3a3f5c)">${senaEsc(ST.avisoDevolucion(Number(SENA_CFG.sena_devolucion_horas) || 0))}</div>`;
+  const horas = Number(SENA_CFG.sena_devolucion_horas) || 0;
+  box.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:12px;margin-bottom:6px;border-bottom:1px solid color-mix(in srgb, var(--azul) 20%, transparent)">
+      <span style="font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--texto-medio,#3a3f5c)">${senaEsc(ST.avisoTitulo)}</span>
+      <span style="font-size:24px;font-weight:800;white-space:nowrap;color:var(--texto-oscuro,#0A0F2E)">${senaEsc(senaFmt(monto))}</span>
+    </div>
+    ${senaFila('descuento', ST.avisoDescuento)}
+    ${senaFila('reloj', ST.avisoMinutos(min))}
+    ${senaFila('devolucion', ST.avisoDevolucion(horas))}
+    ${senaFila('candado', ST.avisoPago)}`;
   btn.textContent = ST.btnContinuarPago;
 }
 
@@ -1002,7 +1040,9 @@ function senaActualizarResumen(){
 function senaAbrirConsultas(){
   const num = restaurantData?.whatsapp_numero;
   if(!num){ alert(T.errorWhatsapp); return; }
-  window.open(`https://wa.me/${num}?text=${encodeURIComponent(ST.consultasMensaje(restaurantData?.name || ''))}`, '_blank');
+  const nombre = restaurantData?.name || '';
+  const texto = MENSAJE_CONSULTAS ? MENSAJE_CONSULTAS.replace(/\{restaurante\}/g, nombre) : ST.consultasMensaje(nombre);
+  window.open(`https://wa.me/${num}?text=${encodeURIComponent(texto)}`, '_blank');
 }
 
 function senaLimpiarTimers(){
