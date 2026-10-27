@@ -850,6 +850,313 @@ const MOCK_HORARIOS = ['12:30','13:00','13:30','20:00','20:30','21:00','21:30','
 
 let restaurantData = null; // se completa con cargarRestaurante()
 
+/* ============================================================
+   💳 SEÑAS CON MERCADO PAGO — módulo igual para todas las páginas.
+   - Quién paga seña y cuánto lo decide SIEMPRE el backend (Endpoint 2
+     + calcular_sena en Supabase). Esta parte solo muestra avisos y la
+     pantalla de pago; si la config no se puede leer, la página sigue
+     funcionando igual y el backend igual pide la seña cuando corresponde.
+   - Al volver de Mercado Pago la página recibe ?sena=<id> y consulta
+     el estado real en /webhook/senas-estado (sin WhatsApp nuevos).
+   ============================================================ */
+const SENA_WEBHOOK_ESTADO = 'https://n8n.airisworld.com/webhook/senas-estado';
+const SENA_STORAGE_KEY = 'airis_sena_' + CONFIG.supabase.restaurantSlug;
+let SENA_CFG = null; // config de seña del local (solo para mostrar avisos)
+let senaTimer = null, senaPoll = null;
+
+const SENA_TXT = {
+  es: {
+    avisoTitulo: 'Esta reserva lleva seña',
+    avisoTexto: (monto, min) => `Para confirmarla pagarás una seña de ${monto} con Mercado Pago (tarjeta de crédito o débito, no hace falta tener cuenta). Se descuenta del total de tu consumo. Tienes ${min} minutos para pagarla.`,
+    avisoDevolucion: (h) => h > 0 ? `Si cancelas hasta ${h} horas antes, te la devolvemos automáticamente.` : 'Si cancelas, te la devolvemos automáticamente.',
+    btnContinuarPago: 'Continuar al pago →',
+    pagoTitulo: 'Falta un paso: paga la seña',
+    pagoTexto: (monto) => `Tu lugar quedó guardado. Para confirmar la reserva, paga la seña de ${monto} con Mercado Pago.`,
+    pagoTiempo: 'Tiempo para pagar',
+    pagoBtn: 'Pagar seña con Mercado Pago',
+    pagoNota: 'La seña se descuenta del total de tu consumo. Si no se paga a tiempo, el lugar se libera.',
+    pagoYaPague: 'Ya pagué, ver el estado',
+    pagoVencido: 'El tiempo para pagar terminó. Si ya pagaste, toca "Ya pagué" para verificarlo.',
+    estadoVerificando: 'Verificando tu pago…',
+    estadoConfirmadaTitulo: '¡Seña pagada, reserva confirmada!',
+    estadoEsperandoTitulo: 'Esperando la confirmación del pago',
+    estadoVencidaTitulo: 'El tiempo para pagar terminó',
+    estadoDevueltaTitulo: 'Te devolvimos la seña',
+    estadoCanceladaTitulo: 'Reserva cancelada',
+    estadoErrorTitulo: 'No pudimos verificar tu pago',
+    btnActualizar: 'Actualizar estado',
+    btnNuevaReserva: 'Hacer otra reserva',
+    detalle: (r) => [r.local, r.salon, r.fecha && r.hora ? `${r.fecha} · ${r.hora} hs` : '', r.personas ? `${r.personas} personas` : ''].filter(Boolean).join(' · '),
+    montoPagado: (m) => `Seña pagada: ${m} (se descuenta de tu consumo)`,
+    consultasChip: 'Consultas',
+    consultasMensaje: (rest) => `Hola! Tengo una consulta sobre una reserva en ${rest}.`,
+  },
+  en: {
+    avisoTitulo: 'This booking requires a deposit',
+    avisoTexto: (monto, min) => `To confirm it you will pay a ${monto} deposit with Mercado Pago (credit or debit card, no account needed). It is deducted from your bill. You have ${min} minutes to pay.`,
+    avisoDevolucion: (h) => h > 0 ? `If you cancel at least ${h} hours before, it is refunded automatically.` : 'If you cancel, it is refunded automatically.',
+    btnContinuarPago: 'Continue to payment →',
+    pagoTitulo: 'One more step: pay the deposit',
+    pagoTexto: (monto) => `Your table is on hold. To confirm the booking, pay the ${monto} deposit with Mercado Pago.`,
+    pagoTiempo: 'Time left to pay',
+    pagoBtn: 'Pay deposit with Mercado Pago',
+    pagoNota: 'The deposit is deducted from your bill. If it is not paid in time, the table is released.',
+    pagoYaPague: 'I already paid, check status',
+    pagoVencido: 'Time to pay is over. If you already paid, tap "I already paid" to check.',
+    estadoVerificando: 'Checking your payment…',
+    estadoConfirmadaTitulo: 'Deposit paid, booking confirmed!',
+    estadoEsperandoTitulo: 'Waiting for payment confirmation',
+    estadoVencidaTitulo: 'Time to pay is over',
+    estadoDevueltaTitulo: 'Your deposit was refunded',
+    estadoCanceladaTitulo: 'Booking cancelled',
+    estadoErrorTitulo: 'We could not check your payment',
+    btnActualizar: 'Refresh status',
+    btnNuevaReserva: 'Make another booking',
+    detalle: (r) => [r.local, r.salon, r.fecha && r.hora ? `${r.fecha} · ${r.hora}` : '', r.personas ? `${r.personas} people` : ''].filter(Boolean).join(' · '),
+    montoPagado: (m) => `Deposit paid: ${m} (deducted from your bill)`,
+    consultasChip: 'Questions',
+    consultasMensaje: (rest) => `Hi! I have a question about a booking at ${rest}.`,
+  },
+  pt: {
+    avisoTitulo: 'Esta reserva exige um sinal',
+    avisoTexto: (monto, min) => `Para confirmá-la você vai pagar um sinal de ${monto} com Mercado Pago (cartão de crédito ou débito, não precisa de conta). O valor é descontado da sua conta. Você tem ${min} minutos para pagar.`,
+    avisoDevolucion: (h) => h > 0 ? `Se cancelar até ${h} horas antes, devolvemos automaticamente.` : 'Se cancelar, devolvemos automaticamente.',
+    btnContinuarPago: 'Continuar para o pagamento →',
+    pagoTitulo: 'Falta um passo: pague o sinal',
+    pagoTexto: (monto) => `Seu lugar está reservado. Para confirmar, pague o sinal de ${monto} com Mercado Pago.`,
+    pagoTiempo: 'Tempo para pagar',
+    pagoBtn: 'Pagar sinal com Mercado Pago',
+    pagoNota: 'O sinal é descontado da sua conta. Se não for pago a tempo, o lugar é liberado.',
+    pagoYaPague: 'Já paguei, ver status',
+    pagoVencido: 'O tempo para pagar terminou. Se já pagou, toque em "Já paguei" para verificar.',
+    estadoVerificando: 'Verificando seu pagamento…',
+    estadoConfirmadaTitulo: 'Sinal pago, reserva confirmada!',
+    estadoEsperandoTitulo: 'Aguardando a confirmação do pagamento',
+    estadoVencidaTitulo: 'O tempo para pagar terminou',
+    estadoDevueltaTitulo: 'Devolvemos o seu sinal',
+    estadoCanceladaTitulo: 'Reserva cancelada',
+    estadoErrorTitulo: 'Não conseguimos verificar seu pagamento',
+    btnActualizar: 'Atualizar status',
+    btnNuevaReserva: 'Fazer outra reserva',
+    detalle: (r) => [r.local, r.salon, r.fecha && r.hora ? `${r.fecha} · ${r.hora}` : '', r.personas ? `${r.personas} pessoas` : ''].filter(Boolean).join(' · '),
+    montoPagado: (m) => `Sinal pago: ${m} (descontado da sua conta)`,
+    consultasChip: 'Dúvidas',
+    consultasMensaje: (rest) => `Olá! Tenho uma dúvida sobre uma reserva em ${rest}.`,
+  },
+};
+const ST = SENA_TXT[LANG] || SENA_TXT.es;
+
+function senaEsc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function senaFmt(n){ const v = Number(n); return Number.isFinite(v) ? '$\u00a0' + v.toLocaleString('es-AR', {maximumFractionDigits: 2}) : ''; }
+
+/* Lee la config de seña del local. Consulta aparte y no bloqueante:
+   si falla, la página funciona igual que siempre. */
+async function cargarConfigSena(){
+  try{
+    const sb = window.supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
+    const { data, error } = await sb.from('restaurants')
+      .select('sena_activa, sena_modo, sena_desde_personas, sena_tipo_monto, sena_monto, sena_minutos_pago, sena_devolucion_horas, mp_conectado')
+      .eq('slug', CONFIG.supabase.restaurantSlug).single();
+    if(error) throw error;
+    SENA_CFG = (data && data.sena_activa === true && data.mp_conectado === true && data.sena_monto != null) ? data : null;
+  }catch(e){
+    console.warn('[widget] no se pudo leer la config de seña (no bloqueante):', e?.message || e);
+    SENA_CFG = null;
+  }
+}
+
+/* Monto estimado que se va a pedir (solo para el aviso; el real lo calcula la base). */
+function senaMontoEstimado(personas){
+  const c = SENA_CFG;
+  if(!c) return null;
+  const aplica = c.sena_modo === 'siempre' || (c.sena_modo === 'desde_personas' && c.sena_desde_personas != null && personas >= c.sena_desde_personas);
+  if(!aplica) return null;
+  const m = Number(c.sena_monto);
+  return c.sena_tipo_monto === 'por_persona' ? Math.round(m * personas * 100) / 100 : m;
+}
+
+/* Aviso en el resumen (paso 5) y texto del botón. */
+function senaActualizarResumen(){
+  const btn = document.getElementById('confirmBtn');
+  let box = document.getElementById('senaAviso');
+  const monto = senaMontoEstimado(state.personas);
+  if(monto === null){
+    if(box) box.remove();
+    btn.textContent = T.btnConfirmar;
+    return;
+  }
+  if(!box){
+    box = document.createElement('div');
+    box.id = 'senaAviso';
+    box.style.cssText = 'background:var(--paper,#fff);border:1.5px solid var(--azul);border-radius:var(--r,16px);padding:14px 16px;margin:-8px 0 20px;font-size:13.5px;line-height:1.5;color:var(--texto-oscuro,#0A0F2E)';
+    document.getElementById('summaryCard').insertAdjacentElement('afterend', box);
+  }
+  const min = SENA_CFG.sena_minutos_pago || 15;
+  box.innerHTML = `<div style="font-weight:800;margin-bottom:4px">💳 ${senaEsc(ST.avisoTitulo)}</div>
+    <div>${senaEsc(ST.avisoTexto(senaFmt(monto), min))}</div>
+    <div style="margin-top:4px;color:var(--texto-medio,#3a3f5c)">${senaEsc(ST.avisoDevolucion(Number(SENA_CFG.sena_devolucion_horas) || 0))}</div>`;
+  btn.textContent = ST.btnContinuarPago;
+}
+
+/* Con seña activa, el chip de grupos pasa a "Consultas" y abre WhatsApp directo. */
+function senaAbrirConsultas(){
+  const num = restaurantData?.whatsapp_numero;
+  if(!num){ alert(T.errorWhatsapp); return; }
+  window.open(`https://wa.me/${num}?text=${encodeURIComponent(ST.consultasMensaje(restaurantData?.name || ''))}`, '_blank');
+}
+
+function senaLimpiarTimers(){
+  if(senaTimer){ clearInterval(senaTimer); senaTimer = null; }
+  if(senaPoll){ clearTimeout(senaPoll); senaPoll = null; }
+}
+
+function senaCaja(){
+  let box = document.getElementById('senaBox');
+  if(!box){
+    box = document.createElement('div');
+    box.id = 'senaBox';
+    box.style.cssText = 'margin-top:18px;text-align:center';
+    document.querySelector('.step[data-step="6"] .success-box').appendChild(box);
+  }
+  return box;
+}
+
+function senaBoton(texto, estiloPrincipal){
+  const b = document.createElement('button');
+  b.className = estiloPrincipal ? 'btn btn-next' : 'btn btn-back';
+  b.style.cssText = 'width:100%;margin-top:10px;' + (estiloPrincipal ? 'background:#009EE3;color:#fff' : '');
+  b.textContent = texto;
+  return b;
+}
+
+/* Pantalla "pagá la seña" después de confirmar. */
+function mostrarPantallaPagoSena(r){
+  senaLimpiarTimers();
+  try{ sessionStorage.setItem(SENA_STORAGE_KEY, r.sena_id); }catch(e){}
+  const icon = document.getElementById('successIcon');
+  icon.textContent = '💳';
+  icon.classList.remove('error');
+  document.getElementById('successTitle').textContent = ST.pagoTitulo;
+  document.getElementById('successSub').textContent = ST.pagoTexto(senaFmt(r.monto));
+
+  const box = senaCaja();
+  box.innerHTML = `<div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--texto-medio,#3a3f5c)">${senaEsc(ST.pagoTiempo)}</div>
+    <div id="senaReloj" style="font-size:34px;font-weight:800;font-variant-numeric:tabular-nums;margin:2px 0 6px"></div>`;
+  const pagar = document.createElement('a');
+  pagar.href = r.checkout_url;
+  pagar.className = 'btn btn-next';
+  pagar.style.cssText = 'display:flex;align-items:center;justify-content:center;width:100%;text-decoration:none;background:#009EE3;color:#fff';
+  pagar.textContent = ST.pagoBtn;
+  box.appendChild(pagar);
+  const nota = document.createElement('p');
+  nota.style.cssText = 'font-size:12.5px;color:var(--texto-medio,#3a3f5c);margin-top:10px;line-height:1.45';
+  nota.textContent = ST.pagoNota;
+  box.appendChild(nota);
+  const ya = senaBoton(ST.pagoYaPague, false);
+  ya.addEventListener('click', () => mostrarEstadoSena(r.sena_id));
+  box.appendChild(ya);
+
+  const fin = Date.now() + Math.max(0, Number(r.segundos_para_pagar) || 0) * 1000;
+  const reloj = document.getElementById('senaReloj');
+  const tick = () => {
+    const s = Math.max(0, Math.round((fin - Date.now()) / 1000));
+    reloj.textContent = `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+    if(s <= 0){
+      clearInterval(senaTimer); senaTimer = null;
+      pagar.style.display = 'none';
+      nota.textContent = ST.pagoVencido;
+    }
+  };
+  tick();
+  senaTimer = setInterval(tick, 1000);
+  goToStep(6);
+}
+
+/* Estado real de la seña (al volver de Mercado Pago o con "Ya pagué"). */
+async function mostrarEstadoSena(senaId, intento = 0){
+  senaLimpiarTimers();
+  const icon = document.getElementById('successIcon');
+  const titulo = document.getElementById('successTitle');
+  const sub = document.getElementById('successSub');
+  const box = senaCaja();
+  if(intento === 0){
+    icon.textContent = '⏳'; icon.classList.remove('error');
+    titulo.textContent = ST.estadoVerificando;
+    sub.textContent = '';
+    box.innerHTML = '';
+    goToStep(6);
+  }
+
+  let d = null;
+  try{
+    const res = await fetch(`${SENA_WEBHOOK_ESTADO}?sena=${encodeURIComponent(senaId)}`, { cache: 'no-store' });
+    d = await res.json();
+  }catch(e){ d = null; }
+
+  const detalle = d && d.reserva ? ST.detalle(d.reserva) : '';
+  box.innerHTML = '';
+  if(detalle){
+    const p = document.createElement('div');
+    p.style.cssText = 'font-size:14px;font-weight:700;margin-top:6px';
+    p.textContent = detalle;
+    box.appendChild(p);
+  }
+
+  const estado = d && d.ok ? d.estado : (d && d.estado) || 'error';
+  const finales = ['confirmada', 'vencida', 'devuelta', 'devolucion_en_proceso', 'cancelada', 'no_encontrada'];
+
+  if(estado === 'confirmada'){
+    icon.textContent = '✓'; icon.classList.remove('error');
+    titulo.textContent = ST.estadoConfirmadaTitulo;
+    sub.textContent = d.mensaje || '';
+    const m = document.createElement('div');
+    m.style.cssText = 'font-size:13px;color:var(--texto-medio,#3a3f5c);margin-top:6px';
+    m.textContent = ST.montoPagado(senaFmt(d.monto));
+    box.appendChild(m);
+    try{ sessionStorage.removeItem(SENA_STORAGE_KEY); }catch(e){}
+  }else if(estado === 'esperando_pago' || estado === 'verificando'){
+    icon.textContent = '⏳'; icon.classList.remove('error');
+    titulo.textContent = ST.estadoEsperandoTitulo;
+    sub.textContent = d.mensaje || '';
+    // Reintenta solo: cada 3 s los primeros 2 minutos (el aviso de Mercado Pago suele tardar segundos)
+    if(intento < 40) senaPoll = setTimeout(() => mostrarEstadoSena(senaId, intento + 1), 3000);
+    const act = senaBoton(ST.btnActualizar, false);
+    act.addEventListener('click', () => mostrarEstadoSena(senaId));
+    box.appendChild(act);
+  }else{
+    icon.textContent = (estado === 'devuelta' || estado === 'devolucion_en_proceso') ? '↩' : '✕';
+    icon.classList.toggle('error', estado !== 'devuelta' && estado !== 'devolucion_en_proceso');
+    titulo.textContent = estado === 'vencida' ? ST.estadoVencidaTitulo
+      : (estado === 'devuelta' || estado === 'devolucion_en_proceso') ? ST.estadoDevueltaTitulo
+      : estado === 'cancelada' ? ST.estadoCanceladaTitulo
+      : ST.estadoErrorTitulo;
+    sub.textContent = (d && d.mensaje) || T.successSubErrDefault;
+    if(!finales.includes(estado)){
+      const act = senaBoton(ST.btnActualizar, false);
+      act.addEventListener('click', () => mostrarEstadoSena(senaId));
+      box.appendChild(act);
+    }else{
+      try{ sessionStorage.removeItem(SENA_STORAGE_KEY); }catch(e){}
+    }
+  }
+
+  if(finales.includes(estado)){
+    const nueva = senaBoton(ST.btnNuevaReserva, true);
+    nueva.style.background = '';
+    nueva.style.color = '';
+    nueva.addEventListener('click', () => { window.location.href = window.location.pathname; });
+    box.appendChild(nueva);
+  }
+}
+
+/* Si la página se abre con ?sena=<id> (vuelta de Mercado Pago), muestra el estado. */
+function senaRevisarVuelta(){
+  const id = new URLSearchParams(window.location.search).get('sena');
+  if(id && /^[0-9a-f-]{36}$/i.test(id)){ mostrarEstadoSena(id); return true; }
+  return false;
+}
+
+
 /* Trae nombre, prefijo telefónico y marca (logo/colores) del
    restaurante desde Supabase. Si las columnas de marca todavía no
    existen (no corriste el SQL), reintenta pidiendo solo las columnas
@@ -1042,8 +1349,8 @@ function renderPersonas(){
   chipGrupo.className = 'quick-chip';
   chipGrupo.style.borderColor = 'var(--coral)';
   chipGrupo.style.color = 'var(--coral)';
-  chipGrupo.textContent = T.grupoGrandeChip;
-  chipGrupo.addEventListener('click', () => mostrarCartelGrupo());
+  chipGrupo.textContent = SENA_CFG ? ST.consultasChip : T.grupoGrandeChip;
+  chipGrupo.addEventListener('click', () => SENA_CFG ? senaAbrirConsultas() : mostrarCartelGrupo());
   quick.appendChild(chipGrupo);
 }
 
@@ -1412,6 +1719,7 @@ function renderResumen(){
     <div class="summary-row"><span class="summary-row-label">${T.summaryTelefono}</span><span class="summary-row-val">${state.prefijo} ${state.telefono}</span></div>
     ${notaRow}
   `;
+  senaActualizarResumen();
 }
 
 /* Crea la reserva real vía el Endpoint 2 (confirmar-reserva). En modo
@@ -1465,6 +1773,14 @@ document.getElementById('confirmBtn').addEventListener('click', async () => {
   btn.textContent = T.btnConfirmando;
 
   const resultado = await crearReserva();
+
+  // Reserva con seña: el lugar queda retenido y se muestra la pantalla de pago
+  if(resultado && resultado.success && resultado.requiere_sena && resultado.checkout_url){
+    btn.disabled = false;
+    btn.textContent = T.btnConfirmar;
+    mostrarPantallaPagoSena(resultado);
+    return;
+  }
 
   const successIcon = document.getElementById('successIcon');
   if(resultado.success){
@@ -1581,11 +1897,13 @@ async function init(){
     await cargarExcepcionesAperturaEspecial();
     if(CONFIG.MOCK_MODE) document.getElementById('mockBanner').classList.remove('hidden');
 
+    await cargarConfigSena();
     renderSalones();
     renderPersonas();
     renderFechas();
     renderPrefijos();
     renderProgress();
+    senaRevisarVuelta();
   }catch(e){
     console.error('[Pura Vida widget] error cargando datos de Supabase:', e);
     document.body.classList.add('marca-lista');
