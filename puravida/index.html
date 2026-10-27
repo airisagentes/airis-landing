@@ -989,6 +989,148 @@ const SENA_TXT = {
     consultasMensaje: (rest) => `Olá! Gostaria de fazer uma consulta sobre uma reserva no ${rest}.`,
   },
 };
+/* Textos del pago integrado (pantallas de pago, espera, confirmación y vencida). */
+Object.assign(SENA_TXT.es, {
+  p1Titulo: 'Falta un paso: paga la seña',
+  p1Texto: 'Tu lugar quedó guardado. Paga la seña para confirmar tu reserva.',
+  p1Etiqueta: 'Seña',
+  p1Guardado: 'Tu lugar queda guardado por',
+  p1Btn: (m) => `Pagar seña · ${m}`,
+  p1Seguro1: 'Débito, crédito o dinero en Mercado Pago',
+  p1Seguro2: 'Pago seguro procesado por Mercado Pago',
+  p1Volver: 'Cuando termines de pagar, vuelve a esta pantalla: tu reserva se confirma sola.',
+  p1Tiempo: 'El tiempo para pagar terminó. Si ya pagaste, toca "Ya pagué, verificar ahora".',
+  p2Titulo: 'Esperando tu pago…',
+  p2Texto: 'Completa el pago en la ventana que se abrió. Esta pantalla se actualiza sola apenas se acredite.',
+  p2Verificando: 'Estamos verificando tu pago. Puede tardar unos minutos; esta pantalla se actualiza sola.',
+  p2Paso1: 'Lugar guardado', p2Paso2: 'Pago de la seña', p2Paso3: 'Reserva confirmada',
+  p2Reabrir: 'Volver a la ventana de pago',
+  p2YaPague: 'Ya pagué, verificar ahora',
+  p2NoCierres: 'No cierres esta pantalla',
+  p3Titulo: '¡Reserva confirmada!',
+  p3Texto: 'Te esperamos. Antes de tu reserva te enviaremos un recordatorio por WhatsApp.',
+  p3Encabezado: 'Reserva confirmada',
+  p3Fecha: 'Fecha', p3Personas: 'Personas', p3Nombre: 'A nombre de', p3Sena: 'Seña',
+  p3Pagada: (m) => `Pagada ${m}`,
+  p3Nota: (h) => 'La seña se descuenta del total de tu consumo. ' + (h > 0 ? `Puedes cancelar con devolución automática hasta ${h} hs antes.` : 'Si cancelas, te la devolvemos automáticamente.'),
+  calBtn: 'Agregar a mi calendario',
+  calGoogle: 'Google Calendar',
+  calOtro: 'Calendario del celular u Outlook',
+  calTitulo: (local) => `Reserva en ${local}`,
+  calDetalle: (p, salon, m) => [p ? `${p} personas` : '', salon, m ? `Seña pagada: ${m}` : ''].filter(Boolean).join(' · '),
+  otraReserva: 'Hacer otra reserva',
+  p4Titulo: 'El tiempo para pagar terminó',
+  p4Texto: 'Tu lugar se liberó para otras personas. Puedes volver a reservar cuando quieras.',
+  p4Pagaste: '¿Llegaste a pagar?',
+  p4PagasteTexto: 'No te preocupes: si el pago entró después del plazo, te devolvemos el dinero automáticamente.',
+  p4Btn: 'Volver a reservar',
+  devTitulo: 'Te devolvimos el dinero',
+  devTarde: 'Tu pago llegó cuando el lugar ya se había liberado. Te devolvimos el dinero completo.',
+  devCancelada: 'La reserva se canceló y te devolvimos la seña.',
+  devProceso: 'La reserva se canceló. La devolución de tu seña está en proceso.',
+  cancTitulo: 'Reserva cancelada',
+  cancTexto: 'Esta reserva fue cancelada.',
+  errTitulo: 'No pudimos verificar tu pago',
+  errTexto: 'Revisa tu conexión y prueba de nuevo en unos segundos.',
+  errBtn: 'Verificar de nuevo',
+  noEncontrada: 'No encontramos esta reserva.',
+  personas: (n) => `${n} personas`,
+  hs: 'hs',
+});
+Object.assign(SENA_TXT.en, {
+  p1Titulo: 'One more step: pay the deposit',
+  p1Texto: 'Your table is on hold. Pay the deposit to confirm your booking.',
+  p1Etiqueta: 'Deposit',
+  p1Guardado: 'Your table is held for',
+  p1Btn: (m) => `Pay deposit · ${m}`,
+  p1Seguro1: 'Debit, credit or Mercado Pago balance',
+  p1Seguro2: 'Secure payment processed by Mercado Pago',
+  p1Volver: 'When you finish paying, come back to this screen: your booking confirms automatically.',
+  p1Tiempo: 'Time to pay is over. If you already paid, tap "I already paid, check now".',
+  p2Titulo: 'Waiting for your payment…',
+  p2Texto: 'Complete the payment in the window that opened. This screen updates by itself as soon as it goes through.',
+  p2Verificando: 'We are checking your payment. It may take a few minutes; this screen updates by itself.',
+  p2Paso1: 'Table on hold', p2Paso2: 'Deposit payment', p2Paso3: 'Booking confirmed',
+  p2Reabrir: 'Back to the payment window',
+  p2YaPague: 'I already paid, check now',
+  p2NoCierres: 'Do not close this screen',
+  p3Titulo: 'Booking confirmed!',
+  p3Texto: "See you soon. We'll send you a WhatsApp reminder before your booking.",
+  p3Encabezado: 'Booking confirmed',
+  p3Fecha: 'Date', p3Personas: 'Guests', p3Nombre: 'Name', p3Sena: 'Deposit',
+  p3Pagada: (m) => `Paid ${m}`,
+  p3Nota: (h) => 'The deposit is deducted from your bill. ' + (h > 0 ? `You can cancel with an automatic refund up to ${h} hrs before.` : 'If you cancel, it is refunded automatically.'),
+  calBtn: 'Add to my calendar',
+  calGoogle: 'Google Calendar',
+  calOtro: 'Phone calendar or Outlook',
+  calTitulo: (local) => `Booking at ${local}`,
+  calDetalle: (p, salon, m) => [p ? `${p} people` : '', salon, m ? `Deposit paid: ${m}` : ''].filter(Boolean).join(' · '),
+  otraReserva: 'Make another booking',
+  p4Titulo: 'Time to pay is over',
+  p4Texto: 'Your table was released. You can book again whenever you like.',
+  p4Pagaste: 'Did you pay?',
+  p4PagasteTexto: "Don't worry: if the payment went through after the deadline, we refund it automatically.",
+  p4Btn: 'Book again',
+  devTitulo: 'Your money was refunded',
+  devTarde: 'Your payment arrived after the table was released. We refunded the full amount.',
+  devCancelada: 'The booking was cancelled and your deposit was refunded.',
+  devProceso: 'The booking was cancelled. Your deposit refund is in process.',
+  cancTitulo: 'Booking cancelled',
+  cancTexto: 'This booking was cancelled.',
+  errTitulo: 'We could not check your payment',
+  errTexto: 'Check your connection and try again in a few seconds.',
+  errBtn: 'Check again',
+  noEncontrada: 'We could not find this booking.',
+  personas: (n) => `${n} people`,
+  hs: '',
+});
+Object.assign(SENA_TXT.pt, {
+  p1Titulo: 'Falta um passo: pague o sinal',
+  p1Texto: 'Seu lugar está reservado. Pague o sinal para confirmar sua reserva.',
+  p1Etiqueta: 'Sinal',
+  p1Guardado: 'Seu lugar fica reservado por',
+  p1Btn: (m) => `Pagar sinal · ${m}`,
+  p1Seguro1: 'Débito, crédito ou saldo no Mercado Pago',
+  p1Seguro2: 'Pagamento seguro processado pelo Mercado Pago',
+  p1Volver: 'Quando terminar de pagar, volte a esta tela: sua reserva é confirmada sozinha.',
+  p1Tiempo: 'O tempo para pagar terminou. Se já pagou, toque em "Já paguei, verificar agora".',
+  p2Titulo: 'Aguardando seu pagamento…',
+  p2Texto: 'Conclua o pagamento na janela que abriu. Esta tela se atualiza sozinha assim que o pagamento for aprovado.',
+  p2Verificando: 'Estamos verificando seu pagamento. Pode levar alguns minutos; esta tela se atualiza sozinha.',
+  p2Paso1: 'Lugar reservado', p2Paso2: 'Pagamento do sinal', p2Paso3: 'Reserva confirmada',
+  p2Reabrir: 'Voltar à janela de pagamento',
+  p2YaPague: 'Já paguei, verificar agora',
+  p2NoCierres: 'Não feche esta tela',
+  p3Titulo: 'Reserva confirmada!',
+  p3Texto: 'Esperamos você. Antes da sua reserva enviaremos um lembrete pelo WhatsApp.',
+  p3Encabezado: 'Reserva confirmada',
+  p3Fecha: 'Data', p3Personas: 'Pessoas', p3Nombre: 'Em nome de', p3Sena: 'Sinal',
+  p3Pagada: (m) => `Pago ${m}`,
+  p3Nota: (h) => 'O sinal é descontado do total da sua conta. ' + (h > 0 ? `Você pode cancelar com devolução automática até ${h} h antes.` : 'Se cancelar, devolvemos automaticamente.'),
+  calBtn: 'Adicionar à minha agenda',
+  calGoogle: 'Google Agenda',
+  calOtro: 'Agenda do celular ou Outlook',
+  calTitulo: (local) => `Reserva no ${local}`,
+  calDetalle: (p, salon, m) => [p ? `${p} pessoas` : '', salon, m ? `Sinal pago: ${m}` : ''].filter(Boolean).join(' · '),
+  otraReserva: 'Fazer outra reserva',
+  p4Titulo: 'O tempo para pagar terminou',
+  p4Texto: 'Seu lugar foi liberado. Você pode reservar de novo quando quiser.',
+  p4Pagaste: 'Chegou a pagar?',
+  p4PagasteTexto: 'Não se preocupe: se o pagamento entrou depois do prazo, devolvemos o dinheiro automaticamente.',
+  p4Btn: 'Reservar de novo',
+  devTitulo: 'Devolvemos o seu dinheiro',
+  devTarde: 'Seu pagamento chegou quando o lugar já tinha sido liberado. Devolvemos o valor completo.',
+  devCancelada: 'A reserva foi cancelada e devolvemos o sinal.',
+  devProceso: 'A reserva foi cancelada. A devolução do sinal está em andamento.',
+  cancTitulo: 'Reserva cancelada',
+  cancTexto: 'Esta reserva foi cancelada.',
+  errTitulo: 'Não conseguimos verificar seu pagamento',
+  errTexto: 'Verifique sua conexão e tente de novo em alguns segundos.',
+  errBtn: 'Verificar de novo',
+  noEncontrada: 'Não encontramos esta reserva.',
+  personas: (n) => `${n} pessoas`,
+  hs: 'h',
+});
 const ST = SENA_TXT[LANG] || SENA_TXT.es;
 
 function senaEsc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
@@ -1083,9 +1225,99 @@ function senaAbrirConsultas(){
   window.open(`https://wa.me/${num}?text=${encodeURIComponent(texto)}`, '_blank');
 }
 
+/* ---------- Pago integrado: pagar → esperando → confirmada / vencida ----------
+   El botón abre Mercado Pago en otra ventana (o la app en el celular) y esta
+   página consulta sola el estado real de la seña hasta que se confirma.
+   Si el navegador bloquea la ventana nueva, se usa el método de siempre
+   (misma pestaña y vuelta automática con ?sena=). */
+let senaVentana = null;      // ventana de pago abierta
+let senaSesion = 0;          // invalida consultas viejas al cambiar de pantalla
+let senaVisibleHandler = null;
+
 function senaLimpiarTimers(){
   if(senaTimer){ clearInterval(senaTimer); senaTimer = null; }
   if(senaPoll){ clearTimeout(senaPoll); senaPoll = null; }
+  if(senaVisibleHandler){
+    document.removeEventListener('visibilitychange', senaVisibleHandler);
+    window.removeEventListener('focus', senaVisibleHandler);
+    senaVisibleHandler = null;
+  }
+  senaSesion++;
+}
+
+function senaEstilos(){
+  if(document.getElementById('senaCss')) return;
+  const st = document.createElement('style');
+  st.id = 'senaCss';
+  st.textContent = `
+.sn-wrap{text-align:left;max-width:420px;margin:0 auto}
+.sn-card{border:1px solid color-mix(in srgb, var(--azul) 18%, transparent);border-radius:var(--r,16px);padding:15px 17px;background:color-mix(in srgb, var(--azul) 4%, #fff);margin:4px 0 14px}
+.sn-monto{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.sn-monto span{font-family:var(--font-mono,monospace);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--texto-medio,#3a3f5c)}
+.sn-monto b{font-size:28px;font-weight:800;color:var(--texto-oscuro,#0A0F2E)}
+.sn-det{font-size:13.5px;color:var(--texto-medio,#3a3f5c);margin-top:5px}
+.sn-timer{display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;color:var(--texto-medio,#3a3f5c);margin:4px 0 16px}
+.sn-timer b{font-family:var(--font-mono,monospace);font-size:15px;color:var(--texto-oscuro,#0A0F2E);background:color-mix(in srgb, var(--azul) 10%, #fff);padding:4px 10px;border-radius:8px;font-variant-numeric:tabular-nums}
+.sn-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;border:0;border-radius:14px;padding:15px 16px;font:700 16px var(--font-display,sans-serif);cursor:pointer;text-decoration:none;box-sizing:border-box}
+.sn-btn.pri{background:var(--azul);color:#fff;box-shadow:0 6px 16px color-mix(in srgb, var(--azul) 30%, transparent)}
+.sn-btn.sec{background:#fff;color:var(--azul);border:1.5px solid color-mix(in srgb, var(--azul) 30%, transparent);margin-top:10px}
+.sn-btn:disabled{opacity:.6;cursor:default}
+.sn-seguro{display:flex;gap:7px;align-items:flex-start;justify-content:center;font-size:12px;line-height:1.45;color:var(--texto-medio,#3a3f5c);text-align:center;margin-top:12px}
+.sn-seguro svg{margin-top:2px;flex:none}
+.sn-tarjetas{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+.sn-tarjetas span{font-family:var(--font-mono,monospace);font-size:9.5px;font-weight:600;color:#5b6180;border:1px solid #E1E4F2;border-radius:6px;padding:4px 7px;background:#fff}
+.sn-hint{font-size:12.5px;line-height:1.45;color:var(--texto-medio,#3a3f5c);text-align:center;margin:10px 4px 0}
+.sn-mini{display:flex;gap:10px;align-items:flex-start;font-size:12.5px;color:var(--texto-medio,#3a3f5c);line-height:1.4;margin-top:9px}
+.sn-mini svg{flex:none;margin-top:1px}
+.sn-link{display:block;width:100%;background:none;border:0;text-align:center;font:600 13.5px var(--font-display,sans-serif);color:var(--azul);text-decoration:underline;margin-top:16px;cursor:pointer;padding:4px}
+.sn-pasos{list-style:none;padding:0;margin:0 0 6px}
+.sn-pasos li{display:flex;gap:12px;align-items:center;font-size:13.5px;padding:7px 0;color:var(--texto-medio,#3a3f5c)}
+.sn-pasos li i{flex:none;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:12px;font-weight:700}
+.sn-pasos .ok i{background:#1E9E5A;color:#fff}
+.sn-pasos .ya{color:var(--texto-oscuro,#0A0F2E);font-weight:700}
+.sn-pasos .ya i{background:var(--azul);color:#fff}
+.sn-pasos .luego i{background:color-mix(in srgb, var(--azul) 12%, #fff);color:var(--azul)}
+.sn-pie{text-align:center;font-family:var(--font-mono,monospace);font-size:10px;color:#9aa0bd;letter-spacing:.08em;text-transform:uppercase;margin-top:22px}
+.sn-rec{border:1px solid #E1E4F2;border-radius:var(--r,16px);overflow:hidden;margin:4px 0 12px;background:#fff}
+.sn-rec .h{background:var(--navy,#0A0F2E);color:#fff;padding:13px 17px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.sn-rec .h b{font-size:16.5px}
+.sn-rec .h span{font-family:var(--font-mono,monospace);font-size:10.5px;opacity:.7;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.sn-fila{display:flex;justify-content:space-between;gap:12px;padding:10px 17px;border-top:1px dashed #E1E4F2;font-size:13.5px}
+.sn-fila:first-of-type{border-top:0}
+.sn-fila span{color:var(--texto-medio,#3a3f5c)}
+.sn-fila b{font-weight:700;text-align:right;color:var(--texto-oscuro,#0A0F2E)}
+.sn-pill{display:inline-flex;align-items:center;gap:5px;background:#E6F6EE;color:#1E9E5A;font-weight:700;font-size:12.5px;padding:4px 10px;border-radius:20px;white-space:nowrap}
+.sn-aviso{border:1px solid #E1E4F2;border-radius:var(--r,16px);padding:14px 16px;font-size:13.5px;line-height:1.5;color:var(--texto-medio,#3a3f5c);background:#F7F8FC;margin:4px 0 14px}
+.sn-aviso b{color:var(--texto-oscuro,#0A0F2E)}
+.sn-cal{display:none;gap:8px;margin-top:8px}
+.sn-cal.show{display:grid;grid-template-columns:1fr 1fr}
+.sn-cal button{border:1.5px solid color-mix(in srgb, var(--azul) 30%, transparent);background:#fff;color:var(--azul);border-radius:12px;padding:11px 8px;font:700 13px var(--font-display,sans-serif);cursor:pointer}
+.sn-spin{width:64px;height:64px;border-radius:50%;border:5px solid color-mix(in srgb, var(--azul) 14%, #fff);border-top-color:var(--azul);margin:0 auto 18px;animation:snGira 1s linear infinite;box-sizing:border-box}
+@keyframes snGira{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){.sn-spin{animation-duration:3s}}`;
+  document.head.appendChild(st);
+}
+
+const SN_SVG = {
+  tarjeta: '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--azul)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3 10h18M7 15h3"/></svg>',
+  ok: '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#1E9E5A" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+  reloj: '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#D93025" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  vuelta: '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--azul)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>',
+  cruz: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D93025" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+  candado: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>',
+  cal: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+  tilde: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--azul)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+  devol: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--azul)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>',
+};
+
+/* Encabezado del paso 6: ícono, título y texto (elementos de la página). */
+function senaCabecera(icono, fondo, titulo, texto){
+  const icon = document.getElementById('successIcon');
+  icon.classList.remove('error');
+  icon.style.background = fondo;
+  icon.innerHTML = icono;
+  document.getElementById('successTitle').textContent = titulo;
+  document.getElementById('successSub').textContent = texto || '';
 }
 
 function senaCaja(){
@@ -1093,144 +1325,276 @@ function senaCaja(){
   if(!box){
     box = document.createElement('div');
     box.id = 'senaBox';
-    box.style.cssText = 'margin-top:18px;text-align:center';
+    box.style.cssText = 'margin-top:4px';
     document.querySelector('.step[data-step="6"] .success-box').appendChild(box);
   }
   return box;
 }
 
-function senaBoton(texto, estiloPrincipal){
-  const b = document.createElement('button');
-  b.className = estiloPrincipal ? 'btn btn-next' : 'btn btn-back';
-  b.style.cssText = 'width:100%;margin-top:10px;' + (estiloPrincipal ? 'background:#009EE3;color:#fff' : '');
-  b.textContent = texto;
-  return b;
+function senaGuardar(datos){ try{ sessionStorage.setItem(SENA_STORAGE_KEY, JSON.stringify(datos)); }catch(e){} }
+function senaLeer(){
+  try{
+    const v = sessionStorage.getItem(SENA_STORAGE_KEY);
+    if(!v) return null;
+    if(/^[0-9a-f-]{36}$/i.test(v)) return { id: v };
+    return JSON.parse(v);
+  }catch(e){ return null; }
 }
+function senaOlvidar(){ try{ sessionStorage.removeItem(SENA_STORAGE_KEY); }catch(e){} }
 
-/* Pantalla "pagá la seña" después de confirmar. */
-function mostrarPantallaPagoSena(r){
-  senaLimpiarTimers();
-  try{ sessionStorage.setItem(SENA_STORAGE_KEY, r.sena_id); }catch(e){}
-  const icon = document.getElementById('successIcon');
-  icon.textContent = '💳';
-  icon.classList.remove('error');
-  document.getElementById('successTitle').textContent = ST.pagoTitulo;
-  document.getElementById('successSub').textContent = ST.pagoTexto(senaFmt(r.monto));
+function senaHorasDevolucion(){ return Number(SENA_CFG && SENA_CFG.sena_devolucion_horas) || 0; }
 
-  const box = senaCaja();
-  box.innerHTML = `<div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--texto-medio,#3a3f5c)">${senaEsc(ST.pagoTiempo)}</div>
-    <div id="senaReloj" style="font-size:34px;font-weight:800;font-variant-numeric:tabular-nums;margin:2px 0 6px"></div>`;
-  const pagar = document.createElement('a');
-  pagar.href = r.checkout_url;
-  pagar.className = 'btn btn-next';
-  pagar.style.cssText = 'display:flex;align-items:center;justify-content:center;width:100%;text-decoration:none;background:#009EE3;color:#fff';
-  pagar.textContent = ST.pagoBtn;
-  box.appendChild(pagar);
-  const nota = document.createElement('p');
-  nota.style.cssText = 'font-size:12.5px;color:var(--texto-medio,#3a3f5c);margin-top:10px;line-height:1.45';
-  nota.textContent = ST.pagoNota;
-  box.appendChild(nota);
-  const ya = senaBoton(ST.pagoYaPague, false);
-  ya.addEventListener('click', () => mostrarEstadoSena(r.sena_id));
-  box.appendChild(ya);
-
-  const fin = Date.now() + Math.max(0, Number(r.segundos_para_pagar) || 0) * 1000;
-  const reloj = document.getElementById('senaReloj');
+/* Reloj "Tu lugar queda guardado por mm:ss". */
+function senaArrancarReloj(fin, alTerminar){
+  if(senaTimer){ clearInterval(senaTimer); senaTimer = null; }
+  const el = document.getElementById('senaReloj');
+  if(!el || !fin) return;
   const tick = () => {
     const s = Math.max(0, Math.round((fin - Date.now()) / 1000));
-    reloj.textContent = `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
-    if(s <= 0){
-      clearInterval(senaTimer); senaTimer = null;
-      pagar.style.display = 'none';
-      nota.textContent = ST.pagoVencido;
-    }
+    el.textContent = `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+    if(s <= 0){ clearInterval(senaTimer); senaTimer = null; if(alTerminar) alTerminar(); }
   };
   tick();
   senaTimer = setInterval(tick, 1000);
+}
+
+/* Abre la ventana de pago. Si el navegador la bloquea, sigue en la misma pestaña (vuelve con ?sena=). */
+function senaAbrirPago(url){
+  if(!url) return false;
+  if(senaVentana && !senaVentana.closed){ try{ senaVentana.focus(); return true; }catch(e){} }
+  let w = null;
+  try{ w = window.open(url, '_blank'); }catch(e){ w = null; }
+  if(!w){ window.location.href = url; return false; }
+  try{ w.opener = null; }catch(e){}
+  senaVentana = w;
+  return true;
+}
+
+/* PANTALLA 1 — "Falta un paso: paga la seña" (después de confirmar). */
+function mostrarPantallaPagoSena(r){
+  senaLimpiarTimers();
+  senaEstilos();
+  const fin = Date.now() + Math.max(0, Number(r.segundos_para_pagar) || 0) * 1000;
+  const datos = { id: r.sena_id, url: r.checkout_url, fin, monto: r.monto };
+  senaGuardar(datos);
+
+  senaCabecera(SN_SVG.tarjeta, 'color-mix(in srgb, var(--azul) 12%, #fff)', ST.p1Titulo, ST.p1Texto);
+  const salon = r.room_name || (CONFIG.salones.find(s => s.id === state.salon) || {}).nombre || '';
+  const detalle = [state.fechaLabel, state.hora ? `${state.hora} ${ST.hs}`.trim() : '', state.personas ? ST.personas(state.personas) : '', salon].filter(Boolean).join(' · ');
+  const h = senaHorasDevolucion();
+  const box = senaCaja();
+  box.innerHTML = `<div class="sn-wrap">
+    <div class="sn-card"><div class="sn-monto"><span>${senaEsc(ST.p1Etiqueta)}</span><b>${senaEsc(senaFmt(r.monto))}</b></div>
+      ${detalle ? `<div class="sn-det">${senaEsc(detalle)}</div>` : ''}</div>
+    <div class="sn-timer">${senaEsc(ST.p1Guardado)} <b id="senaReloj">--:--</b></div>
+    <button type="button" class="sn-btn pri" id="senaPagar">${senaEsc(ST.p1Btn(senaFmt(r.monto)))}</button>
+    <div class="sn-seguro">${SN_SVG.candado}<span>${senaEsc(ST.p1Seguro1)}<br>${senaEsc(ST.p1Seguro2)}</span></div>
+    <div class="sn-tarjetas"><span>VISA</span><span>Mastercard</span><span>AMEX</span><span>Mercado Pago</span></div>
+    <p class="sn-hint" id="senaNota">${senaEsc(ST.p1Volver)}</p>
+    <div class="sn-mini">${SN_SVG.tilde}<span>${senaEsc(ST.avisoDescuento)}</span></div>
+    <div class="sn-mini">${SN_SVG.devol}<span>${senaEsc(ST.avisoDevolucion(h))}</span></div>
+    <button type="button" class="sn-link" id="senaYa" style="display:none">${senaEsc(ST.p2YaPague)}</button>
+  </div>`;
+  document.getElementById('senaPagar').addEventListener('click', () => {
+    if(senaAbrirPago(r.checkout_url)) mostrarEsperandoPago(datos);
+  });
+  document.getElementById('senaYa').addEventListener('click', () => mostrarEsperandoPago(datos, true));
+  senaArrancarReloj(fin, () => {
+    document.getElementById('senaPagar').style.display = 'none';
+    document.getElementById('senaNota').textContent = ST.p1Tiempo;
+    document.getElementById('senaYa').style.display = '';
+    // Se consulta una vez: si ya pagó (o venció), la pantalla lo muestra sola
+    mostrarEsperandoPago(datos, true);
+  });
   goToStep(6);
 }
 
-/* Estado real de la seña (al volver de Mercado Pago o con "Ya pagué"). */
-async function mostrarEstadoSena(senaId, intento = 0){
+/* PANTALLA 2 — "Esperando tu pago…": consulta el estado sola hasta que se resuelve. */
+function mostrarEsperandoPago(datos, soloVerificar){
   senaLimpiarTimers();
-  const icon = document.getElementById('successIcon');
-  const titulo = document.getElementById('successTitle');
-  const sub = document.getElementById('successSub');
+  senaEstilos();
+  const sesion = senaSesion;
+  const inicio = Date.now();
+  senaCabecera('<div class="sn-spin" style="margin:0"></div>', 'transparent', ST.p2Titulo, ST.p2Texto);
   const box = senaCaja();
-  if(intento === 0){
-    icon.textContent = '⏳'; icon.classList.remove('error');
-    titulo.textContent = ST.estadoVerificando;
-    sub.textContent = '';
-    box.innerHTML = '';
-    goToStep(6);
-  }
+  box.innerHTML = `<div class="sn-wrap">
+    <ul class="sn-pasos">
+      <li class="ok"><i>✓</i>${senaEsc(ST.p2Paso1)}</li>
+      <li class="ya"><i>2</i>${senaEsc(ST.p2Paso2)}</li>
+      <li class="luego"><i>3</i>${senaEsc(ST.p2Paso3)}</li>
+    </ul>
+    <div class="sn-timer" id="senaTimerFila" style="margin-top:14px">${senaEsc(ST.p1Guardado)} <b id="senaReloj">--:--</b></div>
+    ${datos.url ? `<button type="button" class="sn-btn sec" id="senaReabrir">${senaEsc(ST.p2Reabrir)}</button>` : ''}
+    <button type="button" class="sn-link" id="senaYa">${senaEsc(ST.p2YaPague)}</button>
+    <div class="sn-pie">${senaEsc(ST.p2NoCierres)}</div>
+  </div>`;
+  if(datos.url) document.getElementById('senaReabrir').addEventListener('click', () => senaAbrirPago(datos.url));
+  if(datos.fin && datos.fin > Date.now()) senaArrancarReloj(datos.fin);
+  else document.getElementById('senaTimerFila').style.display = 'none';
 
-  let d = null;
-  try{
-    const res = await fetch(`${SENA_WEBHOOK_ESTADO}?sena=${encodeURIComponent(senaId)}`, { cache: 'no-store' });
-    d = await res.json();
-  }catch(e){ d = null; }
-
-  const detalle = d && d.reserva ? ST.detalle(d.reserva) : '';
-  box.innerHTML = '';
-  if(detalle){
-    const p = document.createElement('div');
-    p.style.cssText = 'font-size:14px;font-weight:700;margin-top:6px';
-    p.textContent = detalle;
-    box.appendChild(p);
-  }
-
-  const estado = d && d.ok ? d.estado : (d && d.estado) || 'error';
-  const finales = ['confirmada', 'vencida', 'devuelta', 'devolucion_en_proceso', 'cancelada', 'no_encontrada'];
-
-  if(estado === 'confirmada'){
-    icon.textContent = '✓'; icon.classList.remove('error');
-    titulo.textContent = ST.estadoConfirmadaTitulo;
-    sub.textContent = d.mensaje || '';
-    const m = document.createElement('div');
-    m.style.cssText = 'font-size:13px;color:var(--texto-medio,#3a3f5c);margin-top:6px';
-    m.textContent = ST.montoPagado(senaFmt(d.monto));
-    box.appendChild(m);
-    try{ sessionStorage.removeItem(SENA_STORAGE_KEY); }catch(e){}
-  }else if(estado === 'esperando_pago' || estado === 'verificando'){
-    icon.textContent = '⏳'; icon.classList.remove('error');
-    titulo.textContent = ST.estadoEsperandoTitulo;
-    sub.textContent = d.mensaje || '';
-    // Reintenta solo: cada 3 s los primeros 2 minutos (el aviso de Mercado Pago suele tardar segundos)
-    if(intento < 40) senaPoll = setTimeout(() => mostrarEstadoSena(senaId, intento + 1), 3000);
-    const act = senaBoton(ST.btnActualizar, false);
-    act.addEventListener('click', () => mostrarEstadoSena(senaId));
-    box.appendChild(act);
-  }else{
-    icon.textContent = (estado === 'devuelta' || estado === 'devolucion_en_proceso') ? '↩' : '✕';
-    icon.classList.toggle('error', estado !== 'devuelta' && estado !== 'devolucion_en_proceso');
-    titulo.textContent = estado === 'vencida' ? ST.estadoVencidaTitulo
-      : (estado === 'devuelta' || estado === 'devolucion_en_proceso') ? ST.estadoDevueltaTitulo
-      : estado === 'cancelada' ? ST.estadoCanceladaTitulo
-      : ST.estadoErrorTitulo;
-    sub.textContent = (d && d.mensaje) || T.successSubErrDefault;
-    if(!finales.includes(estado)){
-      const act = senaBoton(ST.btnActualizar, false);
-      act.addEventListener('click', () => mostrarEstadoSena(senaId));
-      box.appendChild(act);
-    }else{
-      try{ sessionStorage.removeItem(SENA_STORAGE_KEY); }catch(e){}
+  let consultando = false;
+  const consultar = async () => {
+    if(consultando || sesion !== senaSesion) return;
+    consultando = true;
+    if(senaPoll){ clearTimeout(senaPoll); senaPoll = null; }
+    let d = null;
+    try{
+      const res = await fetch(`${SENA_WEBHOOK_ESTADO}?sena=${encodeURIComponent(datos.id)}`, { cache: 'no-store' });
+      d = await res.json();
+    }catch(e){ d = null; }
+    consultando = false;
+    if(sesion !== senaSesion) return;
+    const estado = d && d.estado;
+    if(estado === 'esperando_pago' && !senaTimer && Number(d.segundos_restantes) > 0){
+      // Vuelta desde Mercado Pago u otra pestaña: el reloj se toma del estado real
+      datos.fin = Date.now() + Number(d.segundos_restantes) * 1000;
+      const fila = document.getElementById('senaTimerFila');
+      if(fila){ fila.style.display = ''; senaArrancarReloj(datos.fin); }
     }
-  }
-
-  if(finales.includes(estado)){
-    const nueva = senaBoton(ST.btnNuevaReserva, true);
-    nueva.style.background = '';
-    nueva.style.color = '';
-    nueva.addEventListener('click', () => { window.location.href = window.location.pathname; });
-    box.appendChild(nueva);
-  }
+    if(estado === 'esperando_pago' || estado === 'verificando' || !d || estado === 'error'){
+      if(estado === 'verificando'){
+        document.getElementById('successSub').textContent = ST.p2Verificando;
+        const fila = document.getElementById('senaTimerFila'); if(fila) fila.style.display = 'none';
+      }
+      // Cada 3 s los primeros 20 minutos; después solo con "Ya pagué"
+      if(Date.now() - inicio < 20 * 60 * 1000) senaPoll = setTimeout(consultar, 3000);
+      return;
+    }
+    senaMostrarResultado(d);
+  };
+  document.getElementById('senaYa').addEventListener('click', consultar);
+  // Apenas el comensal vuelve a esta pestaña (desde Mercado Pago), se consulta al instante
+  senaVisibleHandler = () => { if(document.visibilityState !== 'hidden') consultar(); };
+  document.addEventListener('visibilitychange', senaVisibleHandler);
+  window.addEventListener('focus', senaVisibleHandler);
+  if(soloVerificar) consultar(); else senaPoll = setTimeout(consultar, 3000);
+  goToStep(6);
 }
 
-/* Si la página se abre con ?sena=<id> (vuelta de Mercado Pago), muestra el estado. */
+/* Fecha linda en el idioma de la página: "Sábado 31/10 · 21:00 hs". */
+function senaFechaLinda(iso, tz){
+  const d = new Date(iso);
+  if(isNaN(d)) return '';
+  const zona = tz || restaurantData?.timezone || 'America/Argentina/Buenos_Aires';
+  const dia = d.toLocaleDateString(LANG, { timeZone: zona, weekday: 'long' });
+  const dm = d.toLocaleDateString('es-AR', { timeZone: zona, day: '2-digit', month: '2-digit' });
+  const hora = d.toLocaleTimeString('es-AR', { timeZone: zona, hour: '2-digit', minute: '2-digit', hour12: false });
+  return `${dia.charAt(0).toUpperCase() + dia.slice(1)} ${dm} · ${hora} ${ST.hs}`.trim();
+}
+
+/* Calendario: Google Calendar o archivo .ics (iPhone, Android, Outlook). */
+function senaEventoCalendario(d){
+  const r = d.reserva || {};
+  const ini = new Date(r.inicio);
+  if(isNaN(ini)) return null;
+  let fin = new Date(r.fin);
+  if(isNaN(fin) || fin <= ini) fin = new Date(ini.getTime() + 2 * 60 * 60 * 1000);
+  return { ini, fin, titulo: ST.calTitulo(r.local || restaurantData?.name || ''),
+    detalle: ST.calDetalle(r.personas, r.salon, senaFmt(d.monto).replace(/\u00a0/g, ' '))
+      + (restaurantData?.google_maps_url ? '\n' + restaurantData.google_maps_url : ''),
+    lugar: r.direccion || r.local || '' };
+}
+function senaUtc(f){ return f.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, ''); }
+function senaGoogleCal(ev){
+  const p = new URLSearchParams({ action: 'TEMPLATE', text: ev.titulo, dates: `${senaUtc(ev.ini)}/${senaUtc(ev.fin)}`, details: ev.detalle, location: ev.lugar });
+  window.open('https://calendar.google.com/calendar/render?' + p.toString(), '_blank');
+}
+function senaIcs(ev){
+  const e = (s) => String(s || '').replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
+  const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Airis//Reservas//ES', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', 'BEGIN:VEVENT',
+    'UID:' + Date.now() + '@airisworld.com', 'DTSTAMP:' + senaUtc(new Date()), 'DTSTART:' + senaUtc(ev.ini), 'DTEND:' + senaUtc(ev.fin),
+    'SUMMARY:' + e(ev.titulo), 'DESCRIPTION:' + e(ev.detalle), 'LOCATION:' + e(ev.lugar),
+    'BEGIN:VALARM', 'TRIGGER:-PT2H', 'ACTION:DISPLAY', 'DESCRIPTION:' + e(ev.titulo), 'END:VALARM',
+    'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+  const url = URL.createObjectURL(new Blob([ics], { type: 'text/calendar;charset=utf-8' }));
+  const a = document.createElement('a');
+  a.href = url; a.download = 'reserva.ics';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+}
+function senaEsApple(){ return /iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent) && !/Chrome|CriOS|Android/.test(navigator.userAgent); }
+
+/* PANTALLAS 3 y 4 — resultado final según el estado real de la seña. */
+function senaMostrarResultado(d){
+  senaLimpiarTimers();
+  senaEstilos();
+  const box = senaCaja();
+  const estado = (d && d.estado) || 'error';
+  const r = (d && d.reserva) || {};
+  const nueva = `<button type="button" class="sn-link" id="senaNueva">${senaEsc(ST.otraReserva)}</button>`;
+
+  if(estado === 'confirmada'){
+    senaOlvidar();
+    senaCabecera(SN_SVG.ok, '#E6F6EE', ST.p3Titulo, ST.p3Texto);
+    const horas = Number(r.devolucion_horas ?? senaHorasDevolucion()) || 0;
+    const filas = [
+      r.inicio ? [ST.p3Fecha, senaFechaLinda(r.inicio, r.timezone)] : (r.fecha ? [ST.p3Fecha, `${r.fecha} · ${r.hora} ${ST.hs}`.trim()] : null),
+      r.personas ? [ST.p3Personas, [r.personas, r.salon].filter(Boolean).join(' · ')] : null,
+      r.nombre ? [ST.p3Nombre, r.nombre] : null,
+    ].filter(Boolean);
+    const ev = senaEventoCalendario(d);
+    box.innerHTML = `<div class="sn-wrap">
+      <div class="sn-rec">
+        <div class="h"><b>${senaEsc(r.local || restaurantData?.name || '')}</b><span>${senaEsc(ST.p3Encabezado)}</span></div>
+        ${filas.map(f => `<div class="sn-fila"><span>${senaEsc(f[0])}</span><b>${senaEsc(f[1])}</b></div>`).join('')}
+        <div class="sn-fila"><span>${senaEsc(ST.p3Sena)}</span><b><span class="sn-pill">✓ ${senaEsc(ST.p3Pagada(senaFmt(d.monto)))}</span></b></div>
+      </div>
+      <p class="sn-hint" style="margin:0 4px 14px">${senaEsc(ST.p3Nota(horas))}</p>
+      ${ev ? `<button type="button" class="sn-btn pri" id="senaCal">${SN_SVG.cal}${senaEsc(ST.calBtn)}</button>
+      <div class="sn-cal" id="senaCalOpc"><button type="button" data-c="g">${senaEsc(ST.calGoogle)}</button><button type="button" data-c="i">${senaEsc(ST.calOtro)}</button></div>` : ''}
+      ${nueva}
+    </div>`;
+    if(ev){
+      document.getElementById('senaCal').addEventListener('click', () => {
+        if(senaEsApple()){ senaIcs(ev); return; }
+        document.getElementById('senaCalOpc').classList.toggle('show');
+      });
+      document.querySelector('#senaCalOpc [data-c="g"]').addEventListener('click', () => senaGoogleCal(ev));
+      document.querySelector('#senaCalOpc [data-c="i"]').addEventListener('click', () => senaIcs(ev));
+    }
+  }else if(estado === 'vencida'){
+    senaOlvidar();
+    senaCabecera(SN_SVG.reloj, '#FCECEC', ST.p4Titulo, ST.p4Texto);
+    box.innerHTML = `<div class="sn-wrap">
+      <div class="sn-aviso"><b>${senaEsc(ST.p4Pagaste)}</b><br>${senaEsc(ST.p4PagasteTexto)}</div>
+      <button type="button" class="sn-btn pri" id="senaNueva">${senaEsc(ST.p4Btn)}</button>
+    </div>`;
+  }else if(estado === 'devuelta' || estado === 'devolucion_en_proceso'){
+    senaOlvidar();
+    const texto = estado === 'devolucion_en_proceso' ? ST.devProceso : (d.tarde ? ST.devTarde : ST.devCancelada);
+    senaCabecera(SN_SVG.vuelta, 'color-mix(in srgb, var(--azul) 12%, #fff)', ST.devTitulo, texto);
+    box.innerHTML = `<div class="sn-wrap">${nueva}</div>`;
+  }else if(estado === 'cancelada' || estado === 'no_encontrada'){
+    senaOlvidar();
+    senaCabecera(SN_SVG.cruz, '#FCECEC', ST.cancTitulo, estado === 'cancelada' ? ST.cancTexto : ST.noEncontrada);
+    box.innerHTML = `<div class="sn-wrap">${nueva}</div>`;
+  }else{
+    senaCabecera(SN_SVG.cruz, '#FCECEC', ST.errTitulo, ST.errTexto);
+    const guardada = senaLeer();
+    box.innerHTML = `<div class="sn-wrap"><button type="button" class="sn-btn sec" id="senaReintentar">${senaEsc(ST.errBtn)}</button>${nueva}</div>`;
+    document.getElementById('senaReintentar').addEventListener('click', () => mostrarEsperandoPago(guardada || { id: d && d.sena_id }, true));
+  }
+  const btnNueva = document.getElementById('senaNueva');
+  if(btnNueva) btnNueva.addEventListener('click', () => { window.location.href = window.location.pathname; });
+  goToStep(6);
+}
+
+/* Compatibilidad: "ver estado" de una seña (vuelta de Mercado Pago o recarga). */
+function mostrarEstadoSena(senaId){
+  const g = senaLeer();
+  const datos = (g && g.id === senaId) ? g : { id: senaId };
+  mostrarEsperandoPago(datos, true);
+}
+
+/* Si la página se abre con ?sena=<id> (vuelta de Mercado Pago), muestra el estado.
+   Limpia el ?sena= de la dirección para que recargar no repita la consulta vieja. */
 function senaRevisarVuelta(){
   const id = new URLSearchParams(window.location.search).get('sena');
-  if(id && /^[0-9a-f-]{36}$/i.test(id)){ mostrarEstadoSena(id); return true; }
+  if(id && /^[0-9a-f-]{36}$/i.test(id)){
+    try{ history.replaceState(null, '', window.location.pathname); }catch(e){}
+    mostrarEstadoSena(id);
+    return true;
+  }
   return false;
 }
 
