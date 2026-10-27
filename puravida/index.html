@@ -891,6 +891,13 @@ const SENA_TXT = {
     btnNuevaReserva: 'Hacer otra reserva',
     detalle: (r) => [r.local, r.salon, r.fecha && r.hora ? `${r.fecha} · ${r.hora} hs` : '', r.personas ? `${r.personas} personas` : ''].filter(Boolean).join(' · '),
     montoPagado: (m) => `Seña pagada: ${m} (se descuenta de tu consumo)`,
+    cancelarConDevolucion: (m) => `Te devolveremos automáticamente la seña de ${m}.`,
+    cancelarSinDevolucion: (m, h) => `Estás fuera del plazo de cancelación (hasta ${h} hs antes de la reserva), por lo que la seña de ${m} no es reembolsable.`,
+    confirmarTitulo: '¿Cancelar esta reserva?',
+    confirmarSinSena: 'Esta acción no se puede deshacer.',
+    confirmarVolver: 'Volver',
+    confirmarSi: 'Sí, cancelar',
+    filaSena: 'Seña pagada',
     consultasChip: 'Consultas',
     consultasMensaje: (rest) => `¡Hola! Quisiera hacer una consulta sobre una reserva en ${rest}.`,
   },
@@ -919,6 +926,13 @@ const SENA_TXT = {
     btnNuevaReserva: 'Make another booking',
     detalle: (r) => [r.local, r.salon, r.fecha && r.hora ? `${r.fecha} · ${r.hora}` : '', r.personas ? `${r.personas} people` : ''].filter(Boolean).join(' · '),
     montoPagado: (m) => `Deposit paid: ${m} (deducted from your bill)`,
+    cancelarConDevolucion: (m) => `Your ${m} deposit will be refunded automatically.`,
+    cancelarSinDevolucion: (m, h) => `You are past the cancellation window (up to ${h} hrs before the booking), so the ${m} deposit is non-refundable.`,
+    confirmarTitulo: 'Cancel this booking?',
+    confirmarSinSena: 'This action cannot be undone.',
+    confirmarVolver: 'Go back',
+    confirmarSi: 'Yes, cancel',
+    filaSena: 'Deposit paid',
     consultasChip: 'Questions',
     consultasMensaje: (rest) => `Hi! I'd like to ask about a reservation at ${rest}.`,
   },
@@ -947,6 +961,13 @@ const SENA_TXT = {
     btnNuevaReserva: 'Fazer outra reserva',
     detalle: (r) => [r.local, r.salon, r.fecha && r.hora ? `${r.fecha} · ${r.hora}` : '', r.personas ? `${r.personas} pessoas` : ''].filter(Boolean).join(' · '),
     montoPagado: (m) => `Sinal pago: ${m} (descontado da sua conta)`,
+    cancelarConDevolucion: (m) => `O sinal de ${m} será devolvido automaticamente.`,
+    cancelarSinDevolucion: (m, h) => `Você está fora do prazo de cancelamento (até ${h} h antes da reserva), por isso o sinal de ${m} não é reembolsável.`,
+    confirmarTitulo: 'Cancelar esta reserva?',
+    confirmarSinSena: 'Esta ação não pode ser desfeita.',
+    confirmarVolver: 'Voltar',
+    confirmarSi: 'Sim, cancelar',
+    filaSena: 'Sinal pago',
     consultasChip: 'Dúvidas',
     consultasMensaje: (rest) => `Olá! Gostaria de fazer uma consulta sobre uma reserva no ${rest}.`,
   },
@@ -1194,6 +1215,38 @@ function senaRevisarVuelta(){
   const id = new URLSearchParams(window.location.search).get('sena');
   if(id && /^[0-9a-f-]{36}$/i.test(id)){ mostrarEstadoSena(id); return true; }
   return false;
+}
+
+/* "Gestionar mi reserva": cartel propio para confirmar la cancelación (reemplaza la ventanita del navegador).
+   Devuelve una promesa: true si confirma, false si vuelve. */
+function senaConfirmarCancelacion(r){
+  return new Promise((resolver) => {
+    const fecha = r && r.reserved_at ? new Date(r.reserved_at).toLocaleString(LANG, { timeZone: restaurantData?.timezone || 'America/Argentina/Buenos_Aires', weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }) : '';
+    let aviso;
+    if(r && r.sena){
+      const m = senaFmt(r.sena.monto);
+      aviso = r.sena.devuelve
+        ? `<div style="background:color-mix(in srgb, var(--azul) 12%, transparent);border:1px solid color-mix(in srgb, var(--azul) 35%, transparent);border-radius:12px;padding:12px 14px;font-size:13.5px;line-height:1.45;color:var(--texto-oscuro,#0A0F2E)">${senaEsc(ST.cancelarConDevolucion(m))}</div>`
+        : `<div style="background:rgba(217,48,37,0.07);border:1px solid rgba(217,48,37,0.3);border-radius:12px;padding:12px 14px;font-size:13.5px;line-height:1.45;color:#8a1c14">${senaEsc(ST.cancelarSinDevolucion(m, r.sena.horas))}</div>`;
+    }else{
+      aviso = `<div style="font-size:13.5px;color:var(--texto-medio,#3a3f5c)">${senaEsc(ST.confirmarSinSena)}</div>`;
+    }
+    const capa = document.createElement('div');
+    capa.style.cssText = 'position:fixed;inset:0;z-index:200;background:rgba(10,15,46,0.55);display:flex;align-items:center;justify-content:center;padding:16px';
+    capa.innerHTML = `<div role="dialog" aria-modal="true" style="background:var(--paper,#fff);border-radius:var(--r,18px);max-width:380px;width:100%;padding:22px 20px 18px;box-shadow:0 18px 50px rgba(0,0,0,0.25)">
+      <div style="font-size:18px;font-weight:800;color:var(--texto-oscuro,#0A0F2E);margin-bottom:6px">${senaEsc(ST.confirmarTitulo)}</div>
+      <div style="font-size:13.5px;color:var(--texto-medio,#3a3f5c);margin-bottom:14px;line-height:1.45">${senaEsc([r?.room_name, fecha, r?.people_count ? r.people_count + ' ' + T.modalReservaPersonas : ''].filter(Boolean).join(' · '))}</div>
+      ${aviso}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px">
+        <button type="button" data-r="no" class="btn btn-back" style="width:100%">${senaEsc(ST.confirmarVolver)}</button>
+        <button type="button" data-r="si" class="btn btn-next" style="width:100%;background:#D93025;color:#fff">${senaEsc(ST.confirmarSi)}</button>
+      </div></div>`;
+    const cerrar = (v) => { capa.remove(); resolver(v); };
+    capa.addEventListener('click', (e) => { if(e.target === capa) cerrar(false); });
+    capa.querySelector('[data-r="no"]').addEventListener('click', () => cerrar(false));
+    capa.querySelector('[data-r="si"]').addEventListener('click', () => cerrar(true));
+    document.body.appendChild(capa);
+  });
 }
 
 
@@ -2029,15 +2082,16 @@ function renderReservasEncontradas(reservas){
       <div class="reserva-item-row"><span class="reserva-item-label">${T.summaryEspacio}</span><span class="reserva-item-val">${r.room_name}</span></div>
       <div class="reserva-item-row"><span class="reserva-item-label">${T.summaryFecha}</span><span class="reserva-item-val">${fechaLabel}</span></div>
       <div class="reserva-item-row"><span class="reserva-item-label">${T.summaryPersonas}</span><span class="reserva-item-val">${r.people_count} ${T.modalReservaPersonas}</span></div>
+      ${r.sena ? `<div class="reserva-item-row"><span class="reserva-item-label">${ST.filaSena}</span><span class="reserva-item-val">${senaFmt(r.sena.monto)}</span></div>` : ''}
       <button class="reserva-cancel-btn" data-id="${r.id}">${T.modalCancelarBtn}</button>
     `;
-    item.querySelector('.reserva-cancel-btn').addEventListener('click', (e) => cancelarReserva(r.id, e.target));
+    item.querySelector('.reserva-cancel-btn').addEventListener('click', (e) => cancelarReserva(r.id, e.target, r));
     cont.appendChild(item);
   });
 }
 
-async function cancelarReserva(reservationId, btn){
-  if(!confirm(T.modalConfirmarCancelar)) return;
+async function cancelarReserva(reservationId, btn, reserva){
+  if(!(await senaConfirmarCancelacion(reserva))) return;
 
   btn.disabled = true;
   btn.textContent = T.modalCancelando;
@@ -2051,7 +2105,7 @@ async function cancelarReserva(reservationId, btn){
     const data = await res.json();
     const cont = document.getElementById('modalResultados');
     if(data.success){
-      cont.innerHTML = `<div class="modal-msg ok">${T.modalCanceladaOk}</div>`;
+      cont.innerHTML = `<div class="modal-msg ok">${T.modalCanceladaOk}${data.sena_mensaje ? '<br>' + senaEsc(data.sena_mensaje) : ''}</div>`;
     }else{
       cont.innerHTML = `<div class="modal-msg err">${T.modalCanceladaErr}</div>`;
     }
