@@ -286,6 +286,17 @@ body{
   padding:0;margin-top:4px;
 }
 .gestionar-link:hover{color:var(--airis-blue)}
+.ubicacion-link{
+  display:none; /* se muestra por JS solo si Supabase trae la URL */
+  align-items:center;justify-content:center;gap:5px;
+  margin:0 auto;width:max-content;
+  font-family:var(--font-display);font-weight:700;font-size:11px;
+  color:#F5273B;text-shadow:0 0 4px rgba(245,39,59,0.9),0 0 10px rgba(232,56,74,0.7),0 0 20px rgba(214,40,57,0.5);
+  text-decoration:none;background:rgba(214,40,57,0.14);cursor:pointer;
+  padding:6px 14px;border-radius:100px;border:1px solid rgba(255,77,94,0.5);
+  transition:background 0.15s;
+}
+.ubicacion-link:hover{background:rgba(214,40,57,0.26)}
 .modal-overlay{
   display:none;position:fixed;inset:0;background:rgba(10,15,46,0.55);
   z-index:100;align-items:center;justify-content:center;padding:16px;
@@ -455,6 +466,10 @@ body{
 </div>
 
 <div style="text-align:center;margin-top:20px">
+  <a class="ubicacion-link" id="ubicacionLink" href="#" target="_blank" rel="noopener">📍 <span id="ubicacionLinkText"></span></a>
+</div>
+
+<div style="text-align:center;margin-top:12px">
   <button class="gestionar-link" id="abrirGestionar"></button>
 </div>
 
@@ -497,6 +512,7 @@ const TRANSLATIONS = {
     pageTitle: 'Reserva tu mesa',
     topTitle: 'Reserva tu mesa',
     topSub: 'Elige el espacio, la fecha y el horario que prefieras.',
+    verUbicacion: 'Ubicación',
     mockBanner: '⚠ Modo de prueba: horarios de ejemplo, la reserva no se crea de verdad todavía',
     progressStep: (n, total) => `Paso ${n} de ${total}`,
     stepNames: { 1: 'Elige el espacio', 2: 'Cantidad de personas', 3: 'Fecha y horario', 4: 'Tus datos', 5: 'Confirma' },
@@ -559,6 +575,7 @@ const TRANSLATIONS = {
     pageTitle: 'Book your table',
     topTitle: 'Book your table',
     topSub: 'Choose the space, date, and time you prefer.',
+    verUbicacion: 'Location',
     mockBanner: '⚠ Test mode: sample times shown, no reservation is created yet',
     progressStep: (n, total) => `Step ${n} of ${total}`,
     stepNames: { 1: 'Choose the space', 2: 'Number of guests', 3: 'Date and time', 4: 'Your details', 5: 'Confirm' },
@@ -621,6 +638,7 @@ const TRANSLATIONS = {
     pageTitle: 'Reserve sua mesa',
     topTitle: 'Reserve sua mesa',
     topSub: 'Escolha o espaço, a data e o horário que preferir.',
+    verUbicacion: 'Localização',
     mockBanner: '⚠ Modo de teste: horários de exemplo, a reserva ainda não é criada de verdade',
     progressStep: (n, total) => `Passo ${n} de ${total}`,
     stepNames: { 1: 'Escolha o espaço', 2: 'Quantidade de pessoas', 3: 'Data e horário', 4: 'Seus dados', 5: 'Confirmar' },
@@ -869,7 +887,7 @@ let restaurantData = null; // se completa con cargarRestaurante()
 async function cargarRestaurante(){
   const sb = window.supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
 
-  const columnasCompletas = 'id, name, phone_prefix, timezone, whatsapp_numero, logo_type, logo_value, color_primario, color_oscuro, color_secundario, color_texto_oscuro, color_texto_medio, color_bg, color_card, bg_image, politicas_confirmacion, open_time, close_time, ventana_reserva_restringida, mensaje_orden_llegada';
+  const columnasCompletas = 'id, name, phone_prefix, timezone, whatsapp_numero, logo_type, logo_value, color_primario, color_oscuro, color_secundario, color_texto_oscuro, color_texto_medio, color_bg, color_card, bg_image, google_maps_url, politicas_confirmacion, open_time, close_time, ventana_reserva_restringida, mensaje_orden_llegada';
   let { data, error } = await sb.from('restaurants').select(columnasCompletas).eq('slug', CONFIG.supabase.restaurantSlug).single();
 
   if(error){
@@ -919,6 +937,17 @@ function aplicarMarca(restaurante){
       logoEl.textContent = logoValue;
     }
   }
+
+  // Botón "Ver ubicación" -- 100% dinámico desde Supabase
+  // (restaurants.google_maps_url). Si la columna no existe todavía
+  // o está vacía, el botón simplemente no aparece (no rompe nada).
+  const ubicacionEl = document.getElementById('ubicacionLink');
+  if(restaurante.google_maps_url){
+    ubicacionEl.href = restaurante.google_maps_url;
+    ubicacionEl.style.display = 'inline-flex';
+  }else{
+    ubicacionEl.style.display = 'none';
+  }
 }
 
 function mostrarErrorCarga(mensaje){
@@ -938,6 +967,7 @@ function aplicarIdioma(){
   document.getElementById('pageTitle').textContent = T.pageTitle;
   document.getElementById('topTitle').textContent = T.topTitle;
   document.getElementById('topSub').textContent = T.topSub;
+  document.getElementById('ubicacionLinkText').textContent = T.verUbicacion;
   document.getElementById('mockBanner').textContent = T.mockBanner;
 
   document.getElementById('step1Title').textContent = T.step1Title;
